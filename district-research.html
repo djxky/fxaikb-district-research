@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飞象老师校园版 · 区域教育智能研究</title>
+  <script src="assets/lucide-local.js"></script>
+  <link rel="stylesheet" href="assets/district-research.css" />
+</head>
+<body>
+  <div class="research-app" id="researchApp" data-mode="brief">
+    <main class="main-stage">
+      <header class="global-header">
+        <div class="brand-lockup">
+          <div class="brand-mark"><i data-lucide="sparkles"></i></div>
+          <div><strong>飞象老师</strong><span>区域教育智能研究</span></div>
+        </div>
+        <div class="header-title">
+          <h1 id="pageTitle">区域教育智能研究</h1>
+          <span id="pageSubtitle">让每一次教育判断都有证据</span>
+        </div>
+        <div class="header-meta">
+          <div class="district-context"><span class="org-seal">海岳</span><span><strong>海岳区教育局</strong><small>教育数据可信空间</small></span></div>
+          <div class="data-freshness"><i data-lucide="shield-check"></i><span>8 个系统已授权</span><b>·</b><span>09:12 更新</span></div>
+          <button class="term-select" type="button"><i data-lucide="calendar-days"></i>2025—2026学年第二学期<i data-lucide="chevron-down"></i></button>
+        </div>
+      </header>
+
+      <section class="brief-stage view-stage" id="briefStage">
+        <div class="brief-ambient" aria-hidden="true"></div>
+        <div class="brief-wrap">
+          <div class="brief-kicker"><span></span>教育分析编译器 · ANALYSIS COMPILER</div>
+          <h2>提出任何教育问题，生成<br /><em>一项可审计的专业研究</em></h2>
+          <p class="brief-lead">AI 自动理解决策意图、组织专家方法与跨系统证据，动态生成研究计划，而不是套用固定报表。</p>
+
+          <div class="research-prompt-card">
+            <div class="prompt-topline">
+              <span class="student-context"><i data-lucide="user-round-search"></i>研究对象：林知遥 · 八年级（3）班</span>
+              <span class="privacy-context"><i data-lucide="lock-keyhole"></i>敏感数据已按局端权限脱敏</span>
+            </div>
+            <textarea id="researchPrompt" aria-label="研究指令">全面分析林知遥本学期的发展情况，识别稳定优势、需要支持的问题及跨领域关联，并给出学校可执行的支持建议；所有结论必须说明依据、反证和适用边界。</textarea>
+            <div class="query-examples" aria-label="示例研究问题">
+              <span>试试不同问题</span>
+              <span class="query-example active"><i data-lucide="user-round-search"></i>学生全面分析</span>
+              <span class="query-example"><i data-lucide="chart-no-axes-combined"></i>八年级数学为何下降</span>
+              <span class="query-example"><i data-lucide="school"></i>区域课程机会是否均衡</span>
+            </div>
+            <div class="prompt-actions">
+              <div class="scope-chips">
+                <span><i data-lucide="scan-search"></i>全面扫描</span>
+                <span><i data-lucide="git-branch"></i>动态研究计划</span>
+                <span><i data-lucide="file-check-2"></i>可审计报告</span>
+              </div>
+              <button class="primary-button" id="startResearch" type="button"><i data-lucide="play"></i>开始研究</button>
+            </div>
+          </div>
+
+          <div class="data-universe" aria-label="本次研究可调用的数据">
+            <div class="universe-label"><span>本次研究可调用</span><strong>8 个系统 · 3,612 条学生级记录 · 3 学年纵向数据</strong></div>
+            <div class="universe-items">
+              <span><i data-lucide="notebook-tabs"></i>智能作业</span>
+              <span><i data-lucide="square-pen"></i>AI 作文星</span>
+              <span><i data-lucide="clipboard-check"></i>区统测</span>
+              <span><i data-lucide="activity"></i>体质健康</span>
+              <span><i data-lucide="heart-handshake"></i>心理关爱</span>
+              <span><i data-lucide="folder-clock"></i>成长档案</span>
+              <span><i data-lucide="book-open-check"></i>阅读平台</span>
+              <span><i data-lucide="school"></i>学生管理</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="analysis-stage view-stage" id="analysisStage" aria-live="polite">
+        <div class="analysis-toolbar">
+          <div class="research-identity">
+            <span class="identity-avatar">林</span>
+            <div><strong>林知遥综合发展研究</strong><small>海岳区云岫实验学校 · 八年级（3）班 · 研究编号 HY-2026-0718-042</small></div>
+          </div>
+          <div class="analysis-status" id="analysisStatus"><span class="status-pulse"></span><strong>AI 正在建立研究计划</strong><small id="elapsedTime">00:00</small></div>
+          <div class="toolbar-actions">
+            <button type="button" class="soft-button" id="restartResearch"><i data-lucide="rotate-ccw"></i>重新演示</button>
+            <button type="button" class="soft-button" id="skipAnalysis"><i data-lucide="fast-forward"></i>快速完成</button>
+          </div>
+        </div>
+
+        <div class="research-chain-wrap">
+          <div class="research-chain" id="researchChain"></div>
+          <div class="chain-progress"><span id="chainProgress"></span></div>
+        </div>
+
+        <div class="analysis-grid">
+          <section class="analysis-canvas" id="analysisCanvas">
+            <aside class="research-framework">
+              <div class="framework-head">
+                <span>本次动态研究协议</span>
+                <strong>综合扫描 + 重点问题深挖</strong>
+                <small>根据当前问题即时生成 · 非固定模板</small>
+              </div>
+              <div class="construct-card">
+                <span class="construct-label">任务编译结果</span>
+                <h3>学生全面发展循证分析</h3>
+                <p>先检查各领域数据覆盖，再发现值得深挖的问题；证据不足的领域不形成判断。</p>
+                <div class="construct-dimensions">
+                  <span><b>01</b>全面扫描与覆盖评估</span>
+                  <span><b>02</b>关键变化与跨域关联</span>
+                  <span><b>03</b>重点问题专题深挖</span>
+                </div>
+              </div>
+              <div class="framework-source">
+                <span>理论与政策锚点</span>
+                <button type="button"><i data-lucide="landmark"></i><span><strong>义务教育质量评价指南</strong><small>发展性、过程性评价</small></span></button>
+                <button type="button"><i data-lucide="book-open-check"></i><span><strong>义务教育课程方案与标准</strong><small>核心素养与学业质量</small></span></button>
+              </div>
+              <div class="source-stack-label"><span>可调用证据源</span><b>最小必要数据</b></div>
+              <div class="source-stack" id="sourceStack"></div>
+            </aside>
+
+            <div class="inference-workbench">
+              <div class="argument-map" aria-label="证据推理结构">
+                <div class="argument-node raw"><span>01</span><strong>问题编译</strong><small>对象、范围、用途与约束</small></div>
+                <i data-lucide="arrow-right"></i>
+                <div class="argument-node observable"><span>02</span><strong>证据契约</strong><small>结论需要哪些可观察证据</small></div>
+                <i data-lucide="arrow-right"></i>
+                <div class="argument-node hypothesis"><span>03</span><strong>动态分析图</strong><small>按问题选择分析算子</small></div>
+                <i data-lucide="arrow-right"></i>
+                <div class="argument-node test"><span>04</span><strong>验证与反证</strong><small>排除替代解释与数据偏差</small></div>
+                <i data-lucide="arrow-right"></i>
+                <div class="argument-node conclusion"><span>05</span><strong>结论治理</strong><small>事实、关联、解释与建议分层</small></div>
+              </div>
+
+              <article class="active-analysis-card" id="activeAnalysisCard">
+                <div class="active-card-head">
+                  <span class="step-index" id="activeStepIndex">01</span>
+                  <div><small id="activeStepEyebrow">RESEARCH PLANNING</small><h3 id="activeStepTitle">理解任务</h3></div>
+                  <span class="running-badge" id="runningBadge"><i data-lucide="loader-circle"></i>分析中</span>
+                </div>
+                <p class="step-narrative" id="stepNarrative"></p>
+                <div class="audit-quadrants">
+                  <button class="audit-block" type="button" data-detail="method">
+                    <span><i data-lucide="flask-conical"></i>专家规则</span><strong id="methodValue"></strong><small>方法、判定规则与适用边界</small>
+                  </button>
+                  <button class="audit-block" type="button" data-detail="source">
+                    <span><i data-lucide="database-zap"></i>实际证据</span><strong id="sourceValue"></strong><small>原始字段、数量与数据血缘</small>
+                  </button>
+                  <button class="audit-block" type="button" data-detail="finding">
+                    <span><i data-lucide="scan-search"></i>本步判定</span><strong id="findingValue"></strong><small>事实、关联、假设分层表达</small>
+                  </button>
+                  <button class="audit-block" type="button" data-detail="confidence">
+                    <span><i data-lucide="badge-check"></i>证据等级</span><strong id="confidenceValue"></strong><small>完整度、一致性、独立性与反证</small>
+                  </button>
+                </div>
+                <div class="active-log" id="activeLog"></div>
+              </article>
+
+              <div class="hypothesis-stack" id="hypothesisStack">
+                <div class="hypothesis-label"><span>当前重点问题 · 学业表现分化</span><small>全面扫描后自动选择深挖方向</small></div>
+                <div class="hypothesis-grid">
+                  <div class="hypothesis-card primary-hypothesis">
+                    <span class="hypothesis-state">H1 · 当前解释</span>
+                    <strong id="hypothesisText">尚未形成研究假设</strong>
+                    <div class="confidence-meter"><span id="confidenceMeter"></span></div>
+                    <small id="hypothesisMeta">等待跨源证据</small>
+                  </div>
+                  <div class="hypothesis-card alternate"><span class="hypothesis-state">H2 · 替代解释</span><strong>近期变化可能来自试题难度与口径变化</strong><small>等待同卷难度与题型结构校验</small></div>
+                  <div class="hypothesis-card alternate"><span class="hypothesis-state">H3 · 替代解释</span><strong>表现分化可能主要由作答节奏造成</strong><small>等待限时任务与过程数据检验</small></div>
+                </div>
+                <div class="counter-card" id="counterCard"><i data-lucide="scale"></i><span><b>反证引擎待启动</b><small>将主动寻找能推翻 H1 的证据，而不是只累积支持材料</small></span></div>
+              </div>
+
+              <div class="canvas-footer">
+                <button type="button" class="play-control" id="pauseAnalysis"><i data-lucide="pause"></i><span>暂停研究</span></button>
+                <div class="footer-progress"><span id="footerProgressText">正在准备研究环境</span><b id="evidenceCount">0 条证据</b></div>
+                <button type="button" class="report-button" id="generateReport" disabled><i data-lucide="file-check-2"></i>生成循证研究报告</button>
+              </div>
+            </div>
+          </section>
+
+          <aside class="evidence-panel">
+            <div class="panel-heading">
+              <div><span class="live-dot"></span><strong>实时证据流</strong><small id="evidenceSummary">证据将在分析过程中持续汇入</small></div>
+              <button type="button" aria-label="筛选证据"><i data-lucide="list-filter"></i></button>
+            </div>
+            <div class="evidence-list" id="evidenceList">
+              <div class="evidence-empty"><i data-lucide="radar"></i><strong>等待证据汇入</strong><span>AI 将显示来源、方法、时间与可信度</span></div>
+            </div>
+            <div class="evidence-audit-footer"><i data-lucide="shield-check"></i><span>本次研究已开启完整审计留痕</span></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="report-stage view-stage" id="reportStage">
+        <div class="report-toolbar">
+          <div>
+            <button type="button" class="back-button" id="backToAnalysis"><i data-lucide="arrow-left"></i>返回分析过程</button>
+            <span class="report-saved"><i data-lucide="circle-check"></i>研究报告已生成并完成一致性检查</span>
+          </div>
+          <div>
+            <button type="button" class="soft-button" id="openMethodology"><i data-lucide="book-open-text"></i>方法与数据附录</button>
+            <button type="button" class="soft-button" id="printReport"><i data-lucide="printer"></i>打印 / 导出 PDF</button>
+          </div>
+        </div>
+
+        <div class="report-scroll" id="reportScroll">
+          <article class="research-report">
+            <header class="report-cover">
+              <div class="cover-topline"><span>海岳区教育智能研究中心</span><span>研究编号 HY-2026-0718-042</span></div>
+              <div class="cover-grid">
+                <div class="cover-copy">
+                  <span class="report-type">学生全面发展循证分析</span>
+                  <h2>林知遥综合发展<br />循证研究报告</h2>
+                  <p>2025—2026学年第二学期</p>
+                  <div class="cover-meta"><span>研究对象：林知遥</span><span>学校：海岳区云岫实验学校</span><span>生成时间：2026-07-18 10:37</span></div>
+                </div>
+                <div class="trust-seal">
+                  <div class="seal-ring"><strong>A</strong><span>数据质量等级</span></div>
+                  <p><i data-lucide="shield-check"></i>6 类有效来源交叉验证</p>
+                  <p><i data-lucide="scan-search"></i>3 项反证完成检查</p>
+                  <p><i data-lucide="user-check"></i>建议由教研员复核后使用</p>
+                </div>
+              </div>
+              <div class="cover-statement"><i data-lucide="quote"></i><p>本学期共形成 2 项高证据等级优势、1 项需要支持的问题；另有 2 个发展领域因数据覆盖不足不作判断。重点问题并非普遍知识缺失，更可能与限时基础计算稳定性和作答节奏有关。</p></div>
+            </header>
+
+            <div class="report-body-grid">
+              <aside class="report-toc">
+                <span>报告目录</span>
+                <a href="#executive" class="active">01 核心结论</a>
+                <a href="#growth">02 综合发展图谱</a>
+                <a href="#findings">03 关键发现与证据</a>
+                <a href="#innovation">04 重点问题深挖</a>
+                <a href="#support">05 支持建议</a>
+                <a href="#regional">06 区域升维洞察</a>
+                <a href="#methodology">07 方法与数据附录</a>
+              </aside>
+
+              <div class="report-content">
+                <section class="report-section" id="executive">
+                  <div class="section-number">01</div>
+                  <div class="section-heading"><span>EXECUTIVE SUMMARY</span><h3>核心结论</h3><p>先给判断，再给证据与边界。</p></div>
+                  <div class="executive-grid">
+                    <div class="primary-conclusion">
+                      <span class="conclusion-tag">主要发现 · A 级证据</span>
+                      <h4>高阶任务表现持续改善，但基础稳定性限制了优势向常规成绩转化。</h4>
+                      <p>过去 18 周中，开放性数学任务与写作实质性修改持续改善；常规成绩未同步提升，重点差异集中在限时基础计算和作答节奏。</p>
+                      <button type="button" class="evidence-link" data-report-evidence="transfer"><i data-lucide="waypoints"></i>查看 27 条核心证据</button>
+                    </div>
+                    <div class="boundary-note">
+                      <span><i data-lucide="triangle-alert"></i>结论边界</span>
+                      <p>这是教育支持研究，不是能力定级。研究未使用家庭背景和心理咨询原文，也未对数据不足的品德发展、审美素养生成替代分数。</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="report-section" id="growth">
+                  <div class="section-number">02</div>
+                  <div class="section-heading"><span>DEVELOPMENT COVERAGE</span><h3>全面发展扫描</h3><p>先展示证据覆盖，再展示可被数据支持的发展发现。</p></div>
+                  <div class="growth-layout">
+                    <div class="chart-panel radar-panel">
+                      <div class="chart-title"><strong>五个发展领域证据覆盖</strong><span>数据覆盖率 · 不是学生得分</span></div>
+                      <canvas id="radarChart" width="420" height="330"></canvas>
+                    </div>
+                    <div class="growth-facts">
+                      <div><span>学业发展</span><strong>96<em>%</em></strong><small>可形成主要结论</small></div>
+                      <div><span>身心发展</span><strong>81<em>%</em></strong><small>体质可分析，心理原文不调用</small></div>
+                      <div><span>劳动与社会实践</span><strong>68<em>%</em></strong><small>仅形成探索性发现</small></div>
+                      <div class="needs-support"><span>审美与品德</span><strong>—</strong><small>覆盖不足，本次不判断</small></div>
+                    </div>
+                  </div>
+                  <div class="trend-panel">
+                    <div class="chart-title"><strong>18 周关键指标变化</strong><span>稳健趋势估计 · 已剔除缺勤与异常作答</span></div>
+                    <canvas id="trendChart" width="900" height="270"></canvas>
+                  </div>
+                </section>
+
+                <section class="report-section" id="findings">
+                  <div class="section-number">03</div>
+                  <div class="section-heading"><span>KEY FINDINGS</span><h3>关键发现与证据</h3><p>每个结论同时呈现支持证据、反证与可信度。</p></div>
+                  <div class="finding-list">
+                    <article class="finding-row">
+                      <span class="finding-rank">A</span>
+                      <div class="finding-copy"><h4>开放任务迁移能力持续增强</h4><p>在 37 道新情境开放题中，能够主动调用两个以上知识点完成解释的比例从 54% 上升至 78%。</p><div class="finding-sources"><span>智能作业 37 题</span><span>区统测 11 题</span><span>科技项目 4 次</span></div></div>
+                      <div class="finding-confidence"><strong>92%</strong><span>高可信</span><small>3 源一致</small></div>
+                    </article>
+                    <article class="finding-row">
+                      <span class="finding-rank">B</span>
+                      <div class="finding-copy"><h4>跨学科表达已形成稳定风格</h4><p>作文中的科学类比、证据引用和观点自我修正显著高于配对组，但语言规范性仍存在波动。</p><div class="finding-sources"><span>作文星 14 篇</span><span>47 次修改</span><span>教师评语 22 条</span></div></div>
+                      <div class="finding-confidence"><strong>89%</strong><span>高可信</span><small>教师复核一致率 0.86</small></div>
+                    </article>
+                    <article class="finding-row caution">
+                      <span class="finding-rank">C</span>
+                      <div class="finding-copy"><h4>基础计算稳定性限制优势转化</h4><p>复杂任务表现较好，但限时情境下基础计算错误率升高。该问题更接近节奏与稳定性，而非概念缺失。</p><div class="finding-sources"><span>智能作业 624 题</span><span>6 次统测</span><span>订正记录 83 条</span></div></div>
+                      <div class="finding-confidence"><strong>82%</strong><span>中高可信</span><small>存在情境差异</small></div>
+                    </article>
+                  </div>
+                </section>
+
+                <section class="report-section" id="innovation">
+                  <div class="section-number">04</div>
+                  <div class="section-heading"><span>FOCUSED DIAGNOSIS</span><h3>重点问题深挖</h3><p>为什么高阶任务表现提升，但常规成绩没有同步改善？</p></div>
+                  <div class="innovation-matrix">
+                    <div class="matrix-axis"><span>竞争性解释</span><span>支持证据</span><span>反证结果</span><span>证据等级</span><span>研究判断</span></div>
+                    <div><strong>基础稳定性</strong><span>624 道基础题</span><span>限时错误集中</span><span class="strength high">B</span><b>主要解释</b></div>
+                    <div><strong>作答节奏</strong><span>2 次限时任务</span><span>非限时表现稳定</span><span class="strength medium">B</span><b>部分成立</b></div>
+                    <div><strong>试题难度变化</strong><span>6 次同卷校验</span><span>变化不足以解释</span><span class="strength medium">C</span><b>基本排除</b></div>
+                    <div><strong>缺勤或参与下降</strong><span>158 日出勤</span><span>出勤稳定</span><span class="strength medium">C</span><b>排除</b></div>
+                  </div>
+                  <div class="counter-evidence-report"><i data-lucide="scale"></i><div><strong>反证没有被隐藏</strong><p>常规考试总分仅处于年级第 58 百分位，且两次限时任务表现回落。这说明潜质信号尚未稳定转化为普遍学业优势。</p></div></div>
+                </section>
+
+                <section class="report-section" id="support">
+                  <div class="section-number">05</div>
+                  <div class="section-heading"><span>ACTION PLAN</span><h3>学校支持建议</h3><p>建议均标记责任角色、观察周期和验证指标。</p></div>
+                  <div class="action-plan">
+                    <article><span class="action-time">未来 2 周</span><h4>确认基础稳定性问题来源</h4><p>由数学教师使用 2 次低压力短测区分计算熟练度、作答节奏与注意分配，不直接增加重复练习量。</p><footer><span>责任人：数学教师</span><span>验证：同类错误率下降 ≥ 20%</span></footer></article>
+                    <article><span class="action-time">未来 8 周</span><h4>提供开放任务持续观察场</h4><p>纳入跨学科项目小组，每两周保留一次问题提出、方案修正和反思记录，观察优势是否跨场景稳定。</p><footer><span>责任人：项目教师</span><span>验证：迁移行为连续出现 ≥ 3 次</span></footer></article>
+                    <article><span class="action-time">学期末复核</span><h4>召开一次多角色证据复核</h4><p>班主任、学科教师与教研员共同复核证据，不将 AI 结论直接写入正式评价或升学材料。</p><footer><span>责任人：学校教研组</span><span>验证：人工意见一致度</span></footer></article>
+                  </div>
+                </section>
+
+                <section class="report-section regional-section" id="regional">
+                  <div class="section-number">06</div>
+                  <div class="section-heading"><span>REGIONAL INSIGHT</span><h3>从一个学生，升维到区域行动</h3><p>在同一证据标准下识别相似群体，不做简单成绩筛选。</p></div>
+                  <div class="regional-hero">
+                    <div><span>区域相似潜质信号学生</span><strong>143<em>人</em></strong><p>分布于 28 所学校，其中 87 人的高阶表现尚未稳定反映在常规成绩中。</p></div>
+                    <div><span>证据充足可进入人工复核</span><strong>61<em>人</em></strong><p>至少 3 类独立来源、持续 12 周以上，且已完成反证检查。</p></div>
+                    <div><span>课程供给关联信号</span><strong>9<em>校</em></strong><p>相似学生集中，但开放项目课程供给明显不足；该结果仅代表关联，需实地验证。</p></div>
+                  </div>
+                  <div class="regional-recommendation"><span>区域建议 01</span><h4>建立“发现—观察—支持—复核”的区域创新潜质培养机制</h4><p>先在 6 所学校开展一学期试点，用统一证据标准持续观察学生，不以一次测评建立名单；同步补充项目式课程和教师观察工具。</p><button type="button"><i data-lucide="map"></i>查看区域专题研究草案</button></div>
+                </section>
+
+                <section class="report-section methodology-section" id="methodology">
+                  <div class="section-number">07</div>
+                  <div class="section-heading"><span>METHODOLOGY &amp; PROVENANCE</span><h3>研究方法与数据来源</h3><p>任何结论都可以回到原始来源、适用范围与限制条件。</p></div>
+                  <div class="method-grid">
+                    <div><span>研究任务编译</span><strong>对象—范围—用途—边界</strong><p>将自然语言问题转换为可执行研究任务，高风险用途必须先确认。</p></div>
+                    <div><span>趋势判断</span><strong>Theil–Sen 稳健斜率</strong><p>降低极端值和偶发缺勤对趋势判断的影响，至少 8 个有效时间点才形成结论。</p></div>
+                    <div><span>同伴对照</span><strong>同年级同基础配对组</strong><p>从 1,248 名学生中按基线成绩、年级和学习机会匹配 186 人作为参照。</p></div>
+                    <div><span>跨源验证</span><strong>教育证据三角验证</strong><p>只有来自至少两个独立系统且方向一致的信号，才进入主要发现。</p></div>
+                  </div>
+                  <div class="source-table-wrap">
+                    <table class="source-table">
+                      <thead><tr><th>数据来源</th><th>本次引用</th><th>时间范围</th><th>质量检查</th><th>授权范围</th></tr></thead>
+                      <tbody>
+                        <tr><td>飞象智能作业</td><td>186 次作业 / 2,843 道题</td><td>2025-09—2026-07</td><td><span class="quality-pass">完整度 98.7%</span></td><td>学生级明细</td></tr>
+                        <tr><td>飞象 AI 作文星</td><td>14 篇作文 / 47 次修改</td><td>2025-09—2026-06</td><td><span class="quality-pass">师机一致率 0.86</span></td><td>正文已脱敏</td></tr>
+                        <tr><td>海岳区统测平台</td><td>6 次统测 / 782 个题目结果</td><td>2025-10—2026-06</td><td><span class="quality-pass">身份匹配 100%</span></td><td>区域统测授权</td></tr>
+                        <tr><td>国家学生体质健康</td><td>3 学期 / 18 项指标</td><td>2025-03—2026-06</td><td><span class="quality-pass">有效记录 17/18</span></td><td>趋势信号</td></tr>
+                        <tr><td>学生成长档案</td><td>42 条记录 / 4 个项目</td><td>2024-09—2026-07</td><td><span class="quality-pass">双人审核 37 条</span></td><td>校内授权</td></tr>
+                        <tr><td>心理关爱平台</td><td>3 次支持信号</td><td>2025-09—2026-06</td><td><span class="quality-pass">仅使用分级结果</span></td><td>原文不可见</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="report-disclaimer"><i data-lucide="shield-alert"></i><p><strong>重要说明：</strong>本报告为教育支持决策提供研究证据，不替代教师、心理专业人员或教育行政部门的正式判断。涉及学生发展机会、资源配置和评价记录的决定，必须经过有权限人员复核。</p></div>
+                </section>
+
+                <footer class="report-footer"><span>飞象区域教育智能研究中心</span><span>数据使用全程留痕 · 报告校验码 7F3A-91C2-HY42</span><span>第 1 / 1 版</span></footer>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <div class="detail-drawer" id="detailDrawer" aria-hidden="true">
+      <button class="drawer-scrim" id="closeDrawerScrim" type="button" aria-label="关闭详情"></button>
+      <aside class="drawer-panel">
+        <div class="drawer-head"><div><span id="drawerEyebrow">分析节点详情</span><h3 id="drawerTitle">分析方法</h3></div><button type="button" id="closeDrawer"><i data-lucide="x"></i></button></div>
+        <div class="drawer-content" id="drawerContent"></div>
+      </aside>
+    </div>
+
+    <div class="report-generation" id="reportGeneration" aria-hidden="true">
+      <div class="generation-card">
+        <div class="generation-orbit"><i data-lucide="file-check-2"></i><span></span></div>
+        <h3>正在生成双层研究报告</h3>
+        <p id="generationText">正在组织学生级证据链……</p>
+        <div class="generation-steps" id="generationSteps">
+          <span class="active">学生结论复核</span><span>方法附录</span><span>区域相似群体</span><span>一致性检查</span>
+        </div>
+        <div class="generation-progress"><span id="generationProgress"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/district-research.js"></script>
+</body>
+</html>

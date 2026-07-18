@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞象老师校园版 · 搜索应用</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/page-header.css" />
+<link rel="stylesheet" href="assets/review.css" />
+<style>
+  :root{--bg:#faf9f6;--surface:#fff;--ink:#111110;--muted:#6b6a65;--faint:#a19f99;--line:rgba(0,0,0,.07);--line-strong:rgba(0,0,0,.14);--gold:#a87e2c;--gold-bg:#fbf5e6;--radius:16px}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  button,input{font:inherit;border:0;background:none;outline:0}
+  button{cursor:pointer}
+  .app{height:100vh;display:grid;grid-template-columns:240px minmax(0,1fr)}
+  .main{display:flex;flex-direction:column;overflow-y:auto}
+  .search-head{position:sticky;top:0;z-index:10;padding:18px 40px 0;background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4)}
+  .search-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .back-btn{width:34px;height:34px;border-radius:10px;color:var(--muted);display:grid;place-items:center}
+  .back-btn:hover{background:#f1f0ec;color:var(--ink)}
+  .search-box{height:42px;min-width:300px;width:min(520px,58vw);display:flex;align-items:center;gap:10px;padding:0 14px;border:1px solid var(--line);border-radius:21px;background:#fff;transition:border-color .15s,box-shadow .15s}
+  .search-box:focus-within{border-color:rgba(168,126,44,.42);box-shadow:0 0 0 3px rgba(168,126,44,.09)}
+  .search-box [data-lucide]{width:16px;height:16px;color:var(--muted);flex-shrink:0}
+  .search-box input{flex:1;min-width:0;font-size:15px}
+  .search-submit{height:34px;padding:0 16px;border-radius:17px;background:var(--gold-bg);color:#7a5d20;font-size:13px;font-weight:650}
+  .search-submit:hover{background:#f4e7c4}
+  .subject-tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
+  .subject-tabs::-webkit-scrollbar{display:none}
+  .subject-tab{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;padding:8px 18px;border-radius:18px;color:var(--muted);font-size:13.5px;font-weight:500;white-space:nowrap;transition:background .15s,color .15s}
+  .subject-tab:hover{color:var(--ink);background:#f1f0ec}
+  .subject-tab.active{color:#7a5d20;background:var(--gold-bg);font-weight:650}
+  .grid-wrap{width:100%;max-width:1480px;margin:0 auto;padding:28px 40px 80px}
+  .content-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+  .app-card{display:flex;flex-direction:column;overflow:hidden;min-height:226px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:inherit;text-decoration:none;transition:border-color .18s,box-shadow .18s,transform .18s}
+  .app-card:hover{border-color:var(--line-strong);box-shadow:0 12px 28px rgba(0,0,0,.06);transform:translateY(-2px)}
+  .app-cover{position:relative;height:126px;display:grid;place-items:center;color:rgba(255,255,255,.84)}
+  .bg-grad-1{background:linear-gradient(135deg,#edf5ee,#c8e0cd)}.bg-grad-2{background:linear-gradient(135deg,#f5f0f6,#ddc8e3)}.bg-grad-3{background:linear-gradient(135deg,#eff4f9,#c8d8e8)}.bg-grad-4{background:linear-gradient(135deg,#fdfaf3,#f0deb3)}.bg-grad-5{background:linear-gradient(135deg,#fbf0f1,#ecc7ca)}.bg-grad-6{background:linear-gradient(135deg,#f7f2e8,#e3d4ae)}.bg-grad-7{background:linear-gradient(135deg,#f1f3f5,#cdd5dd)}.bg-grad-8{background:linear-gradient(135deg,#fbf3eb,#f0d3b8)}.bg-grad-10{background:linear-gradient(135deg,#ecf3f0,#c2d7cd)}
+  .app-cover-icon{opacity:.46}.app-cover-icon svg{width:42px;height:42px}
+  .app-tag{position:absolute;top:12px;left:12px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.78);color:var(--muted);font-size:11px;font-weight:650}
+  .app-tag.locked{color:#7c5f21;background:rgba(255,255,255,.88);border:1px solid rgba(168,126,44,.22)}
+  .app-stats{position:absolute;right:12px;bottom:10px;display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;background:rgba(0,0,0,.16);color:#fff;font-size:11px;font-weight:650}
+  .app-body{display:flex;flex-direction:column;gap:8px;flex:1;padding:16px 16px 15px}
+  .app-title{color:var(--ink);font-size:15.5px;line-height:1.35;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .app-desc{color:var(--muted);font-size:13px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .app-author{display:flex;align-items:center;gap:8px;margin-top:auto;color:var(--faint);font-size:12px}
+  .author-avatar{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+  .app-author-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .app-favorite{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 8px;border-radius:7px;color:var(--faint);font-size:12px;font-weight:600;flex-shrink:0;transition:background .12s,color .12s}
+  .app-favorite:hover{background:#f3f1ed;color:#8a6720}.app-favorite.is-on{color:#8a6720;background:#fbf5e6}.app-favorite svg{width:13px;height:13px}.app-favorite.is-on svg{fill:currentColor}
+  .empty{grid-column:1/-1;padding:64px 0;color:var(--faint);text-align:center}
+  @media (max-width:1280px){.content-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.search-head,.grid-wrap{padding-left:28px;padding-right:28px}}
+  @media (max-width:960px){.content-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:720px){.app{grid-template-columns:1fr}.content-grid{grid-template-columns:1fr}.search-row{align-items:stretch}.search-box{width:100%;min-width:0}}
+</style>
+</head>
+<body data-page="app-search">
+<div class="app">
+  <aside id="feixiang-sidebar"></aside>
+  <main class="main">
+    <div class="search-head">
+      <div class="search-row">
+        <button class="back-btn" type="button" title="返回应用广场" onclick="location.href='app-square.html'"><i data-lucide="chevron-left"></i></button>
+        <label class="search-box">
+          <i data-lucide="search"></i>
+          <input id="search-input" type="text" autocomplete="off" placeholder="快速搜索应用">
+        </label>
+        <button class="search-submit" id="search-submit" type="button" data-track="/click/feixiangCampusAppSquarePage/search | 搜索应用 | appSource#STRING">搜索</button>
+      </div>
+      <div class="subject-tabs" id="subject-tabs">
+        <button class="subject-tab" data-tab="official" data-track="/click/feixiangCampusAppSquarePage/selectSource | 切换应用来源 | appSource#STRING">飞象官方</button>
+        <button class="subject-tab" data-tab="global" data-track="/click/feixiangCampusAppSquarePage/selectSource | 切换应用来源 | appSource#STRING">飞象老师精选</button>
+        <button class="subject-tab" data-tab="school" data-track="/click/feixiangCampusAppSquarePage/selectSource | 切换应用来源 | appSource#STRING">本校应用</button>
+      </div>
+    </div>
+    <div class="grid-wrap"><div class="content-grid" id="grid"></div></div>
+  </main>
+</div>
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('apps');</script>
+<script>
+  const APPS = [
+    { id:'ai-qbank', title:'AI 校本题库', desc:'把知识库里的题目结构化展示，方便老师查看、筛选、组题与收藏。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', favorites:942, icon:'file-stack', grad:4, cat:['official'], contract:'active', url:'ai-qbank.html' },
+    { id:'ai-record', title:'AI 录题', desc:'上传本地 PDF / Word 自动解析题目，老师校对后入题库。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', favorites:420, icon:'scan-search', grad:6, cat:['official'], contract:'active', url:'ai-record-jobs.html' },
+    { id:'ai-essay-star', title:'飞象 AI 作文星', desc:'作文批改、讲评和成长档案，沉淀学生写作过程。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', favorites:860, icon:'file-text', grad:1, cat:['official'], contract:'active', url:'essay-star-home.html' },
+    { id:'smart-homework', title:'飞象智能作业', desc:'布置、批改和分析作业，生成班级掌握情况。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', favorites:618, icon:'clipboard-list', grad:4, cat:['official'], contract:'locked', landingUrl:'official-app-landing.html?app=smart-homework' },
+    { id:'feixiang-classroom', title:'飞象人工智能通识课', desc:'承接人工智能通识课程内容、课堂使用和学习反馈，帮助学校开展 AI 通识教学。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', favorites:536, icon:'presentation', grad:10, cat:['official'], contract:'active', url:'https://ke.feixiangxingqiu.com/#/lesson-list' },
+    { id:'notify', title:'家长会通知生成器', desc:'输入开会时间和重点，自动生成得体、专业的家长会邀请函及群通知。', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', badge:'精选', usage:'3.2w', favorites:276, icon:'mail', grad:3, cat:['global'] },
+    { id:'lesson-plan', title:'智能教案排版', desc:'输入教学目标和知识点，一键生成符合学校标准格式的 Word 教案。', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', badge:'精选', usage:'8.9w', favorites:345, icon:'file-text', grad:4, cat:['global'] },
+    { id:'speaking', title:'英语口语对练 Agent', desc:'模拟真实对话场景，支持语音输入，自动纠正语法和发音错误。', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', badge:'精选', usage:'21.3w', favorites:1120, icon:'mic', grad:6, cat:['global'] },
+    { id:'sports-signup', title:'运动会报名收集', desc:'快速生成报名表单，自动校验每人限报项目数，一键导出 Excel。', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', badge:'精选', usage:'1.1w', favorites:203, icon:'clipboard-list', grad:7, cat:['global'] },
+    { id:'classic-game', title:'文言文情景闯关 (H5)', desc:'将枯燥的文言文背诵转化为互动文字游戏，学生扫码即可在手机上游玩。', author:'李素芬', avatar:'李', avatarColor:'#81628f', badge:'本校', usage:'842', favorites:189, icon:'gamepad-2', grad:2, cat:['school'] },
+    { id:'finance', title:'班费记账本 (Web App)', desc:'轻量级班费管理工具，支持扫码记账、自动生成月度收支图表。', author:'王建华', avatar:'王', avatarColor:'#4a755b', badge:'本校', usage:'156', favorites:31, icon:'pie-chart', grad:5, cat:['school'] },
+    { id:'chemistry-lab', title:'化学实验模拟器', desc:'H5 互动小应用，拖拽烧杯和试剂，安全模拟危险化学反应现象。', author:'赵明杰', avatar:'赵', avatarColor:'#a8626c', badge:'本校', usage:'420', favorites:88, icon:'flask-conical', grad:8, cat:['school'] }
+  ];
+  const ICONS = {
+    'bar-chart-2':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    'gamepad-2':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258A4 4 0 0 0 17.32 5z"/></svg>',
+    'mail':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+    'presentation':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></svg>',
+    'file-stack':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 2H8a2 2 0 0 0-2 2v12"/><path d="M18 6H10a2 2 0 0 0-2 2v12"/><path d="M12 10h8v12h-8z"/></svg>',
+    'scan-search':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><circle cx="11" cy="11" r="3"/><path d="m16 16-2.2-2.2"/></svg>',
+    'file-text':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>',
+    'pie-chart':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>',
+    'mic':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>',
+    'clipboard-list':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/></svg>',
+    'flask-conical':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/></svg>'
+  };
+  const TAB_LABELS = { official:'飞象官方', global:'飞象老师精选', school:'本校应用' };
+  const params = new URLSearchParams(location.search);
+  let query = params.get('q') || '';
+  let tab = ['official','global','school'].includes(params.get('tab')) ? params.get('tab') : 'official';
+  const input = document.getElementById('search-input');
+  const grid = document.getElementById('grid');
+  input.value = query;
+  function esc(value){ return String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+  function updateUrl(){
+    const next = new URLSearchParams({ q: query, tab });
+    history.replaceState(null, '', `app-search.html?${next.toString()}`);
+  }
+  function render(){
+    document.querySelectorAll('.subject-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+    const q = query.trim().toLowerCase();
+    const list = APPS.filter(app => app.cat.includes(tab) && (!q || (app.title + app.desc + app.author).toLowerCase().includes(q)));
+    grid.innerHTML = list.length ? list.map(app => {
+      const isOfficial = app.cat.includes('official');
+      const isLocked = isOfficial && app.contract === 'locked';
+      const href = isLocked ? app.landingUrl : (app.url || `app-detail.html?app=${encodeURIComponent(app.id)}`);
+      const stats = isOfficial ? '' : `<span class="app-stats"><i data-lucide="eye"></i>${esc(app.usage)}</span>`;
+      const tag = isLocked ? '<span class="app-tag locked">未开通</span>' : (isOfficial ? '' : `<span class="app-tag">${esc(app.badge)}</span>`);
+      return `<a class="app-card ${isLocked ? 'is-locked' : ''}" href="${esc(href)}" target="_blank" rel="noopener" data-track="/click/feixiangCampusAppSquarePage/openApp | 打开应用 | appSource#STRING">
+        <div class="app-cover bg-grad-${app.grad}">${tag}<div class="app-cover-icon">${ICONS[app.icon] || ''}</div>${stats}</div>
+        <div class="app-body">
+          <div class="app-title">${esc(app.title)}</div>
+          <div class="app-desc">${esc(app.desc)}</div>
+          <div class="app-author">
+            <div class="author-avatar" style="background:${esc(app.avatarColor)}">${esc(app.avatar)}</div>
+            <span class="app-author-name">${esc(app.author)}</span>
+            <span class="app-favorite" role="button" tabindex="0" data-favorite data-count="${Number(app.favorites)||0}" title="收藏"><i data-lucide="star"></i><span>${Number(app.favorites)||0}</span></span>
+          </div>
+        </div>
+      </a>`;
+    }).join('') : '<div class="empty">暂时没有匹配的应用</div>';
+    if(window.lucide) lucide.createIcons();
+    bindFavorites();
+    updateUrl();
+  }
+  function submit(){
+    query = input.value.trim();
+    if(!query){ input.focus(); return; }
+    render();
+  }
+  function bindFavorites(){
+    grid.querySelectorAll('[data-favorite]').forEach(btn => {
+      btn.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const on = btn.classList.toggle('is-on');
+        const base = Number(btn.dataset.count) || 0;
+        btn.querySelector('span').textContent = String(base + (on ? 1 : 0));
+      });
+    });
+  }
+  document.getElementById('search-submit').addEventListener('click', submit);
+  input.addEventListener('keydown', event => {
+    if(event.key === 'Enter' && !event.isComposing){ event.preventDefault(); submit(); }
+  });
+  document.getElementById('subject-tabs').addEventListener('click', event => {
+    const btn = event.target.closest('.subject-tab');
+    if(!btn) return;
+    tab = btn.dataset.tab || 'official';
+    render();
+  });
+  render();
+</script>
+<template id="review-template">
+{
+  "title": "搜索应用 · 结果页",
+  "summary": "搜索应用页用于在当前来源范围内查找应用，并把可用应用、未开通官方应用和普通详情页分流到对应承接页。",
+  "sections": [
+    {
+      "id": "app-search-filter",
+      "title": "1. 搜索与分类筛选",
+      "body": "老师输入关键词后，在当前应用分类内查看匹配结果，并可切换应用来源范围。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：从应用广场发起搜索或直接进入搜索页的老师。",
+            "用途：按关键词和来源范围查找应用。",
+            "产出：当前来源范围内的应用结果列表和 链接状态。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "进入搜索页",
+              "text": "读取链接中的关键词和来源范围；搜索框回填关键词，来源分类高亮当前范围。"
+            },
+            {
+              "label": "提交搜索",
+              "text": "点击搜索按钮或按 Enter，按应用名称、说明和作者匹配当前来源范围内应用，并同步页面状态。"
+            },
+            {
+              "label": "切换来源",
+              "text": "点击飞象官方、飞象老师精选、本校应用后，在同一关键词下刷新结果。"
+            },
+            {
+              "label": "清空搜索",
+              "text": "点击清空后保留当前来源范围，回到该来源的默认应用列表。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "空关键词提交时不刷新结果，焦点回到搜索框。",
+            "搜索只在当前来源范围内生效，不跨标签页 混排。",
+            "未开通官方应用展示未开通标识，点击进入官方应用落地页。",
+            "本校应用作者展示校园版老师身份信息。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "搜索条件展示关键词、来源范围、应用类型和当前页。",
+            "从应用广场进入时需要保留来源范围。",
+            "结果列表展示匹配数量、无结果状态和清空入口。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "链接状态缺失",
+              "处理方式": "使用默认来源范围并展示空关键词状态。"
+            },
+            {
+              "场景": "无搜索结果",
+              "处理方式": "展示空状态，保留关键词和来源范围。"
+            },
+            {
+              "场景": "搜索框为空",
+              "处理方式": "不提交搜索，焦点回到搜索框。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "app-square.html",
+              "说明": "应用广场搜索入口来源。"
+            },
+            {
+              "关联对象": "app-detail.html",
+              "说明": "普通应用详情承接页。"
+            },
+            {
+              "关联对象": "official-app-landing.html",
+              "说明": "未开通官方应用介绍页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "输入关键词后结果按关键词收敛。",
+            "切换来源后搜索条件不丢失。",
+            "无结果时展示清空筛选入口。",
+            "页面文案不出现技术参数名。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "app-result-card",
+      "title": "2. 应用结果卡片",
+      "body": "结果卡片帮助老师判断应用来源、可用状态和后续动作。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：查看搜索结果的老师。",
+            "用途：判断应用能否直接使用、需要查看详情还是需要申请开通。",
+            "产出：进入功能页、应用详情页或未开通官方应用介绍页。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开应用",
+              "text": "点击卡片主体后按应用状态跳转；可用应用进入功能页或详情，未开通官方应用进入落地页。"
+            },
+            {
+              "label": "收藏应用",
+              "text": "点击收藏按钮只切换当前卡片收藏态，页面不跳转。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "卡片主体和收藏按钮的点击行为分离。",
+            "未开通官方应用不直接跳业务系统。",
+            "收藏不改变应用来源或学校开通状态。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "应用结果卡片展示应用名称、来源、适用场景、可用状态和操作入口。",
+            "官方、学校和个人应用需要区分来源。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "应用已下架",
+              "处理方式": "点击时提示不可用，并保留结果列表。"
+            },
+            {
+              "场景": "收藏失败",
+              "处理方式": "保留原状态并提示稍后重试。"
+            },
+            {
+              "场景": "未开通官方应用",
+              "处理方式": "进入官方应用能力介绍页，不进入业务系统。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "app-detail.html",
+              "说明": "可查看应用介绍、预览和添加分享。"
+            },
+            {
+              "关联对象": "official-app-landing.html",
+              "说明": "承接未开通官方应用。"
+            },
+            {
+              "关联对象": "my-apps.html",
+              "说明": "收藏后的应用可回到我的作品查看。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "结果卡片入口进入正确详情页。",
+            "无权限应用有明确状态。",
+            "收藏或添加状态展示正确。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>

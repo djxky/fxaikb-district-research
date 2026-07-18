@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞象老师校园版 · 资源广场</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/page-header.css" />
+<link rel="stylesheet" href="assets/ai-create-dock.css" />
+<style>
+  :root {
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --ink: #111110;
+    --muted: #6b6a65;
+    --faint: #a19f99;
+    --line: rgba(0, 0, 0, 0.06);
+    --line-strong: rgba(0, 0, 0, 0.12);
+    --gold: #a87e2c;
+    --gold-soft: #fbf5e6;
+    --green: #4a755b;
+    --green-soft: #eaf3ed;
+    --blue: #53759e;
+    --blue-soft: #edf3f8;
+    --purple: #81628f;
+    --purple-soft: #f4eff5;
+    --rose: #a8626c;
+    --rose-soft: #f8eff0;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+    background: var(--bg); color: var(--ink);
+    font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input { font: inherit; border: 0; background: none; outline: 0; }
+  button { cursor: pointer; transition: all 0.2s ease; }
+
+  .app { height: 100vh; display: grid; grid-template-columns: 240px minmax(0, 1fr); }
+  .main {
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+
+  /* ===== page-header 在资源广场页不吸顶 · 标题区随滚动消失 =====
+     浏览资源时关心的是"我在哪个学科"，不是"页面叫什么" */
+  .page-header[data-page-header="resource-square"] {
+    position: static;
+  }
+
+	  /* ===== 学科 Tab 栏 · 吸顶（带搜索） ===== */
+  .page-head-tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 0 40px;
+    position: sticky; top: 0; z-index: 10;
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    background: rgba(255, 255, 255, 0.92);
+  }
+  .tabs-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 0;
+  }
+  .tabs-row .source-tabs-row {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-bottom: 0;
+  }
+	  .tabs-row .head-actions {
+	    display: flex; align-items: center; gap: 10px;
+	    flex-shrink: 0;
+	  }
+  .search-shell{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .search-shell .search-submit{
+    display:none;
+    height:34px;
+    padding:0 14px;
+    border-radius:17px;
+    background:var(--gold-soft);
+    color:var(--gold);
+    font-size:13px;
+    font-weight:650;
+    white-space:nowrap;
+  }
+  .search-shell:focus-within .search-submit,
+  .search-shell.has-value .search-submit{
+    display:inline-flex;
+    align-items:center;
+  }
+  .search-shell .search-submit:hover{background:#f4e7c4}
+	  .source-tabs-row {
+	    display: flex; align-items: center; gap: 6px;
+	    padding: 0 0 10px;
+	  }
+  .head-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .page-title-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .page-subtitle { font-size: 13px; color: var(--muted); }
+
+  .head-actions { display: flex; align-items: center; gap: 10px; }
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--line);
+    padding: 8px 14px; border-radius: 22px;
+    width: 280px;
+    transition: all 0.2s;
+  }
+  .search-box:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(168,126,44,0.08); }
+  .search-box input { flex: 1; font-size: 13px; min-width: 0; }
+  .search-box input::placeholder { color: var(--faint); }
+  .search-box svg { color: var(--faint); flex-shrink: 0; }
+
+	  /* ===== 学科 Tab 横向 ===== */
+  .subject-tabs {
+    display: flex; gap: 4px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scrollbar-width: none;
+  }
+  .subject-tabs::-webkit-scrollbar { display: none; }
+  .subject-tab {
+    padding: 8px 18px;
+    border-radius: 18px;
+    font-size: 13.5px; font-weight: 500;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 4px;
+    transition: all 0.2s;
+  }
+	  .subject-tab:hover { color: var(--ink); background: var(--bg); }
+		  .subject-tab.active {
+		    color: var(--gold);
+		    background: var(--gold-soft);
+		    font-weight: 600;
+		  }
+		  .advanced-filters {
+		    display: none;
+		    padding: 0 0 14px;
+		  }
+		  .advanced-filters.is-visible {
+		    display: grid;
+		    gap: 8px;
+		  }
+		  .filter-row {
+		    display: flex;
+		    align-items: center;
+		    gap: 8px;
+		    min-width: 0;
+		    overflow-x: auto;
+		    scrollbar-width: none;
+		  }
+		  .filter-row::-webkit-scrollbar { display: none; }
+		  .filter-label {
+		    color: var(--muted);
+		    font-size: 12.5px;
+		    white-space: nowrap;
+		    flex: 0 0 auto;
+		  }
+		  .filter-chip {
+		    height: 28px;
+		    padding: 0 12px;
+		    border-radius: 9px;
+		    color: var(--muted);
+		    font-size: 12.5px;
+		    white-space: nowrap;
+		    flex: 0 0 auto;
+		  }
+		  .filter-chip:hover { color: var(--ink); background: var(--bg); }
+		  .filter-chip.active {
+		    color: #07563f;
+		    background: var(--green-soft);
+		    font-weight: 600;
+		  }
+		  .source-tab {
+		    height: 30px;
+	    padding: 0 12px;
+	    border-radius: 15px;
+	    color: var(--muted);
+	    font-size: 12.5px;
+	    font-weight: 500;
+	    white-space: nowrap;
+	  }
+	  .source-tab:hover { color: var(--ink); background: var(--bg); }
+	  .source-tab.active {
+	    color: var(--gold);
+	    background: var(--gold-soft);
+	    font-weight: 600;
+	  }
+  .new-badge {
+    background: #e65252; color: #fff;
+    font-size: 9px; font-weight: 700;
+    padding: 1px 4px; border-radius: 3px;
+    line-height: 1.4;
+  }
+
+  /* ===== 卡片网格 ===== */
+  .grid-wrap { padding: 28px 40px 60px; max-width: 1480px; margin: 0 auto; width: 100%; }
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+	  .card {
+	    background: var(--surface); border: 1px solid var(--line);
+	    border-radius: var(--radius-lg); overflow: hidden;
+	    display: flex; flex-direction: column;
+	    text-align: left;
+	    cursor: pointer;
+	    transition: all 0.25s;
+	    text-decoration: none; color: inherit;
+	  }
+  .card:hover {
+    border-color: var(--line-strong);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+  }
+
+  .card-cover {
+    height: 130px; position: relative;
+    display: grid; place-items: center;
+    color: rgba(255,255,255,0.85);
+  }
+  .card-cover.mint   { background: linear-gradient(135deg, #edf5ee, #c8e0cd); }
+  .card-cover.lilac  { background: linear-gradient(135deg, #f5f0f6, #ddc8e3); }
+  .card-cover.sky    { background: linear-gradient(135deg, #eff4f9, #c8d8e8); }
+  .card-cover.cream  { background: linear-gradient(135deg, #fdfaf3, #f0deb3); }
+  .card-cover.coral  { background: linear-gradient(135deg, #fbf0f1, #ecc7ca); }
+  .card-cover.sand   { background: linear-gradient(135deg, #f7f2e8, #e3d4ae); }
+  .card-cover.mist   { background: linear-gradient(135deg, #f1f3f5, #cdd5dd); }
+  .card-cover.peach  { background: linear-gradient(135deg, #fbf3eb, #f0d3b8); }
+
+  .card-cover-icon {
+    opacity: 0.45;
+  }
+  .card-cover-icon svg { width: 38px; height: 38px; }
+
+  .card-tag {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; color: var(--ink);
+  }
+  .card-tag.gold { color: var(--gold); }
+  .card-stats {
+    position: absolute; bottom: 12px; right: 12px;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #fff;
+    padding: 3px 8px; border-radius: 6px;
+    font-size: 10.5px; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .card-title {
+    font-size: 14px; font-weight: 600; line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 40px;
+  }
+  .card-author {
+    margin-top: auto; display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--muted);
+    padding-top: 4px;
+  }
+  .author-avatar {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--line-strong);
+    display: grid; place-items: center;
+    font-size: 11px; color: #fff; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .card-author-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card-fav {
+    display: inline-flex; align-items: center; gap: 3px;
+    height: 24px;
+    padding: 0 7px;
+    border-radius: 7px;
+    border: 0;
+    background: transparent;
+    color: var(--faint);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .card-fav:hover { background: var(--bg); color: var(--gold); }
+  .card-fav.is-on { background: var(--gold-soft); color: var(--gold); }
+  .card-fav svg { width: 12px; height: 12px; }
+  .card-fav.is-on svg { fill: currentColor; }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 1280px) {
+    .content-grid { grid-template-columns: repeat(3, 1fr); }
+    .grid-wrap, .page-head { padding-left: 28px; padding-right: 28px; }
+  }
+  @media (max-width: 960px) {
+    .content-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body>
+
+<div class="app">
+  <aside id="feixiang-sidebar"></aside>
+
+  <main class="main">
+    <!-- 统一页面顶栏 · page-header（在本页不吸顶，随滚动消失） -->
+    <header class="page-header" data-page-header="resource-square" data-scroll-target=".main">
+      <div class="ph-left">
+        <i class="ph-icon" data-lucide="layout-grid"></i>
+        <h1 class="ph-title">资源广场</h1>
+      </div>
+    </header>
+
+	    <!-- 来源一级 + 学科二级 · 吸顶 · 内含搜索 -->
+	    <div class="page-head-tabs">
+	      <div class="tabs-row">
+	        <div class="source-tabs-row" id="source-tabs">
+	          <button class="source-tab active" data-source="global" data-track="/click/feixiangCampusResourceSquarePage/selectSource | 切换资源来源 | resourceSource#STRING">飞象老师精选</button>
+	          <button class="source-tab" data-source="school" data-track="/click/feixiangCampusResourceSquarePage/selectSource | 切换资源来源 | resourceSource#STRING">本校资源</button>
+	        </div>
+	        <div class="head-actions">
+	          <div class="search-shell" id="resource-search-shell">
+	            <label class="ph-search">
+	              <i data-lucide="search"></i>
+	              <input id="resource-search" type="text" placeholder="快速搜索资源">
+	            </label>
+	            <button class="search-submit" id="resource-search-submit" type="button" data-track="/click/feixiangCampusResourceSquarePage/search | 搜索资源 | resourceSource#STRING">搜索</button>
+	          </div>
+	        </div>
+	      </div>
+		      <div class="subject-tabs" id="subject-tabs"></div>
+		      <div class="advanced-filters" id="advanced-filters" aria-label="资源筛选"></div>
+		    </div>
+
+    <div class="grid-wrap">
+      <div class="content-grid" id="grid">
+        <!-- 16 张卡片由下方 JS 渲染 -->
+      </div>
+    </div>
+
+    <!-- 给 dock 让出底部空间 -->
+    <div class="ai-dock-spacer"></div>
+  </main>
+
+  <!-- AI 创造入口 · 浏览-创造闭环 -->
+	  <aside class="ai-dock"
+	         data-ai-panel="true"
+	         data-kind="资源"
+	         data-placeholders="互动课件｜帮我生成初英人教七下U1 Grammar Focus的互动课件，通过精简而高效的语言活动，帮助学生掌握并巩固与动物相关的词汇、句型及原因状语从句引导词because的用法。|教学游戏｜以《西游记》取经之路为故事线，生成六年级课内古诗词闯关游戏，让学生在游戏化体验中变“被动背诵”为“主动探究”。|教学动画｜设计初中数学勾股定理互动教学活动，引导学生主动探究，培养几何直观、逻辑推理能力。|AI 组题｜帮我生成一份北京朝阳区七年级上册数学期末考试模拟题">
+	    <div class="ai-dock-input-wrap">
+	      <div class="ai-dock-mode-row">
+	        <button type="button" class="ai-dock-upload-card">
+	          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/></svg>
+	          <span>上传附件</span>
+	        </button>
+	      </div>
+	      <div class="ai-dock-input-line">
+	        <span class="ai-dock-default-mode">
+	          <i data-lucide="sparkles"></i>
+	          <span>AI 生成</span>
+	        </span>
+	        <span class="ai-dock-mode" style="display:none"></span>
+	        <textarea class="ai-dock-input" rows="1" autocomplete="off"
+	                  placeholder="描述你想要的资源…"></textarea>
+	      </div>
+	      <div class="ai-dock-panel" aria-label="AI 生成能力">
+	        <div class="ai-dock-attach-actions" aria-label="添加附件">
+	          <button class="ai-dock-attach-btn" type="button" title="添加文件">
+	            <i data-lucide="paperclip"></i>
+	          </button>
+	          <button class="ai-dock-attach-btn" type="button" title="添加图片">
+	            <i data-lucide="image"></i>
+	          </button>
+	        </div>
+	        <div class="ai-dock-chip-list"></div>
+	      </div>
+	    </div>
+    <div class="ai-dock-actions">
+      <button class="ai-dock-btn" type="button" title="语音输入" onclick="alert('（演示）语音输入')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+      </button>
+	      <button class="ai-dock-btn ai-dock-send" type="button" title="发送(Enter)">
+	        <i data-lucide="arrow-up"></i>
+	      </button>
+	    </div>
+	  </aside>
+</div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('resources');</script>
+<script src="assets/page-header.js"></script>
+<script src="assets/ai-create-dock.js?v=resource-dock-ai-panel"></script>
+
+<script>
+	  // ====== mock 资源数据 ======
+	  const RESOURCES = [
+	    { title: '《荷塘月色》画面捕捉法 · 课堂活动', tag: '课件', tagClass: '', cover: 'mint', subject: 'chinese', source: 'school', author: '王老师', avatar: '王', avatarColor: '#4a755b', views: '4.9万', fav: 821, icon: 'book-open' },
+	    { title: '文言虚词配对小游戏 · 必考 12 个', tag: '互动动画', tagClass: '', cover: 'lilac', subject: 'chinese', source: 'global', author: '程伟老师', avatar: '程', avatarColor: '#53759e', views: '3.2万', fav: 412, icon: 'gamepad-2' },
+	    { title: '现代散文阅读 5 步法 · 附课堂讲义', tag: 'PPT', tagClass: '', cover: 'sky', subject: 'chinese', source: 'global', author: '教OD和PU的Judy', avatar: 'J', avatarColor: '#8a6b9f', views: '2.8万', fav: 356, icon: 'presentation' },
+	    { title: '议论文 8 大常用角度 + 范文导读', tag: '范文', tagClass: '', cover: 'cream', subject: 'chinese', source: 'global', author: '雪儿', avatar: '雪', avatarColor: '#6f8fb8', views: '8.1万', fav: 1240, icon: 'crown' },
+	    { title: '二次函数图像与性质 · 互动动画', tag: '互动动画', tagClass: '', cover: 'sky', subject: 'math', source: 'school', author: '张老师', avatar: '张', avatarColor: '#53759e', views: '5.4万', fav: 678, icon: 'shapes' },
+	    { title: '初中几何辅助线 12 招 · 解题模板', tag: '题单', tagClass: '', cover: 'sand', subject: 'math', source: 'school', author: '刘老师', avatar: '刘', avatarColor: '#a87e2c', views: '6.7万', fav: 932, icon: 'compass' },
+	    { title: '相似三角形判定与应用 · 中考冲刺', tag: '题单', tagClass: '', cover: 'cream', subject: 'math', source: 'global', author: '小叶老师用AI', avatar: '叶', avatarColor: '#5f8f72', views: '7.5万', fav: 1102, icon: 'crown' },
+	    { title: '一次函数实际应用题 · 速解技巧', tag: '课件', tagClass: '', cover: 'mint', subject: 'math', source: 'school', author: '黄老师', avatar: '黄', avatarColor: '#4a755b', views: '3.6万', fav: 489, icon: 'book-open' },
+	    { title: '高中英语完形填空高频词 200 个', tag: '题单', tagClass: '', cover: 'lilac', subject: 'english', source: 'global', author: 'May老师', avatar: 'M', avatarColor: '#8a6b9f', views: '4.3万', fav: 612, icon: 'spell-check' },
+	    { title: '英语作文万能开头与结尾模板', tag: '范文', tagClass: '', cover: 'mist', subject: 'english', source: 'global', author: '陈老师讲英语', avatar: '陈', avatarColor: '#6f8fb8', views: '3.9万', fav: 521, icon: 'pen-tool' },
+	    { title: '牛顿三大定律 · 经典实验视频集', tag: '视频', tagClass: '', cover: 'coral', subject: 'physics', source: 'global', author: '杨老师', avatar: '杨', avatarColor: '#b16d76', views: '2.5万', fav: 348, icon: 'play-circle' },
+	    { title: '电路图解题 7 步法 · 含中考真题', tag: '课件', tagClass: '', cover: 'sky', subject: 'physics', source: 'school', author: '周老师', avatar: '周', avatarColor: '#53759e', views: '3.1万', fav: 412, icon: 'zap' },
+	    { title: '化学方程式配平大全 · 初三总复习', tag: '题单', tagClass: '', cover: 'mint', subject: 'chemistry', source: 'school', author: '赵老师', avatar: '赵', avatarColor: '#4a755b', views: '4.0万', fav: 583, icon: 'flask-conical' },
+	    { title: '细胞分裂动画演示 · 减数分裂全过程', tag: '互动动画', tagClass: '', cover: 'peach', subject: 'biology', source: 'global', author: '林木木', avatar: '林', avatarColor: '#5f8f72', views: '2.2万', fav: 287, icon: 'dna' },
+	    { title: '中国近代史时间轴 · 互动梳理', tag: '互动动画', subject: 'history', tagClass: '', cover: 'sand', source: 'global', author: '赵老师7420780', avatar: '赵', avatarColor: '#a87e2c', views: '1.9万', fav: 245, icon: 'landmark' },
+	    { title: '世界气候类型分布 · 高考填图集训', tag: '题单', tagClass: '', cover: 'mist', subject: 'geography', source: 'global', author: '云朵地理', avatar: '云', avatarColor: '#53759e', views: '2.4万', fav: 312, icon: 'globe' },
+	  ];
+
+  const ICON_SVG = {
+    'book-open':    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+    'gamepad-2':    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>',
+    'presentation': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></svg>',
+    'crown':        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>',
+    'shapes':       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3 4 9h8z"/><circle cx="17" cy="7" r="3"/><rect x="4" y="13" width="8" height="8" rx="1"/><path d="M14 13h7v8h-7z"/></svg>',
+    'compass':      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+    'spell-check':  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m6 16 6-12 6 12"/><path d="M8 12h8"/><path d="m16 20 2 2 4-4"/></svg>',
+    'pen-tool':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>',
+    'play-circle':  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
+    'zap':          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    'flask-conical':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>',
+    'dna':          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M2 9c6.667 6 13.333 0 20 6"/><path d="M14 6h.01M9 11h.01M14 16h.01M9 19h.01"/></svg>',
+    'landmark':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>',
+    'globe':        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+  };
+
+		  const SUBJECT_LABELS = {
+		    all: '推荐',
+		    chinese: '语文',
+		    math: '数学',
+		    english: '英语',
+		    physics: '物理',
+		    chemistry: '化学',
+		    biology: '生物',
+		    history: '历史',
+		    geography: '地理',
+		    politics: '政治',
+		    it: '信息技术',
+		    art: '艺术体育'
+		  };
+
+		  const SUBJECT_ORDER = ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'history', 'geography', 'politics', 'it', 'art'];
+		  const FEATURED_SUBJECTS = ['all', ...SUBJECT_ORDER];
+		  const FEATURED_FILTERS_BY_SUBJECT = {
+		    chinese: [
+		      { key: 'textbook', label: '教材', options: ['不限', '人教版', '部编版', '苏教版'] },
+		      { key: 'grade', label: '年级', options: ['不限', '七年级', '八年级', '九年级', '高中'] },
+		      { key: 'genre', label: '文体', options: ['不限', '现代文', '文言文', '古诗词', '作文'] }
+		    ],
+		    math: [
+		      { key: 'textbook', label: '教材', options: ['不限', '人教版', '北师大版', '苏教版'] },
+		      { key: 'grade', label: '年级', options: ['不限', '一年级', '二年级', '三年级', '四年级', '五年级', '六年级', '七年级', '八年级', '九年级', '高中'] },
+		      { key: 'term', label: '期次', options: ['不限', '上册', '下册'] }
+		    ],
+		    english: [
+		      { key: 'textbook', label: '教材', options: ['不限', '人教版', '外研版', '译林版'] },
+		      { key: 'grade', label: '年级', options: ['不限', '七年级', '八年级', '九年级', '高中'] },
+		      { key: 'skill', label: '能力', options: ['不限', '词汇', '语法', '阅读', '写作', '听说'] }
+		    ],
+		    physics: [
+		      { key: 'grade', label: '年级', options: ['不限', '八年级', '九年级', '高中'] },
+		      { key: 'module', label: '模块', options: ['不限', '力学', '电学', '光学', '热学', '实验'] },
+		      { key: 'type', label: '类型', options: ['不限', '课件', '题单', '实验视频', '互动动画'] }
+		    ],
+		    chemistry: [
+		      { key: 'grade', label: '年级', options: ['不限', '九年级', '高中'] },
+		      { key: 'module', label: '模块', options: ['不限', '方程式', '实验', '物质性质', '计算题'] },
+		      { key: 'type', label: '类型', options: ['不限', '课件', '题单', '实验视频', '知识梳理'] }
+		    ],
+		    biology: [
+		      { key: 'grade', label: '年级', options: ['不限', '七年级', '八年级', '高中'] },
+		      { key: 'module', label: '模块', options: ['不限', '细胞', '遗传', '生态', '人体', '实验'] },
+		      { key: 'type', label: '类型', options: ['不限', '课件', '动画', '题单', '实验视频'] }
+		    ],
+		    history: [
+		      { key: 'stage', label: '学段', options: ['不限', '初中', '高中'] },
+		      { key: 'period', label: '时期', options: ['不限', '中国古代史', '中国近代史', '世界史'] },
+		      { key: 'type', label: '类型', options: ['不限', '时间轴', '课件', '题单', '史料导读'] }
+		    ],
+		    geography: [
+		      { key: 'stage', label: '学段', options: ['不限', '初中', '高中'] },
+		      { key: 'module', label: '模块', options: ['不限', '地图', '气候', '区域地理', '自然地理', '人文地理'] },
+		      { key: 'type', label: '类型', options: ['不限', '填图', '课件', '题单', '互动活动'] }
+		    ],
+		    politics: [
+		      { key: 'stage', label: '学段', options: ['不限', '初中', '高中'] },
+		      { key: 'module', label: '模块', options: ['不限', '道德与法治', '经济', '政治', '哲学', '时政'] },
+		      { key: 'type', label: '类型', options: ['不限', '课件', '案例', '题单', '议题活动'] }
+		    ],
+		    it: [
+		      { key: 'stage', label: '学段', options: ['不限', '小学', '初中', '高中'] },
+		      { key: 'module', label: '模块', options: ['不限', '编程', '算法', '数据', '人工智能', '网络安全'] },
+		      { key: 'type', label: '类型', options: ['不限', '项目', '课件', '练习', '工具'] }
+		    ]
+		  };
+
+		  let currentSubject = 'all';
+		  let currentSource = 'global';
+		  const currentFilters = {};
+
+		  function getSubjectsForSource(source) {
+		    if (source === 'global') return FEATURED_SUBJECTS;
+		    const available = new Set(
+		      RESOURCES
+		        .filter(resource => resource.source === source)
+		        .map(resource => resource.subject)
+		    );
+		    return SUBJECT_ORDER.filter(subject => available.has(subject));
+		  }
+
+		  function renderSubjectTabs() {
+		    const tabs = document.getElementById('subject-tabs');
+		    const subjects = getSubjectsForSource(currentSource);
+		    if (!subjects.includes(currentSubject)) {
+		      currentSubject = subjects[0] || 'all';
+		    }
+		    tabs.innerHTML = subjects.map(subject => `
+		      <button class="subject-tab ${subject === currentSubject ? 'active' : ''}" data-subject="${subject}">
+		        ${SUBJECT_LABELS[subject] || subject}
+		        ${currentSource === 'global' && subject === 'math' ? '<span class="new-badge">NEW</span>' : ''}
+		      </button>
+		    `).join('');
+		  }
+
+		  function renderAdvancedFilters() {
+		    const filters = document.getElementById('advanced-filters');
+		    const subjectFilters = FEATURED_FILTERS_BY_SUBJECT[currentSubject] || [];
+		    const shouldShow = currentSource === 'global' && currentSubject !== 'all' && subjectFilters.length > 0;
+		    filters.classList.toggle('is-visible', shouldShow);
+		    if (!shouldShow) {
+		      filters.innerHTML = '';
+		      return;
+		    }
+		    filters.innerHTML = subjectFilters.map(filter => {
+		      const activeKey = `${currentSubject}:${filter.key}`;
+		      const activeValue = currentFilters[activeKey] || '不限';
+		      return `
+			      <div class="filter-row" data-filter="${filter.key}">
+			        <span class="filter-label">${filter.label}：</span>
+			        ${filter.options.map(option => `
+			          <button class="filter-chip ${activeValue === option ? 'active' : ''}" data-value="${option}">
+			            ${option}
+			          </button>
+			        `).join('')}
+			      </div>
+		      `;
+		    }).join('');
+		  }
+
+	  function renderCards() {
+	    const grid = document.getElementById('grid');
+	    const list = RESOURCES.filter(r => {
+	      const subjectMatched = currentSubject === 'all' || r.subject === currentSubject;
+	      const sourceMatched = r.source === currentSource;
+	      return subjectMatched && sourceMatched;
+	    });
+
+	    if (list.length === 0) {
+	      grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 60px 0; color: var(--muted);">当前筛选暂无资源，敬请期待</div>';
+	      return;
+	    }
+
+	    grid.innerHTML = list.map(r => `
+      <a class="card" href="resource-detail.html?resource=${encodeURIComponent(r.title)}" data-track="/click/feixiangCampusResourceSquarePage/openResource | 打开资源 | resourceSource#STRING,contentType#STRING">
+        <div class="card-cover ${r.cover}">
+          <span class="card-tag ${r.tagClass}">${r.tag}</span>
+          <div class="card-cover-icon">${ICON_SVG[r.icon] || ''}</div>
+          <span class="card-stats">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            ${r.views}
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">${r.title}</div>
+          <div class="card-author">
+            <div class="author-avatar" style="background: ${r.avatarColor}">${r.avatar}</div>
+            <span class="card-author-name">${r.author}</span>
+            <span class="card-fav" role="button" tabindex="0" data-favorite data-count="${r.fav}" title="收藏">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 10 17 15 18 22 12 18 6 22 7 15 2 10 9 9 12 2"/></svg>
+              <span>${r.fav}</span>
+            </span>
+          </div>
+        </div>
+      </a>
+    `).join('');
+    bindFavoriteButtons(grid);
+  }
+
+  function bindFavoriteButtons(scope){
+    scope.querySelectorAll('[data-favorite]').forEach(btn => {
+      btn.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const on = btn.classList.toggle('is-on');
+        const base = Number(btn.dataset.count) || 0;
+        btn.querySelector('span').textContent = String(base + (on ? 1 : 0));
+      });
+    });
+  }
+
+		  document.getElementById('subject-tabs').addEventListener('click', event => {
+		    const tab = event.target.closest('.subject-tab');
+		    if (!tab) return;
+		    currentSubject = tab.dataset.subject || 'all';
+		    renderSubjectTabs();
+		    renderAdvancedFilters();
+		    renderCards();
+		  });
+
+		  document.getElementById('advanced-filters').addEventListener('click', event => {
+		    const chip = event.target.closest('.filter-chip');
+		    if (!chip) return;
+		    const row = chip.closest('.filter-row');
+		    if (!row) return;
+		    currentFilters[`${currentSubject}:${row.dataset.filter}`] = chip.dataset.value || '不限';
+		    renderAdvancedFilters();
+		  });
+
+	  document.querySelectorAll('.source-tab').forEach(tab => {
+	    tab.addEventListener('click', () => {
+		      document.querySelectorAll('.source-tab').forEach(t => t.classList.remove('active'));
+		      tab.classList.add('active');
+		      currentSource = tab.dataset.source || 'global';
+		      const nextSubjects = getSubjectsForSource(currentSource);
+		      currentSubject = currentSource === 'global' ? 'all' : (nextSubjects[0] || 'all');
+		      renderSubjectTabs();
+		      renderAdvancedFilters();
+		      renderCards();
+		    });
+		  });
+
+		  const resourceSearch = document.getElementById('resource-search');
+		  const resourceSearchShell = document.getElementById('resource-search-shell');
+		  const resourceSearchSubmit = document.getElementById('resource-search-submit');
+		  function updateResourceSearchState(){
+		    if(!resourceSearch || !resourceSearchShell) return;
+		    resourceSearchShell.classList.toggle('has-value', !!resourceSearch.value.trim());
+		  }
+		  function goResourceSearch(){
+		    if(!resourceSearch) return;
+		    const q = resourceSearch.value.trim();
+		    if(!q){
+		      resourceSearch.focus();
+		      return;
+		    }
+		    const params = new URLSearchParams({ q, source: currentSource, subject: currentSubject });
+		    window.location.href = `resource-search.html?${params.toString()}`;
+		  }
+		  if(resourceSearch){
+		    resourceSearch.addEventListener('input', updateResourceSearchState);
+		    resourceSearch.addEventListener('keydown', event => {
+		      if(event.key === 'Enter' && !event.isComposing){
+		        event.preventDefault();
+		        goResourceSearch();
+		      }
+		    });
+		  }
+		  if(resourceSearchSubmit) resourceSearchSubmit.addEventListener('click', goResourceSearch);
+
+		  // 初始渲染
+		  renderSubjectTabs();
+		  renderAdvancedFilters();
+		  renderCards();
+		  updateResourceSearchState();
+
+  // 初始化 lucide 图标
+  if (window.lucide) lucide.createIcons();
+</script>
+
+<template id="review-template">
+{
+  "title": "资源广场 · 发现可复用教学资源",
+  "summary": "资源广场帮助老师发现飞象老师精选或本校可复用教学资源，支持筛选、收藏、复制改造和进入详情。",
+  "sections": [
+    {
+      "id": "resource-square-list",
+      "title": "1. 资源列表",
+      "body": "资源列表以卡片展示课件、教案、题单、活动方案等资源，突出来源、适用场景和可复用动作。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：寻找教学资源的老师。",
+            "用途：浏览课件、教案、题单、活动方案等可复用资源。",
+            "展示项：资源类型、来源、适用场景和可复用动作。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "浏览资源",
+              "text": "老师进入资源广场后默认看到飞象老师精选的推荐资源。"
+            },
+            {
+              "label": "查看卡片",
+              "text": "卡片展示资源名称、类型、来源、学科、年级、更新时间。"
+            },
+            {
+              "label": "进入详情",
+              "text": "点击卡片进入资源详情。"
+            },
+            {
+              "label": "快捷操作",
+              "text": "在卡片上可收藏或复制改造，受权限限制。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "资源来源只区分飞象老师精选和本校资源。",
+            "校园版老师收藏飞象老师精选资源或本校资源后，都进入校园版我的收藏或我的作品；飞象老师精选资源的收藏状态在校园版和个人版双端同步，本校资源只在校园版展示和收藏。",
+            "飞象老师精选标签页 下展示推荐和具体分类，资源排序、卡片信息和空状态与飞象老师个人版资源广场保持一致。",
+            "飞象老师精选资源的卡片头像和作者昵称展示个人版 C 端创作者 用户身份信息，不统一展示为飞象老师精选。",
+            "本校资源是本校老师、备课组或学校沉淀并在校内可见的资源池，只服务本校场景，不混入飞象老师精选资源。",
+            "通过校园版创建的资源进入本校资源后，卡片作者/创建者展示校园版老师身份信息，不展示个人版创作者身份信息。",
+            "二级分类由当前来源下的资源内容生成；飞象老师精选展示推荐和完整分类，默认进入推荐；本校资源只展示本校已有资源分类，不展示推荐。",
+            "切换到本校资源后，默认选中本校资源下第一个可用分类；如果本校只有少量资源，则二级分类也会相应减少。",
+            "飞象老师精选点击具体二级分类后，如该分类有下级标签则展示；不同分类的下级标签不同，也可能没有下级标签；本校资源不使用个人版精选细筛。",
+            "复制改造生成老师个人副本，不修改原资源。",
+            "无权限资源不能查看完整内容或复制。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "资源卡片展示资源名称、类型、来源、学科、年级、作者、更新时间、收藏状态、权限状态和点击去向。",
+            "飞象老师精选资源作者展示个人版创作者身份信息；本校资源作者展示校园版老师身份信息。",
+            "收藏信息需要区分内容来源和所属空间；飞象老师精选使用同一收藏状态，本校资源只在校园版空间生效。",
+            "飞象老师精选使用个人版资源广场同一套精选资源、推荐排序和标签页。",
+            "本校资源使用学校维度的数据权限和校内资源池，来源包括本校老师创建、备课组共建、学校知识库沉淀或校内共享资源。",
+            "本校资源的二级分类来自 AI 对本校资源的分类结果；分类集合随本校资源内容变化。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "资源无权限",
+              "处理方式": "显示摘要和权限提示，禁用复制。"
+            },
+            {
+              "场景": "资源已下架",
+              "处理方式": "卡片灰态或不展示。"
+            },
+            {
+              "场景": "列表为空",
+              "处理方式": "展示空状态和清空筛选入口。"
+            },
+            {
+              "场景": "本校资源暂无内容",
+              "处理方式": "展示本校空状态，引导老师从我的作品、学校知识库或资源详情的一键改编沉淀校内资源。"
+            },
+            {
+              "场景": "本校资源没有某个分类",
+              "处理方式": "不展示该分类，不保留空标签页。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "resource-detail.html",
+              "说明": "卡片进入资源详情。"
+            },
+            {
+              "关联对象": "my-apps.html",
+              "说明": "收藏或复制后的资源进入校园版我的作品。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "部分资源可关联学校知识库资料。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "复制改造不修改原资源。",
+            "无权限资源不能完整打开。",
+            "收藏状态与校园版我的作品同步。",
+            "飞象老师精选资源在个人版和校园版收藏状态一致；个人版不展示校园版本校资源。",
+            "飞象老师精选资源卡片不统一展示“飞象老师精选”头像或昵称。",
+            "本校资源列表不出现推荐和精选细筛。",
+            "本校资源分类只来自本校已有资源，不能展示空分类。"
+          ]
+        },
+        {
+          "title": "内容来源与数据归属",
+          "type": "table",
+          "columns": [
+            "内容类型",
+            "校园版可见",
+            "个人版可见",
+            "收藏状态",
+            "创建/复制/发布归属"
+          ],
+          "rows": [
+            {
+              "内容类型": "飞象老师精选应用/资源",
+              "校园版可见": "可见",
+              "个人版可见": "可见",
+              "收藏状态": "双端同步",
+              "创建/复制/发布归属": "复制或改编后按当前空间生成副本"
+            },
+            {
+              "内容类型": "飞象官方应用",
+              "校园版可见": "可见",
+              "个人版可见": "不可见",
+              "收藏状态": "仅校园版",
+              "创建/复制/发布归属": "不进入个人版"
+            },
+            {
+              "内容类型": "本校应用/资源",
+              "校园版可见": "可见",
+              "个人版可见": "不可见",
+              "收藏状态": "仅校园版",
+              "创建/复制/发布归属": "属于学校空间或校园版个人工作区"
+            },
+            {
+              "内容类型": "校园版自创应用/资源",
+              "校园版可见": "按学校权限可见",
+              "个人版可见": "不可见",
+              "收藏状态": "仅校园版",
+              "创建/复制/发布归属": "属于校园版"
+            },
+            {
+              "内容类型": "个人版自创应用/资源",
+              "校园版可见": "不自动进入",
+              "个人版可见": "可见",
+              "收藏状态": "仅个人版",
+              "创建/复制/发布归属": "属于个人版"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resource-square-filter",
+      "title": "2. 分类筛选",
+      "body": "分类筛选帮助老师先按飞象老师精选、本校资源选择来源；输入关键词后进入资源搜索页，并保留当前来源和二级分类。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要定位资源的老师。",
+            "用途：按飞象老师精选、本校资源和二级分类筛选资源。",
+            "产出：来源范围、分类上下文和资源搜索页参数。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "输入关键词",
+              "text": "老师按资源名、知识点或作者输入关键词，搜索按钮在输入态展示。"
+            },
+            {
+              "label": "切换分类",
+              "text": "先选择飞象老师精选或本校资源；飞象老师精选下默认进入推荐，老师可切换推荐或具体二级分类。"
+            },
+            {
+              "label": "切到本校资源",
+              "text": "老师切到本校资源后，系统展示本校资源下 AI 生成的二级分类，并默认选中第一个可用分类。"
+            },
+            {
+              "label": "精选细筛",
+              "text": "在飞象老师精选下点击具体二级分类后，如果该分类有下级标签则展示；推荐和无下级标签分类不展开。"
+            },
+            {
+              "label": "发起搜索",
+              "text": "点击搜索或按 Enter，进入 resource-search.html，在当前来源和二级分类下展示结果。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "筛选只影响广场列表。",
+            "关键词为空时不跳转，光标回到搜索框。",
+            "飞象老师精选、本校资源的二级分类各自独立。",
+            "飞象老师精选标签页 下的筛选展开、下级标签、默认推荐和无下级标签状态与飞象老师个人版资源广场一致。",
+            "飞象老师精选的细筛只在具体二级分类下展示，本校资源不展示。",
+            "不同二级分类的下级标签可以不同，也可以没有，由当前分类配置决定。",
+            "本校资源没有推荐标签页；本校二级分类不是固定学科表，而是由本校资源内容经 AI 分类后生成。",
+            "本校资源分类较少时只展示已有分类；无资源分类不展示，避免老师进入空分类。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "筛选条件展示关键词、资源来源、二级分类、教材、年级、期次、资源类型和收藏状态。",
+            "搜索页通过链接保留关键词、来源和学科范围。",
+            "飞象老师精选的筛选项来源与个人版一致，校园版只额外切分本校资源入口。",
+            "本校资源筛选项来自学校资源池，至少包含来源、AI 二级分类、资源类型、创建老师或教研组、可见权限、收藏状态。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "无结果",
+              "处理方式": "展示无结果和清空入口。"
+            },
+            {
+              "场景": "分类暂无资源",
+              "处理方式": "提示该分类暂无内容，允许切回全部。"
+            },
+            {
+              "场景": "筛选条件过多",
+              "处理方式": "结果为空时提示可减少条件。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "resource-detail.html",
+              "说明": "筛选结果进入详情。"
+            },
+            {
+              "关联对象": "my-apps.html",
+              "说明": "收藏结果进入校园版我的作品。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "组合筛选生效。",
+            "清空后列表恢复。",
+            "无结果有下一步。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resource-square-ai-dock",
+      "title": "3. 底部 AI 生成入口",
+      "body": "资源广场底部保留一行 AI 生成入口，老师浏览资源时不被打扰；点击输入框后向上展开 AI 生成能力。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "底部入口默认是一行输入框，输入框前展示“AI 生成”主模式选项，右侧展示语音按钮和发送按钮。",
+            "默认一行状态下，placeholder 或老师输入内容超出一行时只做截断展示，不换行，不出现滚动条。",
+            "老师点击输入框后，输入框整体向上展开；未选择能力时，附件入口和 AI 生成能力 选项 显示在输入框内部底部。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "默认浏览",
+              "text": "资源广场加载后底部只展示一行输入框，并在输入框前显示“AI 生成”；不默认铺开能力 选项；文案超过一行时以省略方式截断，不展示滚动条。"
+            },
+            {
+              "label": "激活未选",
+              "text": "老师点击输入框后，输入框向上展开，顶部保留 placeholder，底部显示添加文件、添加图片和 AI 组题、教学动画、教学游戏、互动课件、数据回收。"
+            },
+            {
+              "label": "选择能力",
+              "text": "点击某个能力选项 后，输入框前的“AI 生成”替换为具体能力标签，placeholder 切换为该能力提示词，能力 选项 收起。"
+            },
+            {
+              "label": "上传必要资料",
+              "text": "选择互动课件时展示上传教案文件卡片；选择数据回收时展示上传 HTML 文件卡片。上传后展示已上传文件名并支持移除。"
+            },
+            {
+              "label": "发送生成",
+              "text": "老师输入需求后点击发送或按 Enter，后续由对话页按 AI 生成能力承接生成流程。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "资源广场底部默认主模式就是 AI 生成，不再展示知识库问答、创建应用等首页主模式入口。",
+            "默认态需像应用广场一样把当前主模式展示在输入框前面；资源广场展示“AI 生成”，选中具体能力后展示具体能力名称。",
+            "默认态输入框固定单行高度，长文案不换行，不出现横向或纵向滚动条。",
+            "展开后的 AI 生成能力 选项 与首页保持一致：AI 组题、教学动画、教学游戏、互动课件、数据回收；但资源广场不展示 hover 说明卡。",
+            "未选择具体能力时，placeholder 轮播首页 AI 生成示例；选择具体能力后，placeholder 固定为该能力示例，不再轮播。",
+            "点击能力选项 只切换生成意图和输入提示，不跳转页面。",
+            "点击面板外部且没有输入内容和具体能力时，面板可收回一行态。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "发送到对话页时需要保留输入文本、AI 生成主模式、具体能力名称和上传附件上下文。",
+            "附件展示文件名称、类型、大小、上传状态和移除入口。",
+            "能力选择展示当前主模式和具体能力，方便对话页恢复上下文。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "输入为空",
+              "处理方式": "不发起生成，提示输入资源需求。"
+            },
+            {
+              "场景": "语音输入不可用",
+              "处理方式": "保留文本输入，不影响资源生成入口。"
+            },
+            {
+              "场景": "生成失败",
+              "处理方式": "保留输入内容并提示稍后重试。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "chat.html",
+              "说明": "资源生成需求进入新对话并打开生成结果。"
+            },
+            {
+              "关联对象": "resource-detail.html",
+              "说明": "生成或发布后的资源进入详情预览。"
+            },
+            {
+              "关联对象": "my-apps.html",
+              "说明": "老师收藏或改编后的资源回到我的作品。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "底部输入为空时不应生成资源。",
+            "语音按钮不可用时文本输入仍可用。",
+            "生成结果应能进入资源详情或我的作品承接。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'resource-square.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+</body>
+</html>

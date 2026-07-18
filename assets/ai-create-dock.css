@@ -1,0 +1,599 @@
+/* ============================================================
+   ai-create-dock.css · 飞象老师校园版「AI 创造入口」浮动 dock
+   --------------------------------------------------------------
+   - 浮动在内容区底部，浏览-创造闭环（参考飞象 v2 应用广场底部 dock）
+   - 金色 + 玻璃态背景，与校园版整体调性一致
+   - 多页复用：resource-square / app-square / ai-qbank ...
+   - 通过 data-kind / data-placeholders 配置语义和示例
+   ============================================================ */
+
+.ai-dock {
+  position: fixed;
+  /* 默认在 sidebar(240px) 右侧的主区中心，最大宽 720px */
+  left: calc(120px + (100vw - 240px) / 2);
+  transform: translateX(-50%);
+  bottom: 18px;
+  width: min(720px, calc(100vw - 280px));
+  z-index: 90;
+
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  gap: 6px;
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  border: 1px solid rgba(168, 126, 44, 0.22);
+  border-radius: 18px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .7) inset,
+    0 4px 16px rgba(0, 0, 0, .04),
+    0 16px 40px rgba(168, 126, 44, .10);
+
+  transition:
+    box-shadow .2s var(--ease, ease),
+    border-color .2s var(--ease, ease),
+    transform .35s cubic-bezier(.2, .8, .2, 1),
+    opacity .25s var(--ease, ease);
+
+  animation: ai-dock-rise .45s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.ai-dock[data-ai-panel="true"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+  width: min(760px, calc(100vw - 330px));
+  min-height: 56px;
+  padding: 8px;
+  border-radius: 18px;
+  border-color: rgba(168, 126, 44, 0.22);
+  background: rgba(255, 255, 255, .94);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .7) inset,
+    0 4px 16px rgba(0, 0, 0, .04),
+    0 16px 40px rgba(168, 126, 44, .10);
+  overflow: visible;
+}
+
+.ai-dock[data-ai-panel="true"].is-expanded,
+.ai-dock[data-ai-panel="true"]:focus-within {
+  transform: translate(-50%, -10px);
+  border-radius: 18px;
+}
+
+@keyframes ai-dock-rise {
+  from { opacity: 0; transform: translate(-50%, 18px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.ai-dock:focus-within {
+  border-color: var(--gold);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .7) inset,
+    0 6px 18px rgba(0, 0, 0, .06),
+    0 20px 50px rgba(168, 126, 44, .16);
+}
+
+/* ───── 左侧标签（语义标识） ───── */
+.ai-dock-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--gold-bg);
+  color: var(--gold-deep);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  flex-shrink: 0;
+  border: 1px solid rgba(168, 126, 44, 0.22);
+  white-space: nowrap;
+}
+.ai-dock-tag [data-lucide] {
+  width: 14px;
+  height: 14px;
+  color: var(--gold);
+}
+
+/* ───── 中间输入区 ───── */
+.ai-dock-input-wrap {
+  flex: 1 1 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.ai-dock[data-ai-panel="true"] .ai-dock-input-wrap {
+  min-height: 38px;
+}
+
+.ai-dock[data-ai-panel="true"].is-expanded .ai-dock-input-wrap,
+.ai-dock[data-ai-panel="true"]:focus-within .ai-dock-input-wrap {
+  min-height: 94px;
+}
+
+.ai-dock[data-ai-panel="true"].has-mode .ai-dock-input-wrap,
+.ai-dock[data-ai-panel="true"].upload-required .ai-dock-input-wrap {
+  min-height: 118px;
+}
+
+.ai-dock-mode-row {
+  display: none;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  padding: 0 4px 6px;
+}
+
+.ai-dock[data-ai-panel="true"].upload-required .ai-dock-mode-row {
+  display: flex;
+}
+
+.ai-dock-input-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+}
+
+.ai-dock-default-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 13px;
+  border-radius: 12px;
+  border: 1px solid rgba(168,126,44,.22);
+  background: var(--gold-bg);
+  color: var(--gold-deep);
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ai-dock-default-mode [data-lucide] {
+  width: 15px;
+  height: 15px;
+  color: var(--gold);
+}
+
+.ai-dock[data-ai-panel="true"].has-mode .ai-dock-default-mode {
+  display: none;
+}
+
+.ai-dock-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  min-width: 0;
+  height: 26px;
+  padding: 0 6px 0 9px;
+  border-radius: 13px;
+  border: 1px solid rgba(69,132,99,.28);
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 12.5px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.ai-dock-mode svg.mode-ico { width: 13px; height: 13px; }
+.ai-dock-mode .mode-x {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  opacity: .82;
+  cursor: pointer;
+}
+.ai-dock-mode .mode-x:hover { opacity: 1; background: rgba(69,132,99,.12); }
+.ai-dock-mode .mode-x svg { width: 11px; height: 11px; }
+
+.ai-dock-upload-card {
+  display: none;
+  width: 148px;
+  min-height: 58px;
+  border: 1px dashed rgba(17, 17, 16, .18);
+  border-radius: 10px;
+  background: rgba(255,255,255,.72);
+  color: var(--text-1);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.ai-dock.upload-required .ai-dock-upload-card { display: inline-flex; }
+.ai-dock-upload-card:hover {
+  border-color: var(--gold);
+  background: #fffaf0;
+  color: var(--gold);
+}
+.ai-dock-upload-card svg { width: 17px; height: 17px; }
+.ai-dock-upload-card.is-uploaded {
+  border-style: solid;
+  border-color: rgba(69,132,99,.28);
+  background: var(--green-soft);
+  color: var(--text-1);
+  align-items: flex-start;
+  padding: 9px 10px;
+}
+.ai-dock-upload-card.is-uploaded .uploaded-label {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+}
+.ai-dock-upload-card.is-uploaded .uploaded-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+.ai-dock-upload-card.is-uploaded .uploaded-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+.ai-dock-upload-card .upload-remove {
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+.ai-dock-upload-card .upload-remove:hover {
+  background: rgba(69,132,99,.12);
+  color: var(--text-1);
+}
+
+.ai-dock-input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text-1);
+  padding: 9px 4px;
+  resize: none;
+  max-height: 120px;
+  min-height: 38px;
+  line-height: 1.5;
+  font-family: inherit;
+  overflow: hidden;
+  scrollbar-width: none;
+}
+.ai-dock-input::-webkit-scrollbar { display: none; }
+
+.ai-dock[data-ai-panel="true"]:not(.is-expanded):not(:focus-within) .ai-dock-input {
+  height: 38px !important;
+  max-height: 38px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ai-dock[data-ai-panel="true"].is-expanded .ai-dock-input,
+.ai-dock[data-ai-panel="true"]:focus-within .ai-dock-input {
+  white-space: normal;
+}
+
+.ai-dock-panel {
+  display: none;
+  width: 100%;
+  padding: 8px 0 0;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.ai-dock[data-ai-panel="true"].is-expanded .ai-dock-panel,
+.ai-dock[data-ai-panel="true"]:focus-within .ai-dock-panel {
+  display: flex;
+}
+.ai-dock[data-ai-panel="true"].has-mode .ai-dock-panel,
+.ai-dock[data-ai-panel="true"].upload-required .ai-dock-panel {
+  display: none;
+}
+
+.ai-dock-attach-actions,
+.ai-dock-chip-list {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-dock-attach-actions {
+  gap: 8px;
+  margin-right: 2px;
+}
+
+.ai-dock-attach-btn {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: #496255;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.ai-dock-attach-btn:hover {
+  color: var(--green);
+}
+
+.ai-dock-attach-btn [data-lucide] {
+  width: 19px;
+  height: 19px;
+  stroke-width: 2;
+}
+
+.ai-dock-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.74);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s, transform .15s;
+}
+.ai-dock-chip:hover {
+  background: var(--surface);
+  border-color: rgba(79,140,163,.28);
+  color: var(--text-1);
+}
+.ai-dock-chip.active {
+  background: var(--green-soft);
+  border-color: rgba(69,132,99,.26);
+  color: var(--green);
+  font-weight: 650;
+}
+.ai-dock-chip svg { width: 14px; height: 14px; flex-shrink: 0; }
+.ai-dock-chip .chip-beta {
+  margin-left: 0;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: #e6f4ea;
+  color: #1f7a4d;
+  font-size: 10px;
+  font-weight: 800;
+  font-style: italic;
+}
+.ai-dock[data-ai-panel="true"] .ai-dock-tip {
+  display: none;
+}
+
+.ai-dock-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%) translateY(4px);
+  width: 220px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.96);
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 32px rgba(0,0,0,.12);
+  color: var(--text-1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .16s, transform .16s;
+  z-index: 10;
+}
+.ai-dock-tip::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  background: rgba(255,255,255,.96);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transform: translateX(-50%) rotate(45deg);
+}
+.ai-dock-chip:hover .ai-dock-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.ai-dock-tip-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 750;
+}
+.ai-dock-tip-badge {
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: #fff3db;
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 800;
+}
+.ai-dock-tip-desc {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: normal;
+}
+
+.ai-dock-input::placeholder {
+  color: var(--text-3);
+  transition: opacity .25s ease;
+}
+.ai-dock-input.is-fading::placeholder {
+  opacity: 0;
+}
+
+/* ───── 右侧操作按钮 ───── */
+.ai-dock-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding-bottom: 0;
+}
+
+.ai-dock-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-family: inherit;
+  transition: background .15s, color .15s, transform .15s;
+}
+.ai-dock-btn:hover {
+  background: var(--surface-2);
+  color: var(--text-1);
+}
+.ai-dock-btn:active {
+  transform: scale(.94);
+}
+.ai-dock-btn [data-lucide] {
+  width: 17px;
+  height: 17px;
+}
+
+.ai-dock-send {
+  background: #006143;
+  color: #fff;
+  border-radius: 12px;
+}
+.ai-dock-send:hover {
+  background: #000;
+  color: #fff;
+}
+.ai-dock-send [data-lucide] {
+  color: #fff;
+}
+.ai-dock-send:disabled {
+  background: var(--text-4);
+  cursor: not-allowed;
+}
+
+/* ───── 给主区让出底部空间，避免 dock 遮内容 ───── */
+.ai-dock-spacer {
+  height: 88px;
+  flex-shrink: 0;
+}
+
+/* ───── 简单 toast（dock 自带） ───── */
+#ai-dock-toast {
+  position: fixed;
+  left: calc(120px + (100vw - 240px) / 2);
+  bottom: 96px;
+  transform: translate(-50%, 18px);
+  z-index: 200;
+  padding: 10px 18px;
+  border-radius: 14px;
+  background: rgba(26, 22, 14, .92);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .22);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity .25s ease,
+    transform .35s cubic-bezier(.2, .8, .2, 1);
+  max-width: min(560px, calc(100vw - 32px));
+  text-align: center;
+  line-height: 1.5;
+}
+#ai-dock-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ───── 小屏 ───── */
+@media (max-width: 1080px) {
+  .ai-dock {
+    left: calc(120px + (100vw - 240px) / 2);
+    width: calc(100vw - 280px);
+  }
+}
+@media (max-width: 760px) {
+  .ai-dock {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    transform: none;
+    bottom: 12px;
+  }
+  @keyframes ai-dock-rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .ai-dock-tag span {
+    display: none;
+  }
+  .ai-dock-tag {
+    padding: 0 10px;
+  }
+  .ai-dock[data-ai-panel="true"].is-expanded,
+  .ai-dock[data-ai-panel="true"]:focus-within {
+    transform: translateY(-8px);
+  }
+  .ai-dock[data-ai-panel="true"] {
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+  .ai-dock-panel {
+    padding-left: 4px;
+  }
+  .ai-dock-chip {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+  #ai-dock-toast {
+    left: 50%;
+  }
+}
+
+/* ───── 对话态隐藏（如果有页面切到对话） ───── */
+.app[data-chat="open"] .ai-dock,
+.app[data-chat="empty"] .ai-dock {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 18px);
+}

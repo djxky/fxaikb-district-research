@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞象官方应用 · 能力介绍</title>
+<script src="assets/lucide-loader.js"></script>
+<style>
+  :root{
+    --bg:#faf9f6;
+    --surface:#fff;
+    --ink:#161616;
+    --muted:#66645f;
+    --faint:#9c9992;
+    --line:rgba(0,0,0,.08);
+    --gold:#a87e2c;
+    --gold-soft:#fbf5e6;
+    --green:#3f7a61;
+    --green-soft:#eef8f3;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font:inherit;border:0;cursor:pointer}
+  .page{max-width:1180px;margin:0 auto;padding:42px 32px 80px}
+  .top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:40px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#8a6720;
+    font-weight:800;
+  }
+  .brand-mark{
+    width:30px;
+    height:30px;
+    border-radius:9px;
+    display:grid;
+    place-items:center;
+    background:#a87e2c;
+    color:#fff;
+  }
+  .back{
+    height:38px;
+    padding:0 16px;
+    border-radius:10px;
+    background:#fff;
+    border:1px solid var(--line);
+    color:var(--muted);
+  }
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 420px;
+    gap:48px;
+    align-items:center;
+    padding:54px;
+    border-radius:26px;
+    background:#fff;
+    border:1px solid var(--line);
+    box-shadow:0 24px 70px rgba(0,0,0,.04);
+  }
+  .state{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    background:var(--gold-soft);
+    color:#7c5f21;
+    font-size:13px;
+    font-weight:800;
+    margin-bottom:18px;
+  }
+  h1{
+    margin:0 0 18px;
+    font-size:44px;
+    line-height:1.12;
+    letter-spacing:0;
+  }
+  .lead{
+    margin:0 0 30px;
+    max-width:680px;
+    color:var(--muted);
+    font-size:18px;
+    line-height:1.8;
+  }
+  .actions{display:flex;gap:12px;flex-wrap:wrap}
+  .primary,.secondary{
+    height:46px;
+    padding:0 22px;
+    border-radius:12px;
+    font-weight:800;
+  }
+  .primary{background:#111;color:#fff}
+  .secondary{background:#fff;border:1px solid var(--line);color:#333}
+  .visual{
+    min-height:300px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#fff8e7,#e9f7ee);
+    position:relative;
+    overflow:hidden;
+  }
+  .visual:before{
+    content:"";
+    position:absolute;
+    width:210px;
+    height:210px;
+    border-radius:50%;
+    right:42px;
+    top:46px;
+    background:rgba(63,122,97,.2);
+  }
+  .visual:after{
+    content:"";
+    position:absolute;
+    width:136px;
+    height:184px;
+    right:96px;
+    top:54px;
+    border-radius:24px;
+    background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(255,255,255,.44));
+    transform:rotate(22deg);
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.8);
+  }
+  .feature-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin-top:22px;
+  }
+  .feature{
+    padding:24px;
+    border-radius:18px;
+    background:#fff;
+    border:1px solid var(--line);
+  }
+  .feature i{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    display:grid;
+    place-items:center;
+    background:var(--green-soft);
+    color:var(--green);
+    margin-bottom:16px;
+  }
+  .feature h3{margin:0 0 8px;font-size:18px}
+  .feature p{margin:0;color:var(--muted);line-height:1.7}
+  @media (max-width:900px){
+    .page{padding:24px 18px 48px}
+    .hero{grid-template-columns:1fr;padding:30px}
+    .feature-grid{grid-template-columns:1fr}
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="official-app-landing">
+  <main class="page">
+    <div class="top">
+      <div class="brand"><span class="brand-mark">飞</span><span>飞象官方应用</span></div>
+      <button class="back" onclick="history.back()">返回应用广场</button>
+    </div>
+
+    <section class="hero">
+      <div>
+        <div class="state"><i data-lucide="lock-keyhole"></i><span>学校暂未开通</span></div>
+        <h1 id="title">飞象官方应用</h1>
+        <p class="lead" id="lead">了解这项能力如何帮助学校提升教学效率。开通后老师可从应用广场直接进入使用。</p>
+        <div class="actions">
+          <button class="primary" onclick="alert('（演示）已提交开通申请')">申请试用</button>
+          <button class="secondary" onclick="alert('（演示）联系飞象顾问')">联系开通</button>
+        </div>
+      </div>
+      <div class="visual" aria-hidden="true"></div>
+    </section>
+
+    <section class="feature-grid" id="features"></section>
+  </main>
+
+<script>
+  const DATA = {
+    'smart-homework': {
+      title: '飞象智能作业',
+      lead: '覆盖作业布置、智能批改、学情分析和错题沉淀，让老师快速掌握班级完成质量和薄弱知识点。',
+      features: [
+        ['clipboard-check', '作业全流程', '从布置、收取到批改和讲评，形成清晰的班级作业闭环。'],
+        ['chart-no-axes-column', '班级学情分析', '自动汇总得分率、易错点和知识点掌握情况。'],
+        ['book-open-check', '复习任务联动', '把作业错题沉淀到后续订正和复习任务中。']
+      ]
+    },
+    'feixiang-classroom': {
+      title: '飞象人工智能通识课',
+      lead: '承接人工智能通识课程内容、课堂使用和学习反馈，帮助学校开展 AI 通识教学。',
+      features: [
+        ['presentation', '课程内容', '提供面向学校场景的人工智能通识课程内容和课堂材料。'],
+        ['mouse-pointer-click', '课堂使用', '支持老师在课堂中组织讲解、互动和学习任务。'],
+        ['chart-no-axes-column', '学习反馈', '汇总课程参与和学习反馈，帮助老师跟进教学效果。']
+      ]
+    },
+    'mistake-diagnosis': {
+      title: '飞象错因诊断',
+      lead: '基于错题、作业和测验结果，归因学生错误类型，帮助老师快速生成讲评建议和个性化补救方案。',
+      features: [
+        ['scan-search', '错因归类', '识别审题、概念、计算、方法和表达等常见错因。'],
+        ['users-round', '班级共性问题', '沉淀班级高频薄弱点，辅助备课和讲评。'],
+        ['sparkles', '讲评建议', '自动生成可直接使用的讲评重点和练习建议。']
+      ]
+    },
+    wrongbook: {
+      title: '错题本',
+      lead: '汇总学生错题、订正记录和复习任务，形成可追踪的个人错题档案，帮助老师安排针对性复习。',
+      features: [
+        ['book-marked', '错题归档', '按学生、知识点、题型和来源自动整理错题。'],
+        ['history', '订正追踪', '记录订正状态和二次作答情况。'],
+        ['calendar-check', '复习计划', '根据错题掌握情况安排后续巩固任务。']
+      ]
+    }
+  };
+  const app = new URLSearchParams(location.search).get('app') || 'smart-homework';
+  const data = DATA[app] || DATA['smart-homework'];
+  document.title = data.title + ' · 能力介绍';
+  document.getElementById('title').textContent = data.title;
+  document.getElementById('lead').textContent = data.lead;
+  document.getElementById('features').innerHTML = data.features.map(([icon,title,body]) => `
+    <article class="feature">
+      <i data-lucide="${icon}"></i>
+      <h3>${title}</h3>
+      <p>${body}</p>
+    </article>
+  `).join('');
+  if(window.lucide) lucide.createIcons();
+</script>
+<template id="review-template">
+{
+  "title": "飞象官方应用 · 能力介绍",
+  "summary": "官方应用落地页用于承接学校未开通或需介绍的官方能力，解释能力价值，并提供申请试用/联系开通操作。",
+  "sections": [
+    {
+      "id": "official-app-state",
+      "title": "1. 未开通应用介绍",
+      "body": "当学校尚未开通某个官方应用时，老师看到能力介绍而不是空白或错误页。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "页面根据 链接状态 app 切换官方应用名称、介绍文案和三项能力说明。",
+            "默认展示“学校暂未开通”状态，并给出申请试用和联系开通两个动作。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "进入落地页",
+              "text": "触发：从应用广场点击未开通官方应用；动作：读取 app 参数并渲染对应内容；反馈：标题、说明和功能卡片同步更新。"
+            },
+            {
+              "label": "返回应用广场",
+              "text": "触发：点击返回应用广场；动作：执行浏览器返回；反馈：回到上一个应用广场或搜索页。"
+            },
+            {
+              "label": "申请试用",
+              "text": "触发：点击申请试用；动作：当前页面提示已提交申请；反馈：后续正式版本应创建开通线索。"
+            },
+            {
+              "label": "联系开通",
+              "text": "触发：点击联系开通；动作：当前页面提示联系飞象顾问；反馈：后续正式版本应进入联系/咨询流程。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "未开通官方应用不直接跳业务系统，避免老师误以为已有权限。",
+            "未知 app 参数使用默认官方应用内容兜底。",
+            "申请和联系入口只表达开通意向，不在本页承诺立即开通。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "页面根据 app 参数读取官方应用名称、导语、能力卡片、开通状态和申请入口。",
+            "未知 app 参数使用默认官方应用内容，不展示空白页。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "未知 app 参数",
+              "处理方式": "展示默认官方应用介绍。"
+            },
+            {
+              "场景": "申请提交失败",
+              "处理方式": "保留页面并提示稍后重试。"
+            },
+            {
+              "场景": "来源页丢失",
+              "处理方式": "返回按钮回到应用广场。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "app-square.html",
+              "说明": "官方应用入口来源。"
+            },
+            {
+              "关联对象": "app-search.html",
+              "说明": "搜索结果中未开通官方应用也可进入本页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "不同 app 参数能切换标题和能力卡片。",
+            "未开通状态不直接跳业务系统。",
+            "申请试用和联系开通都有反馈。",
+            "返回按钮能回到合理来源页。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>

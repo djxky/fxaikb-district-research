@@ -1,0 +1,2894 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞象老师校园版 · 首页</title>
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<style>
+  :root {
+    --bg: #faf9f6;
+    --side: #f4f3ef;
+    --surface: #ffffff;
+    --ink: #111110;
+    --muted: #6b6a65;
+    --faint: #a19f99;
+    --line: rgba(0, 0, 0, 0.06);
+    --line-strong: rgba(0, 0, 0, 0.12);
+    
+    --gold: #a87e2c;
+    --gold-soft: #fbf5e6;
+    --green: #4a755b;
+    --green-soft: #eaf3ed;
+    --blue: #53759e;
+    --blue-soft: #edf3f8;
+    --purple: #81628f;
+    --purple-soft: #f4eff5;
+    --rose: #a8626c;
+    --rose-soft: #f8eff0;
+    --ai-cyan: #4f8ca3;
+    --ai-cyan-soft: #edf7f8;
+    --ai-violet: #7466a8;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+  }
+  
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.82) 0%, rgba(250,249,246,.96) 46%, var(--bg) 100%),
+      repeating-linear-gradient(90deg, rgba(79,140,163,.045) 0 1px, transparent 1px 44px),
+      repeating-linear-gradient(180deg, rgba(116,102,168,.035) 0 1px, transparent 1px 44px);
+    color: var(--ink);
+    font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input { font: inherit; border: 0; background: none; outline: 0; }
+  button { cursor: pointer; transition: all 0.2s ease; }
+
+  .app { height: 100vh; display: grid; grid-template-columns: 240px minmax(0, 1fr); transition: grid-template-columns .22s ease; }
+  .app[data-sidebar="collapsed"] { grid-template-columns: 56px minmax(0, 1fr); }
+
+  /* ========== 侧栏 ========== */
+  .sidebar {
+    background: var(--side);
+    border-right: 1px solid var(--line);
+    display: flex; flex-direction: column; padding: 20px 16px;
+    transition: padding .22s ease;
+  }
+  .sidebar-head { display:flex; align-items:flex-start; gap:6px; margin-bottom:24px; }
+  .sidebar-toggle { width:28px; height:28px; border-radius:7px; display:grid; place-items:center; color:var(--muted); margin-top:3px; flex-shrink:0; }
+  .sidebar-toggle:hover { background:rgba(0,0,0,0.05); color:var(--ink); }
+  .sidebar-toggle svg { transition:transform .18s ease; }
+  .sidebar-toggle svg { width:15px; height:15px; }
+  .app[data-sidebar="collapsed"] .sidebar { padding:14px 8px; overflow-x:hidden; }
+  .app[data-sidebar="collapsed"] .sidebar-head { flex-direction:column; align-items:center; gap:8px; margin-bottom:18px; }
+  .app[data-sidebar="collapsed"] .sidebar-toggle { order:-1; margin:0; }
+  .app[data-sidebar="collapsed"] .sidebar-toggle svg { transform:rotate(180deg); }
+  .app[data-sidebar="collapsed"] .school-name,
+  .app[data-sidebar="collapsed"] .ws-footer,
+  .app[data-sidebar="collapsed"] .nav-title,
+  .app[data-sidebar="collapsed"] .nav-right,
+  .app[data-sidebar="collapsed"] .user-name,
+  .app[data-sidebar="collapsed"] .user > svg { display:none; }
+  .app[data-sidebar="collapsed"] .workspace { padding:6px 3px; margin:0; align-items:center; }
+  .app[data-sidebar="collapsed"] .ws-main,
+  .app[data-sidebar="collapsed"] .nav-btn,
+  .app[data-sidebar="collapsed"] .user { justify-content:center; }
+  .app[data-sidebar="collapsed"] .nav-btn { width:40px; height:40px; padding:0; margin:0 auto 4px; font-size:0; }
+  .app[data-sidebar="collapsed"] .nav-btn.primary { margin-bottom:18px; }
+  .app[data-sidebar="collapsed"] .nav-btn svg { width:17px; height:17px; }
+  .app[data-sidebar="collapsed"] .user { width:40px; height:40px; padding:0; margin:12px auto 0; border-top:0; }
+  .workspace { display: flex; flex-direction: column; gap: 4px; flex:1; padding: 6px; border-radius: 10px; cursor: pointer; transition: all 0.2s; margin-left: -6px; margin-right: 0; }
+  .workspace:hover { background: rgba(0,0,0,0.04); }
+  .ws-main { display: flex; align-items: center; gap: 10px; width: 100%; }
+  .school-logo { width: 34px; height: 34px; border-radius: 8px; background: var(--gold); color: #fff; display: grid; place-items: center; font-size: 15px; font-weight: 700; flex-shrink: 0; position: relative; }
+  .school-logo::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a87e2c'%3E%3Cpath d='M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z'/%3E%3C/svg%3E"); background-size: 10px; background-position: center; background-repeat: no-repeat; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+  .school-name { font-size: 14.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  .ws-footer { display: flex; align-items: center; padding-left: 44px; }
+  .power-by { font-size: 11px; font-weight: 600; color: var(--gold); display: inline-flex; align-items: center; gap: 4px; }
+  .power-by svg { color: var(--gold); }
+
+  .nav-btn {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--radius-sm);
+    color: var(--ink); font-weight: 500; margin-bottom: 4px;
+    text-decoration: none; cursor: pointer;
+  }
+  .nav-btn:hover { background: rgba(0,0,0,0.04); }
+  .nav-btn.active { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.04); color: var(--gold); }
+  .nav-btn.primary { background: var(--ink); color: #fff; margin-bottom: 24px; }
+  .nav-btn.primary:hover { background: #000; }
+  
+  .nav-title { font-size: 11px; color: var(--faint); font-weight: 600; padding: 12px 12px 6px; margin-top: 8px; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .nav-count { color: var(--faint); font-size: 12px; background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 6px; }
+  .nav-dot { width: 6px; height: 6px; background: #e65252; border-radius: 50%; }
+
+  .spacer { flex: 1; }
+  
+  .user {
+    width: calc(100% + 12px);
+    margin-left: -6px; margin-right: -6px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border-top: 1px solid var(--line);
+    margin-top: 16px;
+    border: 0;
+    border-top: 1px solid var(--line);
+    background: transparent;
+    transition: background .15s;
+    cursor: pointer;
+    text-align: left;
+  }
+  .user:hover { background: rgba(0,0,0,0.04); }
+  .user.open { background: rgba(0,0,0,0.04); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #e3dec9; display: grid; place-items: center; font-weight: 600; }
+  .user-name { font-size: 13px; font-weight: 600; }
+
+  /* ========== 主区 ========== */
+  .main {
+    display: flex; flex-direction: column; overflow: hidden;
+    position: relative;
+  }
+  .main::before {
+    content: "";
+    position: absolute; inset: 0 0 auto 0; height: 280px;
+    background:
+      linear-gradient(90deg, rgba(168,126,44,.08), rgba(79,140,163,.08), rgba(116,102,168,.07)),
+      linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,0));
+    mask-image: linear-gradient(180deg, #000, transparent);
+    pointer-events: none;
+  }
+  .content-wrap {
+    width: 100%; max-width: 1180px;
+    height: 100vh;
+    margin: 0 auto; padding: 42px 38px 28px;
+    display: flex; flex-direction: column; gap: 30px;
+    position: relative; z-index: 1;
+  }
+
+  /* 1. 欢迎语 */
+  .welcome { display: block; }
+  .welcome h1 {
+    margin: 0; font-size: 28px; font-weight: 680; letter-spacing: 0;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(255,255,255,.72);
+  }
+
+  /* 2. 输入区 */
+  .composer-section {
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    padding: 0 0 4px;
+    position: relative;
+    z-index: 30;
+    overflow: visible;
+  }
+  .composer-pill {
+    width: 100%; max-width: 980px; min-height: 58px;
+    background:
+      linear-gradient(#fff, #fff) padding-box,
+      linear-gradient(100deg, rgba(168,126,44,.55), rgba(79,140,163,.24), rgba(116,102,168,.22)) border-box;
+    border: 1px solid transparent;
+    border-radius: 29px; padding: 9px 9px 9px 13px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto;
+    grid-template-areas: "plus input actions";
+    align-items: center;
+    gap: 0 8px;
+    box-shadow: 0 18px 46px rgba(17,17,16,0.07), 0 0 0 5px rgba(255,255,255,.42);
+    transition: all 0.2s;
+  }
+  .composer-pill:focus-within {
+    box-shadow: 0 18px 56px rgba(79,140,163,0.12), 0 0 0 5px rgba(168,126,44,.08);
+  }
+  .composer-pill.has-chips {
+    grid-template-areas: 
+      "input input input"
+      "plus chips actions";
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+    padding: 12px 10px 10px 14px;
+    row-gap: 8px;
+    border-radius: 22px;
+    align-items: end;
+  }
+  #home-plus-btn { grid-area: plus; }
+  .composer-pill.upload-required #home-plus-btn { display: none; }
+  .input-wrap { grid-area: input; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 8px; width: 100%; min-height: 34px; }
+  .input-wrap textarea {
+    flex: 1; font-size: 16px; color: var(--ink); min-width: 0;
+    resize: none; line-height: 1.45; padding: 6px 0; max-height: 160px;
+    background: transparent; border: none; outline: none; font-family: inherit;
+    align-self: center;
+  }
+  .input-wrap textarea::placeholder { color: #b8b3ab; }
+  .composer-pill.ai-mode .input-wrap { align-items: flex-start; min-height: 48px; }
+  .composer-pill.ai-mode .input-wrap textarea {
+    min-height: 48px;
+    max-height: 48px;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.55;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+  .chip-row {
+    grid-area: chips; display: none; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0;
+  }
+  .composer-pill.has-chips .chip-row { display: flex; }
+  .composer-actions { grid-area: actions; display: flex; align-items: center; gap: 6px; }
+
+  /* 已选 chip · 在输入框前面（GPT 风格）· 实金底 + 白字 = 主导意图 */
+  .pill-mode {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 28px; padding: 0 4px 0 11px;
+    background: var(--gold); color: #fff;
+    border-radius: 14px; font-size: 12.5px; font-weight: 600;
+    flex-shrink: 0;
+    box-shadow: 0 1px 2px rgba(168,126,44,0.18);
+  }
+  .pill-mode svg.mode-ico { width: 13px; height: 13px; }
+  .pill-mode .mode-x {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: #fff; opacity: .8;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .pill-mode .mode-x:hover { opacity: 1; background: rgba(255,255,255,.18); }
+  .pill-mode .mode-x svg { width: 11px; height: 11px; }
+  
+  .pill-icon { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); flex-shrink: 0; }
+  .pill-icon:hover { background: var(--ai-cyan-soft); color: var(--ink); }
+  .pill-send { background: var(--ink); color: #fff; }
+  .pill-send:hover { background: #000; box-shadow: 0 6px 16px rgba(0,0,0,.18); }
+  .pill-send svg { width: 16px; height: 16px; }
+  .pill-plus { color: var(--text-1); }
+  .pill-plus:hover { background: var(--side); color: var(--ink); }
+
+  .kb-attached-row {
+    display: contents;
+  }
+  .attachment-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    max-height: 168px;
+    overflow: hidden;
+  }
+  .attachment-row:empty {
+    display: none;
+  }
+  .attachment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: 172px;
+    height: 58px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: rgba(248,248,247,.92);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+    transition: background .15s, border-color .15s;
+  }
+  .attachment-chip:hover {
+    background: #fff;
+    border-color: var(--line);
+  }
+  .attachment-chip svg.ico {
+    width: 22px;
+    height: 22px;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+  .attachment-meta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .attachment-chip .attachment-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .attachment-size {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1;
+  }
+  .attachment-thumb {
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    background:
+      linear-gradient(135deg, rgba(79,140,163,.22), rgba(69,132,99,.22)),
+      linear-gradient(135deg, #f7efe2, #e9f2ee);
+    border: 1px solid rgba(0,0,0,.06);
+  }
+  .attachment-chip .chip-del {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: var(--muted);
+    background: rgba(255,255,255,.86);
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    flex-shrink: 0;
+  }
+  .attachment-chip:hover .chip-del { display: inline-flex; }
+  .attachment-chip .chip-del:hover { background: var(--side); color: var(--ink); }
+  .kb-attached-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 26px; padding: 0 6px 0 10px;
+    border: 1px solid #e8d9b6; border-radius: 6px;
+    background: #fff; color: var(--gold);
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all .15s;
+  }
+  .kb-attached-chip:hover { background: #fdf6e3; border-color: #dec591; }
+  .kb-attached-chip svg.ico { width: 12px; height: 12px; opacity: .85; }
+  .kb-attached-chip .chip-del {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 4px;
+    color: #cda85a; margin-left: 2px;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .kb-attached-chip:hover .chip-del { opacity: 1; }
+  .kb-attached-chip .chip-del:hover { background: rgba(168,126,44,0.15); color: var(--gold); }
+
+  .capability-upload-card {
+    display: none;
+    width: 148px;
+    min-height: 62px;
+    border: 1px dashed rgba(17, 17, 16, .18);
+    border-radius: 10px;
+    background: rgba(255,255,255,.72);
+    color: var(--ink);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .composer-pill.upload-required .capability-upload-card { display: inline-flex; }
+  .capability-upload-card:hover {
+    border-color: var(--gold);
+    background: #fffaf0;
+    color: var(--gold);
+  }
+  .capability-upload-card svg { width: 17px; height: 17px; }
+  .capability-upload-card.is-uploaded {
+    border-style: solid;
+    border-color: rgba(69,132,99,.28);
+    background: var(--green-soft);
+    color: var(--ink);
+    align-items: flex-start;
+    padding: 9px 10px;
+  }
+  .capability-upload-card.is-uploaded .uploaded-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+  }
+  .capability-upload-card.is-uploaded .uploaded-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+  }
+  .capability-upload-card.is-uploaded .uploaded-label {
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .capability-upload-card .upload-remove {
+    width: 17px;
+    height: 17px;
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .capability-upload-card .upload-remove:hover {
+    background: rgba(69,132,99,.12);
+    color: var(--ink);
+  }
+
+  /* + 弹出菜单 · 类 Claude 紧凑风格 */
+  .plus-pop { width: 240px; padding: 6px; }
+  .plus-pop .plus-row {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%;
+    padding: 7px 10px; border-radius: 7px;
+    cursor: pointer; border: 0; background: transparent;
+    font-family: inherit; text-align: left;
+    font-size: 13px; color: var(--ink);
+  }
+  .plus-pop .plus-row:hover { background: var(--side); }
+  .plus-pop .plus-row svg.row-ico { width: 15px; height: 15px; color: var(--text-1); flex-shrink: 0; }
+  .plus-pop .plus-row .row-label { flex: 1; }
+  .plus-pop .plus-row .row-meta {
+    font-size: 11.5px; color: var(--muted); font-weight: 500;
+    margin-left: auto; display: flex; align-items: center; gap: 4px;
+  }
+  .plus-pop .plus-row .row-meta svg { width: 11px; height: 11px; }
+  .plus-pop .plus-row.is-active { color: var(--gold); }
+  .plus-pop .plus-row.is-active svg.row-ico { color: var(--gold); }
+  .plus-pop .plus-row.is-active .row-meta { color: var(--gold); font-weight: 600; }
+  .plus-pop .plus-row .row-chevron { width: 12px; height: 12px; color: var(--muted); flex-shrink: 0; }
+  .plus-pop .plus-divider { height: 1px; background: var(--line); margin: 4px 4px; }
+
+  /* 二级菜单 · 知识库单选 */
+  .kb-submenu {
+    position: fixed;
+    width: 280px;
+    background: #fff;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 18px 48px rgba(0,0,0,0.10);
+    z-index: 100000;
+    max-height: 380px;
+    overflow-y: auto;
+  }
+  .kb-submenu-title {
+    font-size: 11.5px; color: var(--muted); font-weight: 600;
+    padding: 6px 10px 4px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .kb-submenu-clear {
+    font-size: 11px; color: var(--muted);
+    cursor: pointer;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .kb-submenu-clear:hover { background: var(--side); color: var(--ink); }
+  .kb-submenu-group-label {
+    font-size: 10.5px; color: var(--muted); font-weight: 500;
+    padding: 6px 10px 2px;
+    text-transform: none;
+  }
+  .kb-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.15s;
+  }
+  .kb-item:hover { background: var(--side); }
+  .kb-item .kb-check {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 4px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .kb-item .kb-check svg { width: 11px; height: 11px; color: #fff; opacity: 0; }
+  .kb-item.is-checked .kb-check {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .kb-item.is-checked .kb-check svg { opacity: 1; }
+  .kb-item .kb-name { flex: 1; min-width: 0; color: var(--ink); }
+  .kb-item.is-checked .kb-name { color: var(--gold); font-weight: 600; }
+  .kb-item .kb-count {
+    font-size: 11px; color: var(--muted); font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .intent-chips {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    transition: opacity 0.25s, transform 0.25s, height 0.25s;
+    max-width: 880px;
+    margin-top: 0;
+    position: relative;
+    z-index: 60;
+    overflow: visible;
+  }
+  .intent-chips.hidden-chips {
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    height: 0; overflow: hidden;
+    margin-top: -10px;
+  }
+  .intent-chip {
+    position: relative;
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 20px;
+    background: rgba(255,255,255,.62); border: 1px solid rgba(0,0,0,.07);
+    font-size: 13px; color: var(--muted); font-weight: 500;
+    backdrop-filter: blur(8px);
+  }
+  .composer-chip {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0;
+    color: var(--muted); font-size: 13px; font-weight: 500;
+  }
+  .composer-chip:hover { color: var(--ink); }
+  .intent-chip:hover { background: var(--surface); border-color: rgba(79,140,163,.28); color: var(--ink); }
+  .intent-chip.active {
+    background: #fff;
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 2px 8px rgba(168,126,44,0.1);
+    font-weight: 600;
+  }
+  .intent-chip .chip-beta {
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--green);
+    background: var(--green-soft);
+    border-radius: 999px;
+    padding: 2px 4px;
+    margin-left: -2px;
+    transform: translateY(-1px);
+  }
+  .capability-tip {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 10px);
+    transform: translate(-50%, -4px);
+    width: 230px;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.96);
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 18px 45px rgba(25,25,24,.14);
+    color: var(--ink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .16s ease, transform .16s ease;
+    z-index: 2000;
+    text-align: left;
+  }
+  .capability-tip::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    width: 10px;
+    height: 10px;
+    transform: translateX(-50%) rotate(45deg);
+    background: rgba(255,255,255,.96);
+    border-left: 1px solid var(--line-strong);
+    border-top: 1px solid var(--line-strong);
+  }
+  .intent-chip:hover .capability-tip {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .capability-tip-preview {
+    height: 84px;
+    border-radius: 9px;
+    background:
+      radial-gradient(circle at 75% 18%, rgba(255,255,255,.28), transparent 26%),
+      linear-gradient(135deg, rgba(25,72,88,.96), rgba(69,132,99,.88));
+    display: grid;
+    place-items: center;
+    color: rgba(255,255,255,.92);
+    margin-bottom: 9px;
+    overflow: hidden;
+  }
+  .capability-tip-preview svg {
+    width: 38px;
+    height: 38px;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,.22));
+  }
+  .capability-tip-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .capability-tip-badge {
+    font-size: 10px;
+    line-height: 1;
+    color: #fff;
+    background: #f36b3d;
+    border-radius: 999px;
+    padding: 3px 5px;
+  }
+  .capability-tip-desc {
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--muted);
+    white-space: normal;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed; left: 50%; bottom: 24px;
+    transform: translateX(-50%);
+    background: rgba(17, 17, 16, 0.92);
+    color: #fff; padding: 10px 18px; border-radius: 22px;
+    font-size: 12.5px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+    z-index: 9999;
+    backdrop-filter: blur(6px);
+  }
+  #toast.show { opacity: 1; }
+
+  /* 弹层 */
+  .pop {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 18px 48px rgba(0,0,0,0.10);
+    z-index: 200;
+    min-width: 240px;
+  }
+  .pop-section-title {
+    font-size: 11px; color: var(--faint); font-weight: 600;
+    padding: 8px 12px 4px;
+  }
+  .pop button {
+    width: 100%; text-align: left;
+    padding: 9px 12px; border-radius: 8px;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 10px;
+    color: var(--ink);
+  }
+  .pop button:hover { background: var(--side); }
+  .pop button.active { background: var(--gold-soft); color: var(--gold); font-weight: 600; }
+  .pop button svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--faint); }
+  .pop button.active svg { color: var(--gold); }
+  .pop-submenu { position: relative; }
+  .pop-submenu > button::after {
+    content: '';
+    width: 6px; height: 6px;
+    border-top: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    margin-left: auto;
+    opacity: .55;
+  }
+  .pop-flyout {
+    position: absolute;
+    left: calc(100% - 1px);
+    bottom: -6px;
+    width: 252px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 18px 48px rgba(0,0,0,0.10);
+    opacity: 0;
+    transform: translateX(-4px);
+    pointer-events: none;
+    transition: opacity .12s ease, transform .12s ease;
+  }
+  .pop-submenu:hover .pop-flyout,
+  .pop-submenu:focus-within .pop-flyout {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  .pop-divider { height: 1px; background: var(--line); margin: 4px 8px; }
+  .pop-meta { font-size: 11px; color: var(--faint); font-weight: 400; margin-top: 1px; }
+  .pop-row-body { flex: 1; min-width: 0; }
+  .pop-row-title { font-size: 13px; line-height: 1.3; }
+
+  /* 通知弹层 */
+  .notif-item {
+    padding: 12px;
+    border-radius: 10px;
+    display: flex; gap: 10px;
+    cursor: pointer;
+  }
+  .notif-item:hover { background: var(--side); }
+  .notif-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #e65252;
+    margin-top: 6px; flex-shrink: 0;
+  }
+  .notif-dot.read { background: transparent; }
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .notif-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .notif-time { font-size: 11px; color: var(--faint); margin-top: 4px; }
+
+  /* workspace 区作为"回首页"link */
+  .workspace { position: relative; text-decoration: none; color: inherit; }
+  .workspace:hover .school-name { color: var(--gold); }
+
+  /* 通用模块标题 (去掉了过于复杂的点和多余的修饰) */
+  .block-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 0 4px; }
+  .block-title {
+    font-size: 16px; font-weight: 680; color: var(--ink);
+    display: flex; align-items: center;
+    letter-spacing: 0;
+  }
+  .block-more { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+  .block-more:hover { color: var(--ink); }
+
+  /* 3. 中段双栏 */
+  .middle-grid {
+    display: flex; flex-direction: column; gap: 34px;
+    min-height: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .middle-grid .zone:nth-child(2) { order: -1; }
+  .zone { display: flex; flex-direction: column; }
+  .work-list, .tool-list { flex: 1; }
+
+  /* 3A. 工作动态 */
+  .work-list {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    backdrop-filter: none;
+  }
+  .empty-state {
+    flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: rgba(255, 255, 255, 0.4); border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-lg); padding: 32px; text-align: center; gap: 12px;
+  }
+  .empty-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--green-soft); color: var(--green); display: grid; place-items: center; margin-bottom: 4px; }
+  .empty-title { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .empty-desc { font-size: 13px; color: var(--muted); max-width: 240px; line-height: 1.5; }
+
+  .work-card {
+    position: relative;
+    background: transparent; border: 0;
+    border-radius: 10px; padding: 2px 0 2px 42px;
+    display: flex; align-items: center;
+    text-align: left;
+    min-height: 54px;
+    overflow: visible;
+  }
+  .work-card + .work-card { margin-top: 0; }
+  .work-icon {
+    position: absolute;
+    left: 0; top: 50%; transform: translateY(-50%);
+    width: 30px; height: 38px; border-radius: 3px;
+    display: grid;
+    place-items: center;
+    color: var(--gold);
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 5px 12px rgba(17,17,16,.06);
+  }
+  .work-icon svg { width: 17px; height: 17px; stroke-width: 2; }
+  .work-icon.homework { color: #B85F73; border-color: rgba(184,95,115,.18); background: #F9EEF1; }
+  .work-icon.essay { color: #4D8B69; border-color: rgba(77,139,105,.18); background: #EAF5EF; }
+  .work-icon.record { color: #815995; border-color: rgba(129,89,149,.18); background: #F4EEF7; }
+  .work-icon.knowledge { color: #53759E; border-color: rgba(83,117,158,.18); background: #EEF5FB; }
+  .work-card:hover {
+    box-shadow: none;
+    transform: none;
+  }
+  
+  .icon-box {
+    width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.72);
+  }
+  .icon-box.rose { background: var(--rose-soft); color: var(--rose); }
+  .icon-box.green { background: var(--green-soft); color: var(--green); }
+  .icon-box.blue { background: var(--blue-soft); color: var(--blue); }
+  .icon-box.gold { background: var(--gold-soft); color: var(--gold); }
+  .icon-box.purple { background: var(--purple-soft); color: var(--purple); }
+
+  .work-info { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .work-title { font-size: 13.5px; font-weight: 650; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .work-meta { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .work-meta strong { color: var(--ink); font-weight: 700; }
+
+  /* 3B. 常用应用 */
+  .tool-list {
+    display: flex; align-items: flex-start; gap: 30px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 2px 0 0;
+    backdrop-filter: none;
+  }
+  .tool-row {
+    position: relative;
+    background: transparent; border: 0;
+    border-radius: 12px; padding: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 9px;
+    text-align: center; width: 96px; min-height: 74px;
+    cursor: pointer;
+  }
+  .tool-row:hover { background: transparent; box-shadow: none; transform: translateY(-1px); }
+  .tool-list.is-editing .tool-row { padding-left: 0; cursor: default; }
+  .tool-list.is-editing .tool-row:hover { transform: none; }
+  .tool-list.is-editing .tool-add-row { cursor: pointer; }
+  .tool-remove {
+    position: absolute; right: 4px; top: -4px;
+    width: 20px; height: 20px; border-radius: 50%;
+    display: none; place-items: center;
+    background: var(--bg); color: var(--muted);
+    padding: 0; border: 0;
+  }
+  .tool-list.is-editing .tool-remove { display: grid; }
+  .tool-remove:hover { background: var(--rose-soft); color: var(--rose); }
+  .tool-add-row {
+    border: 0;
+    color: var(--muted);
+    justify-content: center;
+    background: transparent;
+  }
+  .tool-add-row:hover { color: var(--gold); border-color: transparent; background: transparent; }
+  .tool-empty-row {
+    border: 1px dashed rgba(0,0,0,.05);
+    background: rgba(255,255,255,.24);
+    pointer-events: none;
+  }
+  .tool-icon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; }
+  .tool-info { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-width: 0; width: 100%; }
+  .tool-name-wrap { display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; }
+  .tool-row .tool-name { font-size: 12.5px; font-weight: 650; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 96px; }
+  .badge-official { font-size: 10px; font-weight: 600; color: var(--gold); background: var(--gold-soft); padding: 1px 4px; border-radius: 4px; flex-shrink: 0; line-height: 1.2; }
+  .tool-row .tool-desc { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tool-add-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: grid; place-items: center;
+    border: 1px solid var(--line-strong);
+    background: rgba(255,255,255,.62);
+    color: var(--muted);
+  }
+  .app-pick-backdrop {
+    position: fixed; inset: 0; z-index: 190;
+    background: rgba(17,17,16,.12);
+  }
+  .app-pick-pop {
+    position: fixed;
+    left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: min(560px, calc(100vw - 48px));
+    max-height: min(70vh, 640px);
+    padding: 18px;
+    display: flex; flex-direction: column;
+  }
+  .app-pick-head {
+    display:flex; align-items:center; justify-content:space-between;
+    min-height: 32px; padding: 0 0 12px;
+  }
+  .app-pick-title { font-size: 16px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .pop .app-pick-close {
+    width: 26px; height: 26px; min-width: 26px; padding: 0;
+    border-radius: 7px; display: grid; place-items: center;
+    color: var(--muted); flex: 0 0 26px; gap: 0;
+  }
+  .app-pick-close:hover { background: var(--side); color: var(--ink); }
+  .app-pick-tabs {
+    display: inline-flex; align-self: flex-start; gap: 4px;
+    padding: 3px; margin-bottom: 12px;
+    background: var(--side); border-radius: 9px;
+  }
+  .pop .app-pick-tab {
+    width: auto; padding: 6px 12px; border-radius: 7px;
+    font-size: 12.5px; color: var(--muted); gap: 0;
+  }
+  .pop .app-pick-tab.active { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  .app-pick-list {
+    display: flex; flex-direction: column; gap: 4px;
+    overflow-y: auto; padding-right: 2px;
+  }
+  .app-pick-item {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    padding: 10px 8px; border-radius: 8px; text-align: left;
+  }
+  .app-pick-item:hover { background: var(--side); }
+  .app-pick-item[disabled] { opacity: .48; cursor: not-allowed; }
+  .app-pick-item[disabled]:hover { background: transparent; }
+  .app-pick-main { flex: 1; min-width: 0; }
+  .app-pick-name { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .app-pick-desc { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .app-pick-action { font-size: 12px; color: var(--gold); font-weight: 600; flex-shrink: 0; }
+  .app-pick-action.is-added { color: var(--muted); }
+
+  /* 4. 推荐区：对齐资源广场卡片 */
+  .featured-section {
+    min-height: 0;
+    padding-top: 2px;
+  }
+  .content-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    text-align: left;
+    text-decoration: none; color: inherit; cursor: pointer;
+    min-height: 214px;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+  }
+  .card:hover {
+    border-color: var(--line-strong);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+  }
+  
+  .card-cover {
+    height: 118px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color: rgba(255,255,255,.85);
+  }
+  .card-cover.mint { background: linear-gradient(135deg, #edf5ee, #c8e0cd); }
+  .card-cover.lilac { background: linear-gradient(135deg, #f5f0f6, #ddc8e3); }
+  .card-cover.sky { background: linear-gradient(135deg, #eff4f9, #c8d8e8); }
+  .card-cover.cream { background: linear-gradient(135deg, #fdfaf3, #f0deb3); }
+  
+  .card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .card-title { font-size: 14px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 40px; }
+  .card-author { margin-top: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); padding-top: 4px; }
+  .author-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--line-strong); display: grid; place-items: center; font-size: 11px; color: #fff; font-weight: 600; flex-shrink: 0; }
+  .card-author-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card-fav {
+    display: inline-flex; align-items: center; gap: 3px;
+    height: 24px; padding: 0 7px;
+    border-radius: 7px;
+    color: var(--faint);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .card-fav svg { width: 12px; height: 12px; stroke-width: 2; }
+  .card-stats {
+    position: absolute; right: 12px; bottom: 12px;
+    display: flex; align-items: center; gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 600;
+  }
+  .card-stat { display: inline-flex; align-items: center; gap: 3px; }
+  .card-stat svg { width: 11px; height: 11px; stroke-width: 2.5; }
+  .featured-empty {
+    grid-column: 1 / -1;
+    min-height: 150px;
+  }
+  
+  @media (max-height: 900px) {
+    .content-wrap { max-width: 1240px; gap: 30px; padding: 28px 48px 24px; }
+    .welcome h1 { font-size: 24px; }
+    .composer-section { gap: 12px; }
+    .composer-pill { min-height: 54px; max-width: 1040px; }
+    .middle-grid { gap: 34px; min-height: 0; }
+    .work-list { gap: 32px; }
+    .work-card { padding: 2px 0 2px 42px; min-height: 54px; }
+    .tool-list { gap: 36px; }
+    .tool-row { padding: 0; gap: 8px; min-height: 72px; }
+    .featured-section { padding-top: 4px; }
+    .card { min-height: 202px; }
+    .card-cover { height: 104px; }
+  }
+
+  @media (max-height: 800px) {
+    .main { overflow-y: hidden; } /* 强制小屏幕不滚动 */
+    .content-wrap { max-width: 1240px; gap: 26px; padding: 20px 48px 20px; }
+    .welcome h1 { font-size: 22px; }
+    .composer-section { gap: 10px; }
+    .composer-pill { min-height: 52px; max-width: 1040px; }
+    .pill-icon { width: 32px; height: 32px; }
+    .intent-chip { padding: 6px 14px; border-radius: 18px; border: 1px solid rgba(0,0,0,.07); background: rgba(255,255,255,.62); font-size: 12px; }
+    .block-head { margin-bottom: 9px; }
+    .block-title { font-size: 15px; }
+    .middle-grid { gap: 30px; min-height: 0; }
+    
+    /* 缩小最近任务卡片 */
+    .work-list { gap: 30px; padding: 0; }
+    .work-card { padding: 2px 0 2px 38px; gap: 0; min-height: 50px; }
+    .icon-box { width: 36px; height: 36px; border-radius: 10px; }
+    .icon-box svg { width: 18px; height: 18px; }
+    .work-title { font-size: 13.5px; }
+    .work-meta { font-size: 11.5px; }
+
+    /* 缩小常用工具卡片 */
+    .tool-list { gap: 34px; padding: 0; }
+    .tool-row { padding: 0; gap: 8px; min-height: 68px; }
+    .tool-icon { width: 30px; height: 30px; }
+    .tool-icon svg { width: 16px; height: 16px; }
+    .tool-row .tool-name { font-size: 12.5px; max-width: 96px; }
+    .tool-row .tool-desc { font-size: 10.5px; }
+
+    /* 缩小推荐卡片 */
+    .featured-section { padding-top: 2px; }
+    .content-grid { gap: 18px; }
+    .card { min-height: 190px; }
+    .card-cover { height: 96px; }
+    .card-body { padding: 12px 14px; gap: 6px; }
+    .card-title { font-size: 13px; min-height: 36px; line-height: 1.3; }
+    .card-author { font-size: 11px; }
+    .author-avatar { width: 20px; height: 20px; font-size: 10px; }
+    .card-fav { height: 22px; padding: 0 6px; font-size: 11px; }
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body>
+
+<div class="app" id="app" data-sidebar="open">
+  <aside id="feixiang-sidebar"></aside>
+
+  <!-- 主区：复用原版 HTML 结构，但通过新 CSS 实现秩序 -->
+  <main class="main">
+    <div class="content-wrap">
+
+      <!-- 1. 欢迎语 -->
+      <header class="welcome">
+        <h1>张老师，今天想做什么？</h1>
+      </header>
+
+      <!-- 2. GPT 风格输入区 -->
+      <section class="composer-section">
+        <div class="composer-pill" id="home-composer">
+          <button class="pill-icon pill-plus" id="home-plus-btn" title="添加文件或图片" onclick="togglePlusMenu(event)" data-track="/click/feixiangCampusHomePage/openAttachmentMenu | 打开首页附件菜单 | mode#STRING">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="input-wrap">
+            <div class="attachment-row" id="home-attachment-row"></div>
+            <textarea id="home-input" rows="1" placeholder="问点什么……" onkeydown="onHomeKey(event)" oninput="autosize(this)"></textarea>
+          </div>
+          <div class="chip-row" id="home-chip-row">
+            <span id="home-mode" class="pill-mode" style="display:none"></span>
+            <button type="button" class="capability-upload-card" id="home-capability-upload" onclick="uploadCapabilityAttachment(event)" data-track="/click/feixiangCampusHomePage/uploadRequiredAttachment | 上传能力必需附件 | capability#STRING">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/></svg>
+              <span>上传附件</span>
+            </button>
+            <div class="kb-attached-row" id="home-kb-row"></div>
+          </div>
+          <div class="composer-actions">
+            <button class="pill-icon" title="语音输入" onclick="showToast('（演示）按住说话，自动转文字')" data-track="/click/feixiangCampusHomePage/voiceInput | 使用首页语音输入 | mode#STRING">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+            </button>
+            <button class="pill-icon pill-send" title="发送" onclick="submitHome()" data-track="/click/feixiangCampusHomePage/submitPrompt | 提交首页输入 | mode#STRING,kbScope#STRING,attachmentCount#INT32">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="intent-chips" id="intent-chip-panel">
+          <button class="intent-chip" data-chip="ai" onclick="toggleChip('ai')" data-track="/click/feixiangCampusHomePage/selectIntent | 选择首页输入模式 | mode#STRING">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9l-7 1 5 5-1 7 6-3 6 3-1-7 5-5-7-1z"/></svg> AI 生成
+          </button>
+          <button class="intent-chip" data-chip="search" onclick="toggleChip('search')" data-track="/click/feixiangCampusHomePage/selectIntent | 选择首页输入模式 | mode#STRING">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg> 知识库问答
+          </button>
+          <button class="intent-chip" data-chip="create" onclick="toggleChip('create')" data-track="/click/feixiangCampusHomePage/selectIntent | 选择首页输入模式 | mode#STRING">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> 创建应用
+          </button>
+        </div>
+      </section>
+
+      <!-- 3. 中段双栏：恢复原版左大右小比例 -->
+      <section class="middle-grid">
+        
+        <!-- 左：工作动态 -->
+        <div class="zone">
+          <div class="block-head">
+            <div class="block-title">工作动态</div>
+            <a class="block-more" href="work-feed.html" style="text-decoration: none;">
+              全部 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </a>
+          </div>
+          <div class="work-list">
+            <button class="work-card" onclick="window.location.href='homework-insight.html'" data-track="/click/feixiangCampusHomePage/enterWorkItem | 进入工作事项 | targetPage#STRING">
+              <span class="work-icon homework" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1 0-4h12"/></svg>
+              </span>
+              <div class="work-info">
+                <div class="work-title" title="八 数据的表示和分析 第4课时 平均数的再认识">八 数据的表示和分析 第4课时 平均数的再认识</div>
+                <div class="work-meta"><span>五年级8班</span> <span>提交 <strong>15/42</strong></span></div>
+              </div>
+            </button>
+            <button class="work-card" onclick="window.location.href='essay-insight.html'" data-track="/click/feixiangCampusHomePage/enterWorkItem | 进入工作事项 | targetPage#STRING">
+              <span class="work-icon essay" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              </span>
+              <div class="work-info">
+                <div class="work-title" title="成长路上，请以《你是美好的代名词》为题">成长路上，请以《你是美好的代名词》为题</div>
+                <div class="work-meta"><span><strong>3</strong> 个班</span> <span><strong>126</strong> 篇待确认</span></div>
+              </div>
+            </button>
+            <button class="work-card" onclick="window.location.href='ai-review.html'" data-track="/click/feixiangCampusHomePage/enterWorkItem | 进入工作事项 | targetPage#STRING">
+              <span class="work-icon record" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="11" cy="11" r="3"/><path d="m16 16-2.2-2.2"/></svg>
+              </span>
+              <div class="work-info">
+                <div class="work-title" title="《期中模拟卷》">《期中模拟卷》</div>
+                <div class="work-meta"><span>AI 录题</span> <span>解析完成</span> <span>共 <strong>36</strong> 题</span></div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 右：常用工具 (修复为 2x2 网格，彻底消除凌乱感) -->
+        <div class="zone">
+          <div class="block-head">
+            <div class="block-title">常用应用</div>
+            <button type="button" class="block-more" id="common-app-edit-btn" onclick="toggleCommonAppEdit(event)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 
+              编辑
+            </button>
+          </div>
+          <div class="tool-list" id="common-app-list"></div>
+        </div>
+
+      </section>
+
+      <!-- 4. 推荐区：沿用原版4卡片布局，但弱化了封面的视觉噪音 -->
+      <section class="featured-section">
+        <div class="block-head">
+          <div class="block-title">为您推荐</div>
+          <a class="block-more" href="resource-square.html" style="text-decoration: none;">更多 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></a>
+        </div>
+        <div class="content-grid" id="featured-resource-list"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('home');</script>
+<script>
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+/* 常用应用编辑 */
+const COMMON_APP_LIMIT = 10;
+const COMMON_APP_LIMIT_TOAST = `最多添加 ${COMMON_APP_LIMIT} 个应用`;
+const COMMON_APPS = [
+  { id: 'qbank', name: 'AI 校本题库', desc: '搜题、筛题、组题', source: 'mine', url: 'ai-qbank.html', color: 'gold', official: true, svg: '<path d="M16 2H8a2 2 0 0 0-2 2v12"/><path d="M18 6H10a2 2 0 0 0-2 2v12"/><path d="M12 10h8v12h-8z"/><path d="M15 14h2"/><path d="M15 18h2"/>' },
+  { id: 'record', name: 'AI 录题', desc: '上传解析入库', source: 'mine', url: 'ai-record-jobs.html', color: 'rose', official: true, svg: '<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="11" cy="11" r="3"/><path d="m16 16-2.2-2.2"/>' },
+  { id: 'essay', name: '飞象 AI 作文星', desc: '作文批改讲评', source: 'mine', url: 'essay-star-home.html', color: 'green', official: true, svg: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="m18.5 2.5 3 3L12 15l-4 1 1-4z"/>' },
+  { id: 'notify', name: '班级通知', desc: '一键发送家长', source: 'mine', url: 'app-detail.html?app=notify&state=owner', color: 'blue', svg: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>' },
+  { id: 'schedule', name: '智能排课', desc: '查看本周课表', source: 'mine', url: 'app-detail.html?app=schedule&state=owner', color: 'purple', svg: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>' },
+  { id: 'leave', name: '请假审批', desc: '学生请假处理', source: 'mine', url: 'app-detail.html?app=leave&state=owner', color: 'green', svg: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/>' },
+  { id: 'score', name: '成绩分析', desc: '班级成绩趋势', source: 'mine', url: 'app-detail.html?app=score&state=owner', color: 'blue', svg: '<path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-5"/>' },
+  { id: 'attendance', name: '课堂考勤', desc: '签到与缺勤记录', source: 'mine', url: 'app-detail.html?app=attendance&state=owner', color: 'gold', svg: '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>' },
+  { id: 'parent', name: '家校沟通', desc: '常用通知与反馈', source: 'favorite', url: 'app-detail.html?app=parent&state=viewer', color: 'rose', svg: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>' },
+  { id: 'vote', name: '课堂投票', desc: '实时收集学生反馈', source: 'favorite', url: 'app-detail.html?app=vote&state=viewer', color: 'blue', svg: '<path d="M3 3h18v14H3z"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="m8 9 3 3 5-5"/>' },
+  { id: 'essay-guide', name: '作文讲评助手', desc: '生成讲评与佳句摘录', source: 'favorite', url: 'app-detail.html?app=essay-guide&state=viewer', color: 'green', svg: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>' },
+];
+let commonAppEditing = false;
+let commonAppIds = ['qbank', 'record', 'essay', 'notify', 'schedule'];
+let commonAppPickerTab = 'favorite';
+
+/* 飞象老师精选推荐 */
+const BLOCKED_FEATURED_RESOURCE_IDS = new Set([
+  'fxr-demo-hidden',
+  'fxr-legacy-offline'
+]);
+const FEATURED_RESOURCES = [
+  {
+    id: 'fxr-hetang-capture',
+    source: 'featured',
+    title: '《荷塘月色》画面捕捉法 · 课堂活动',
+    cover: 'mint',
+    author: '王老师',
+    avatar: '王',
+    avatarColor: 'var(--green)',
+    favoriteCount: 128,
+    viewCount: 3204,
+    url: 'chat.html?q=%E5%B8%AE%E6%88%91%E5%82%99%E3%80%8A%E8%8D%B7%E5%A1%98%E6%9C%88%E8%89%B2%E3%80%8B%E7%AC%AC%E4%BA%8C%E8%AF%BE%E6%97%B6%20%C2%B7%2012%20%E9%A1%B5%E8%AF%BE%E4%BB%B6%20%2B%205%20%E9%81%93%E5%88%86%E5%B1%82%E7%BB%83%E4%B9%A0'
+  },
+  {
+    id: 'fxr-classical-match',
+    source: 'featured',
+    title: '文言虚词配对小游戏 · 必考 12 个',
+    cover: 'lilac',
+    author: '李老师',
+    avatar: '李',
+    avatarColor: 'var(--purple)',
+    favoriteCount: 96,
+    viewCount: 2188,
+    url: 'resource-square.html'
+  },
+  {
+    id: 'fxr-modern-prose',
+    source: 'featured',
+    title: '现代散文阅读 5 步法 · 附课堂讲义',
+    cover: 'sky',
+    author: '陈老师',
+    avatar: '陈',
+    avatarColor: 'var(--blue)',
+    favoriteCount: 84,
+    viewCount: 1936,
+    url: 'resource-square.html'
+  },
+  {
+    id: 'fxr-argument-guide',
+    source: 'featured',
+    title: '议论文 8 大常用角度 + 范文导读',
+    cover: 'cream',
+    author: '飞象教研组',
+    avatar: '飞',
+    avatarColor: 'var(--gold)',
+    favoriteCount: 142,
+    viewCount: 3760,
+    url: 'resource-square.html'
+  }
+];
+
+function renderFeaturedResources() {
+  const list = document.getElementById('featured-resource-list');
+  if (!list) return;
+  const resources = FEATURED_RESOURCES
+    .filter(item => item.source === 'featured')
+    .filter(item => !BLOCKED_FEATURED_RESOURCE_IDS.has(item.id))
+    .slice(0, 4);
+  if (!resources.length) {
+    list.innerHTML = `
+      <div class="empty-state featured-empty">
+        <div class="empty-title">暂无精选推荐</div>
+        <div class="empty-desc">可前往资源广场查看更多飞象老师精选内容。</div>
+      </div>
+    `;
+    return;
+  }
+  list.innerHTML = resources.map(item => `
+    <a class="card" href="${escapeHtml(item.url)}" data-resource-id="${escapeHtml(item.id)}" data-source="${escapeHtml(item.source)}">
+      <div class="card-cover ${escapeHtml(item.cover)}">
+        <div class="card-stats" aria-label="浏览量">
+          <span class="card-stat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            ${escapeHtml(item.viewCount)}
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${escapeHtml(item.title)}</div>
+        <div class="card-author">
+          <div class="author-avatar" style="background: ${escapeHtml(item.avatarColor)}">${escapeHtml(item.avatar)}</div>
+          <span class="card-author-name">${escapeHtml(item.author)}</span>
+          <span class="card-fav" aria-label="收藏数量">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            ${escapeHtml(item.favoriteCount)}
+          </span>
+        </div>
+      </div>
+    </a>
+  `).join('');
+}
+
+function appIcon(app, size = 18) {
+  return `<div class="icon-box ${app.color} tool-icon"><svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${app.svg}</svg></div>`;
+}
+
+function renderCommonApps() {
+  const list = document.getElementById('common-app-list');
+  if (!list) return;
+  const apps = commonAppIds.map(id => COMMON_APPS.find(app => app.id === id)).filter(Boolean);
+  list.classList.toggle('is-editing', commonAppEditing);
+  const appHtml = apps.map(app => `
+    <div
+      role="button"
+      tabindex="0"
+      class="tool-row"
+      data-app-id="${app.id}"
+      onclick="openCommonApp('${app.id}')"
+      onkeydown="onCommonAppKey(event, '${app.id}')"
+    >
+      ${appIcon(app)}
+      <div class="tool-info">
+        <div class="tool-name-wrap">
+          <div class="tool-name">${app.name}</div>
+        </div>
+      </div>
+      <button type="button" class="tool-remove" title="移除" draggable="false" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation();removeCommonApp('${app.id}')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  `).join('');
+  const emptyHtml = commonAppEditing ? `
+    <button type="button" class="tool-row tool-add-row" onclick="openCommonAppPicker(event)">
+      <span class="tool-add-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </span>
+      添加应用
+    </button>
+  ` : '';
+  list.innerHTML = appHtml + emptyHtml;
+}
+
+function toggleCommonAppEdit(e) {
+  e?.preventDefault();
+  e?.stopPropagation();
+  commonAppEditing = !commonAppEditing;
+  closeAllPops();
+  syncCommonAppEditButton();
+  renderCommonApps();
+}
+
+function syncCommonAppEditButton() {
+  const btn = document.getElementById('common-app-edit-btn');
+  if (btn) {
+    btn.innerHTML = commonAppEditing
+      ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> 完成'
+      : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑';
+  }
+}
+
+function openCommonApp(id) {
+  const app = COMMON_APPS.find(item => item.id === id);
+  if (!app) return;
+  if (commonAppEditing) return;
+  window.open(app.url, '_blank', 'noopener');
+}
+
+function onCommonAppKey(e, id) {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  e.preventDefault();
+  openCommonApp(id);
+}
+
+function removeCommonApp(id) {
+  commonAppIds = commonAppIds.filter(appId => appId !== id);
+  renderCommonApps();
+  showToast('已从首页移除');
+}
+
+function addCommonApp(id) {
+  if (commonAppIds.includes(id)) return;
+  if (commonAppIds.length >= COMMON_APP_LIMIT) {
+    showToast(COMMON_APP_LIMIT_TOAST);
+    return;
+  }
+  commonAppIds.push(id);
+  renderCommonApps();
+  renderCommonAppPicker();
+  showToast('已添加到常用应用');
+}
+
+function openCommonAppPicker(e) {
+  e.stopPropagation();
+  if (commonAppIds.length >= COMMON_APP_LIMIT) {
+    showToast(COMMON_APP_LIMIT_TOAST);
+    return;
+  }
+  closeAllPops();
+  commonAppPickerTab = 'favorite';
+  const backdrop = document.createElement('div');
+  backdrop.className = 'app-pick-backdrop';
+  backdrop.id = 'app-pick-backdrop';
+  backdrop.onclick = closeAllPops;
+  const pop = document.createElement('div');
+  pop.className = 'pop app-pick-pop';
+  pop.id = 'app-pick-pop';
+  pop.onclick = ev => ev.stopPropagation();
+  document.body.appendChild(backdrop);
+  document.body.appendChild(pop);
+  renderCommonAppPicker();
+}
+
+function renderCommonAppPicker() {
+  const pop = document.getElementById('app-pick-pop');
+  if (!pop) return;
+  const tabs = [
+    { id: 'favorite', label: '我的收藏' },
+    { id: 'mine', label: '我的应用' },
+  ];
+  const candidates = COMMON_APPS.filter(app => app.source === commonAppPickerTab);
+  pop.innerHTML = `
+    <div class="app-pick-head">
+      <div class="app-pick-title">添加常用应用</div>
+      <button type="button" class="app-pick-close" onclick="event.stopPropagation();closeAllPops()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="app-pick-tabs">
+      ${tabs.map(tab => `
+        <button type="button" class="app-pick-tab ${commonAppPickerTab === tab.id ? 'active' : ''}" onclick="event.stopPropagation();switchCommonAppPickerTab('${tab.id}')">${tab.label}</button>
+      `).join('')}
+    </div>
+    <div class="app-pick-list">
+      ${candidates.length ? candidates.map(app => {
+        const added = commonAppIds.includes(app.id);
+        return `
+          <button type="button" class="app-pick-item" ${added ? 'disabled' : ''} onclick="event.stopPropagation();addCommonApp('${app.id}')">
+            ${appIcon(app, 16)}
+            <span class="app-pick-main">
+              <span class="app-pick-name">${app.name}</span>
+              <span class="app-pick-desc">${app.desc}</span>
+            </span>
+            <span class="app-pick-action ${added ? 'is-added' : ''}">${added ? '已添加' : '添加'}</span>
+          </button>
+        `;
+      }).join('') : `<div class="empty-desc" style="padding:18px 10px">${commonAppPickerTab === 'favorite' ? '我的收藏' : '我的应用'}里暂无应用</div>`}
+    </div>
+  `;
+}
+
+function switchCommonAppPickerTab(tab) {
+  commonAppPickerTab = tab;
+  renderCommonAppPicker();
+}
+
+/* 输入框 / 发送 / chip */
+const CHIP_META = {
+  ai:     { label: 'AI 生成',  placeholder: '', svg: '<path d="M12 2L9 9l-7 1 5 5-1 7 6-3 6 3-1-7 5-5-7-1z"/>' },
+  search: { label: '知识库问答', placeholder: '输入问题或资料关键词', svg: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>' },
+  create: { label: '创建应用', placeholder: '描述你想要的应用，比如：班级请假审批小工具',          svg: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>' },
+};
+const AI_PLACEHOLDER_EXAMPLES = [
+  '互动课件｜帮我生成初英人教七下U1 Grammar Focus的互动课件，通过精简而高效的语言活动，帮助学生掌握并巩固与动物相关的词汇、句型及原因状语从句引导词because的用法。',
+  '教学游戏｜以《西游记》取经之路为故事线，生成六年级课内古诗词闯关游戏，让学生在游戏化体验中变“被动背诵”为“主动探究”。',
+  '教学动画｜设计初中数学勾股定理互动教学活动，引导学生主动探究，培养几何直观、逻辑推理能力。',
+  'AI 组题｜帮我生成一份北京朝阳区七年级上册数学期末考试模拟题',
+];
+const AI_CAPABILITIES = [
+  { id: 'qbank', label: 'AI 组题', desc: '根据知识点、题型和难度快速生成练习、测验或试卷。', placeholder: AI_PLACEHOLDER_EXAMPLES[3], svg: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>' },
+  { id: 'animation', label: '教学动画', badge: '新功能', desc: '生成用于课堂讲解的专业级互动教学动画。', placeholder: AI_PLACEHOLDER_EXAMPLES[2], svg: '<path d="M12 3v4"/><path d="M12 17v4"/><path d="M3 12h4"/><path d="M17 12h4"/><path d="m5.6 5.6 2.8 2.8"/><path d="m15.6 15.6 2.8 2.8"/><path d="m18.4 5.6-2.8 2.8"/><path d="m8.4 15.6-2.8 2.8"/><circle cx="12" cy="12" r="3"/>' },
+  { id: 'game', label: '教学游戏', badge: '新功能', desc: '把知识点设计成可在课堂中使用的小游戏。', placeholder: '教学游戏｜以《西游记》取经之路为故事线，生成六年级课内古诗词闯关游戏，让学生在游戏化体验中变“被动背诵”为“主动探究”。', svg: '<line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="3"/>' },
+  { id: 'interactive', label: '互动课件', badge: '新功能', desc: '上传教案文件后，生成可操作、可演示的课堂互动课件。', placeholder: AI_PLACEHOLDER_EXAMPLES[0], svg: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/>' },
+  { id: 'data', label: '数据回收', badge: '新功能', desc: '上传 HTML 文件后，为课件增加答题、统计和课堂数据回收。', placeholder: '数据回收｜我想在课件的练习环节，增加数据回收功能，了解每道题的正确率及高频错题的情况。', svg: '<path d="M3 3v18h18"/><path d="M7 15v2"/><path d="M12 9v8"/><path d="M17 12v5"/>' },
+];
+const HOME_DEFAULT = '问点什么……';
+const ATTACHMENT_LIMIT = 10;
+let activeChip = null;
+let activeAiCapability = null;
+let aiPlaceholderIndex = 0;
+let aiPlaceholderTimer = null;
+let attachedItems = [];
+let capabilityUploads = {};
+
+function getUploadRequirement() {
+  if (activeChip !== 'ai') return null;
+  if (activeAiCapability === 'interactive') return { id: 'interactive', label: '上传教案文件', fileName: '初英U1互动课件教案.docx', toast: '已添加教案文件' };
+  if (activeAiCapability === 'data') return { id: 'data', label: '上传HTML文件', fileName: '课堂练习数据回收.html', toast: '已添加 HTML 文件' };
+  return null;
+}
+
+function attachmentIcon(type) {
+  if (type === 'image') return '<span class="attachment-thumb"></span>';
+  return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+}
+
+function applyAttachmentState() {
+  const row = document.getElementById('home-attachment-row');
+  if (!row) return;
+  row.innerHTML = attachedItems.map(item => `
+    <div class="attachment-chip" title="${item.name}">
+      ${attachmentIcon(item.type)}
+      <span class="attachment-meta">
+        <span class="attachment-name">${item.name}</span>
+        <span class="attachment-size">${item.size}</span>
+      </span>
+      <span class="chip-del" title="移除" onclick="event.stopPropagation(); removeAttachment('${item.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </span>
+    </div>
+  `).join('');
+  refreshComposerLayout();
+}
+
+function addAttachment(type) {
+  if (attachedItems.length >= ATTACHMENT_LIMIT) {
+    closeAllPops();
+    showToast(`最多上传 ${ATTACHMENT_LIMIT} 个附件`);
+    return;
+  }
+  const item = type === 'image'
+    ? { id: `image-${Date.now()}`, type: 'image', name: '课堂板书.png', size: '433.92KB' }
+    : { id: `file-${Date.now()}`, type: 'file', name: '教学资料.docx', size: '167KB' };
+  attachedItems.push(item);
+  applyAttachmentState();
+  closeAllPops();
+  showToast(type === 'image' ? '已添加图片' : '已添加文件');
+}
+
+function removeAttachment(id) {
+  attachedItems = attachedItems.filter(item => item.id !== id);
+  applyAttachmentState();
+}
+
+function renderCapabilityUploadCard(uploadCard, uploadReq) {
+  if (!uploadCard) return;
+  const uploaded = uploadReq ? capabilityUploads[uploadReq.id] : null;
+  uploadCard.classList.toggle('is-uploaded', !!uploaded);
+  uploadCard.innerHTML = uploaded ? `
+    <span class="uploaded-label">已上传</span>
+    <span class="uploaded-line">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      <span class="uploaded-name">${uploaded.name}</span>
+      <span class="upload-remove" title="移除" onclick="event.stopPropagation(); removeCapabilityUpload('${uploadReq.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </span>
+    </span>
+  ` : `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/></svg>
+    <span>${uploadReq ? uploadReq.label : '上传附件'}</span>
+  `;
+}
+
+function toggleChip(kind) {
+  const next = activeChip === kind ? null : kind;
+  activeChip = next;
+  activeAiCapability = null;
+  if (activeChip === 'search' && selectedKbIds.length === 0) selectedKbIds = ['school'];
+  refreshChips();
+  applyKbState();
+}
+function clearChip() {
+  activeChip = null;
+  activeAiCapability = null;
+  refreshChips();
+  applyKbState();
+}
+function selectAiCapability(id) {
+  activeChip = 'ai';
+  activeAiCapability = id;
+  aiPlaceholderIndex = 0;
+  refreshChips();
+  syncAiPlaceholder();
+  applyKbState();
+}
+function getAiPlaceholder() {
+  const cap = activeAiCapability ? AI_CAPABILITIES.find(item => item.id === activeAiCapability) : null;
+  if (cap) return cap.placeholder;
+  return AI_PLACEHOLDER_EXAMPLES[aiPlaceholderIndex % AI_PLACEHOLDER_EXAMPLES.length];
+}
+function syncAiPlaceholder() {
+  const ipt = document.getElementById('home-input');
+  if (ipt && activeChip === 'ai') ipt.placeholder = getAiPlaceholder();
+}
+function startAiPlaceholderCarousel() {
+  syncAiPlaceholder();
+  if (aiPlaceholderTimer) return;
+  aiPlaceholderTimer = setInterval(() => {
+    if (activeChip !== 'ai') {
+      stopAiPlaceholderCarousel();
+      return;
+    }
+    aiPlaceholderIndex = (aiPlaceholderIndex + 1) % AI_PLACEHOLDER_EXAMPLES.length;
+    syncAiPlaceholder();
+  }, 3600);
+}
+function stopAiPlaceholderCarousel() {
+  if (!aiPlaceholderTimer) return;
+  clearInterval(aiPlaceholderTimer);
+  aiPlaceholderTimer = null;
+}
+function renderMainIntentChips() {
+  const panel = document.getElementById('intent-chip-panel');
+  if (!panel) return;
+  panel.innerHTML = `
+    <button class="intent-chip ${activeChip === 'ai' ? 'active' : ''}" data-chip="ai" onclick="toggleChip('ai')" data-track="/click/feixiangCampusHomePage/selectIntent | 选择首页输入模式 | mode#STRING">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${CHIP_META.ai.svg}</svg> AI 生成
+    </button>
+    <button class="intent-chip ${activeChip === 'search' ? 'active' : ''}" data-chip="search" onclick="toggleChip('search')" data-track="/click/feixiangCampusHomePage/selectIntent | 选择首页输入模式 | mode#STRING">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${CHIP_META.search.svg}</svg> 知识库问答
+    </button>
+    <button class="intent-chip ${activeChip === 'create' ? 'active' : ''}" data-chip="create" onclick="toggleChip('create')" data-track="/click/feixiangCampusHomePage/selectIntent | 选择首页输入模式 | mode#STRING">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${CHIP_META.create.svg}</svg> 创建应用
+    </button>
+  `;
+}
+function renderAiCapabilityChips() {
+  const panel = document.getElementById('intent-chip-panel');
+  if (!panel) return;
+  panel.innerHTML = `
+    ${AI_CAPABILITIES.map(cap => `
+      <button class="intent-chip ai-capability-chip ${activeAiCapability === cap.id ? 'active' : ''}" data-capability="${cap.id}" onclick="selectAiCapability('${cap.id}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${cap.svg}</svg>
+        ${cap.label}
+        ${cap.beta ? '<span class="chip-beta">BETA</span>' : ''}
+        <span class="capability-tip">
+          <span class="capability-tip-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${cap.svg}</svg></span>
+          <span class="capability-tip-title">${cap.label}${cap.badge ? `<span class="capability-tip-badge">${cap.badge}</span>` : ''}</span>
+          <span class="capability-tip-desc">${cap.desc}</span>
+        </span>
+      </button>
+    `).join('')}
+  `;
+}
+function renderKbScopeChips() {
+  const panel = document.getElementById('intent-chip-panel');
+  if (!panel) return;
+  panel.innerHTML = `
+    ${KB_FOLDERS.map(f => `
+      <button class="intent-chip ${selectedKbIds.includes(f.id) ? 'active' : ''}" onclick="selectKbScope('${f.id}')" data-track="/click/feixiangCampusHomePage/selectKbScope | 选择知识库范围 | kbScope#STRING">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        ${f.name}
+      </button>
+    `).join('')}
+  `;
+}
+function refreshChips() {
+  const chipsRow = document.querySelector('.intent-chips');
+  if (chipsRow) chipsRow.classList.toggle('hidden-chips', !!activeChip && activeChip !== 'ai' && activeChip !== 'search');
+  if (activeChip === 'ai') renderAiCapabilityChips();
+  else if (activeChip === 'search') renderKbScopeChips();
+  else renderMainIntentChips();
+  const ipt = document.getElementById('home-input');
+  const modeEl = document.getElementById('home-mode');
+  if (activeChip && CHIP_META[activeChip]) {
+    const meta = CHIP_META[activeChip];
+    const aiCap = activeChip === 'ai' && activeAiCapability
+      ? AI_CAPABILITIES.find(cap => cap.id === activeAiCapability)
+      : null;
+    const modeLabel = aiCap ? `${meta.label} · ${aiCap.label}` : meta.label;
+    modeEl.innerHTML = `
+      <svg class="mode-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${meta.svg}</svg>
+      ${modeLabel}
+      <span class="mode-x" onclick="event.stopPropagation();clearChip()" title="取消">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </span>
+    `;
+    modeEl.style.display = 'inline-flex';
+    if (activeChip === 'ai') {
+      startAiPlaceholderCarousel();
+    } else {
+      stopAiPlaceholderCarousel();
+      ipt.placeholder = meta.placeholder;
+    }
+  } else {
+    stopAiPlaceholderCarousel();
+    modeEl.style.display = 'none';
+    modeEl.innerHTML = '';
+    ipt.placeholder = HOME_DEFAULT;
+  }
+  refreshComposerLayout();
+  ipt.focus();
+}
+function onHomeKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    submitHome();
+  }
+}
+function autosize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+function buildChatUrl(qText) {
+  const params = [];
+  if (qText) params.push('q=' + encodeURIComponent(qText));
+  if (activeChip) params.push('intent=' + activeChip);
+  if (activeChip === 'ai' && activeAiCapability) params.push('capability=' + encodeURIComponent(activeAiCapability));
+  const scopeIds = activeChip === 'search' && selectedKbIds.length === 0 ? ['school'] : selectedKbIds;
+  if (scopeIds.length) params.push('kb=1&folders=' + encodeURIComponent(scopeIds.join(',')));
+  return 'chat.html' + (params.length ? '?' + params.join('&') : '');
+}
+function submitHome() {
+  const ipt = document.getElementById('home-input');
+  const text = (ipt.value || '').trim();
+  if (!text) {
+    showToast('请输入内容');
+    ipt.focus();
+    return;
+  }
+  let q = text;
+  if (activeChip && CHIP_META[activeChip]) {
+    const aiCap = activeChip === 'ai' && activeAiCapability
+      ? AI_CAPABILITIES.find(cap => cap.id === activeAiCapability)
+      : null;
+    q = '[' + CHIP_META[activeChip].label + (aiCap ? ' · ' + aiCap.label : '') + '] ' + q;
+  }
+  window.location.href = buildChatUrl(q);
+}
+
+/* 用户区 · 账号 + 工作区切换菜单 */
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  closeAllPops();
+  const btn = document.getElementById('user-btn');
+  if (btn.classList.contains('open')) { btn.classList.remove('open'); return; }
+  btn.classList.add('open');
+  const rect = btn.getBoundingClientRect();
+  const popWidth = 260;
+  const pop = document.createElement('div');
+  pop.className = 'pop';
+  pop.id = 'ws-pop';
+  pop.style.cssText = `position:fixed;width:${popWidth}px;left:${rect.left}px;bottom:${window.innerHeight - rect.top + 6}px`;
+  pop.innerHTML = `
+    <div style="padding:10px 12px 6px;border-bottom:1px solid var(--line);margin-bottom:4px">
+      <div style="font-size:13.5px;font-weight:700;color:var(--ink)">张老师</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:2px">13800138000</div>
+    </div>
+    <div class="pop-submenu">
+      <button onclick="event.stopPropagation()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+        <div class="pop-row-body"><div class="pop-row-title">切换空间</div></div>
+      </button>
+      <div class="pop-flyout">
+        <div class="pop-section-title">校园版</div>
+        <button class="active" onclick="event.stopPropagation();closeAllPops();showToast('当前 · 北京市实验中学')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <div class="pop-row-body"><div class="pop-row-title">北京市实验中学</div></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--gold)"><path d="M5 13l4 4L19 7"/></svg>
+        </button>
+        <button onclick="event.stopPropagation();closeAllPops();showToast('（演示）切换到 · 人大附中')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <div class="pop-row-body"><div class="pop-row-title">人大附中</div></div>
+        </button>
+        <div class="pop-section-title">个人版</div>
+        <button onclick="event.stopPropagation();closeAllPops();showToast('（演示）切换到 · 飞象个人版')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+          <div class="pop-row-body"><div class="pop-row-title">张老师 · 飞象个人版</div></div>
+        </button>
+      </div>
+    </div>
+    <div class="pop-divider"></div>
+    <button onclick="event.stopPropagation();closeAllPops();showToast('（演示）账号设置')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <div class="pop-row-body"><div class="pop-row-title">账号设置</div></div>
+    </button>
+    <button onclick="event.stopPropagation();closeAllPops();window.location.href='teacher-login.html?logout=1'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <div class="pop-row-body"><div class="pop-row-title">退出登录</div></div>
+    </button>
+  `;
+  document.body.appendChild(pop);
+  setTimeout(() => document.addEventListener('click', closeAllPops, { once: true }), 50);
+}
+
+/* 知识库问答范围 · 首页只允许单选：我的 / 学校；默认学校 */
+const KB_FOLDERS = [
+  { id: 'mine',   name: '我的知识库',   count: 18 },
+  { id: 'school', name: '学校知识库',   count: 348 },
+];
+
+let selectedKbIds = ['school'];
+function isKbEnabled() { return selectedKbIds.length > 0; }
+function getKbFolders() { return KB_FOLDERS.filter(f => selectedKbIds.includes(f.id)); }
+
+/* pin 标签文案：1 选显示该库名；知识库问答默认显示学校知识库 */
+function applyKbState() {
+  const row = document.getElementById('home-kb-row');
+  if (!row) return;
+  const list = getKbFolders();
+  if (list.length === 0) {
+    row.innerHTML = '';
+    refreshComposerLayout();
+    return;
+  }
+  row.innerHTML = list.map(f => `
+    <div class="kb-attached-chip" title="已添加知识库">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span>${f.name}</span>
+      <span class="chip-del" title="移除" onclick="event.stopPropagation(); removeKb('${f.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </span>
+    </div>
+  `).join('');
+  refreshComposerLayout();
+}
+
+function refreshComposerLayout() {
+  const composer = document.getElementById('home-composer');
+  if (!composer) return;
+  const mode = document.getElementById('home-mode');
+  const kbRow = document.getElementById('home-kb-row');
+  const attachmentRow = document.getElementById('home-attachment-row');
+  const uploadCard = document.getElementById('home-capability-upload');
+  const uploadReq = getUploadRequirement();
+  const hasMode = mode && mode.style.display !== 'none' && mode.innerHTML.trim() !== '';
+  const hasKb = kbRow && kbRow.children.length > 0;
+  const hasAttachments = attachmentRow && attachmentRow.children.length > 0;
+  renderCapabilityUploadCard(uploadCard, uploadReq);
+  composer.classList.toggle('has-chips', !!(hasMode || hasKb || hasAttachments || uploadReq));
+  composer.classList.toggle('ai-mode', activeChip === 'ai');
+  composer.classList.toggle('upload-required', !!uploadReq);
+}
+
+function removeKb(id) {
+  const idx = selectedKbIds.indexOf(id);
+  if (idx >= 0) selectedKbIds.splice(idx, 1);
+  if (activeChip === 'search' && selectedKbIds.length === 0) selectedKbIds = ['school'];
+  applyKbState();
+  const sub = document.getElementById('kb-submenu');
+  if (sub) renderKbSubmenu(sub);
+  const main = document.getElementById('plus-pop');
+  if (main) renderPlusMenu(main);
+  if (activeChip === 'search') refreshChips();
+}
+
+function selectKbScope(id) {
+  if (activeChip !== 'search') activeChip = 'search';
+  selectedKbIds = [id];
+  applyKbState();
+  refreshChips();
+  document.getElementById('home-input')?.focus();
+}
+
+/* + 主菜单 · openKb=true 时点开主菜单后自动展开知识库二级菜单（pin 点击场景） */
+function uploadCapabilityAttachment(e) {
+  e.stopPropagation();
+  const uploadReq = getUploadRequirement();
+  if (!uploadReq) return;
+  capabilityUploads[uploadReq.id] = { type: 'file', name: uploadReq.fileName };
+  refreshComposerLayout();
+  showToast(uploadReq.toast);
+}
+
+function removeCapabilityUpload(id) {
+  delete capabilityUploads[id];
+  refreshComposerLayout();
+}
+
+function togglePlusMenu(e, opts) {
+  e.stopPropagation();
+  const wasOpen = !!document.getElementById('plus-pop');
+  closeAllPops();
+  if (wasOpen) return;
+  const btn = document.getElementById('home-plus-btn');
+  const rect = btn.getBoundingClientRect();
+  const pop = document.createElement('div');
+  pop.className = 'pop plus-pop';
+  pop.id = 'plus-pop';
+  pop.style.cssText = `top:${rect.bottom + 8}px;left:${rect.left}px`;
+  pop.addEventListener('click', ev => ev.stopPropagation());
+  renderPlusMenu(pop);
+  document.body.appendChild(pop);
+  setTimeout(() => document.addEventListener('click', closeAllPops, { once: true }), 50);
+}
+
+function renderPlusMenu(pop) {
+  pop.innerHTML = `
+    <button class="plus-row" onclick="event.stopPropagation();addAttachment('file')" data-track="/click/feixiangCampusHomePage/addAttachment | 添加首页附件 | attachmentType#STRING,mode#STRING">
+      <svg class="row-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      <span class="row-label">添加文件</span>
+    </button>
+    <button class="plus-row" onclick="event.stopPropagation();addAttachment('image')" data-track="/click/feixiangCampusHomePage/addAttachment | 添加首页附件 | attachmentType#STRING,mode#STRING">
+      <svg class="row-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+      <span class="row-label">添加图片</span>
+    </button>
+  `;
+}
+
+/* 二级菜单 · 知识库单选 */
+function openKbSubmenu(e) {
+  e.stopPropagation();
+  const main = document.getElementById('plus-pop');
+  if (!main) return;
+  // 关闭已存在的二级
+  document.getElementById('kb-submenu')?.remove();
+  const rect = main.getBoundingClientRect();
+  const sub = document.createElement('div');
+  sub.id = 'kb-submenu';
+  sub.className = 'kb-submenu';
+  /* 在主菜单右侧并排 */
+  const subWidth = 280;
+  let leftPos = rect.right + 8;
+  if (leftPos + subWidth > window.innerWidth - 16) leftPos = rect.left - subWidth - 8;
+  sub.style.left = leftPos + 'px';
+  sub.style.top = rect.top + 'px';
+  sub.addEventListener('click', ev => ev.stopPropagation());
+  renderKbSubmenu(sub);
+  document.body.appendChild(sub);
+}
+
+function renderKbSubmenu(sub) {
+  sub.innerHTML = `
+    <div class="kb-submenu-title">
+      <span>选择知识库范围 · 单选</span>
+      ${selectedKbIds.length ? `<span class="kb-submenu-clear" onclick="event.stopPropagation();clearAllKb()">清空</span>` : ''}
+    </div>
+    ${KB_FOLDERS.map(f => {
+      const checked = selectedKbIds.includes(f.id);
+      return `
+        <div class="kb-item ${checked ? 'is-checked' : ''}" onclick="event.stopPropagation();toggleKbItem('${f.id}')">
+          <div class="kb-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+          <span class="kb-name">${f.name}</span>
+          <span class="kb-count">${f.count} 份</span>
+        </div>
+      `;
+    }).join('')}
+  `;
+}
+
+function toggleKbItem(id) {
+  selectedKbIds = selectedKbIds.includes(id) ? [] : [id];
+  applyKbState();
+  if (activeChip === 'search') refreshChips();
+  const sub = document.getElementById('kb-submenu');
+  if (sub) renderKbSubmenu(sub);
+  const main = document.getElementById('plus-pop');
+  if (main) renderPlusMenu(main);
+}
+
+function clearAllKb() {
+  selectedKbIds = [];
+  applyKbState();
+  if (activeChip === 'search') refreshChips();
+  const sub = document.getElementById('kb-submenu');
+  if (sub) renderKbSubmenu(sub);
+  const main = document.getElementById('plus-pop');
+  if (main) renderPlusMenu(main);
+  showToast('已清空知识库引用');
+}
+
+/* 兼容旧引用（buildChatUrl 用到 kbEnabled / currentScope） */
+function getKbUrlParams() {
+  if (selectedKbIds.length === 0) return '';
+  return '&kb=1&folders=' + encodeURIComponent(selectedKbIds.join(','));
+}
+
+/* 通知 */
+function toggleNotifMenu(e) {
+  e.stopPropagation();
+  closeAllPops();
+  if (document.getElementById('notif-pop')) return;
+  const btn = document.getElementById('notif-btn');
+  const rect = btn.getBoundingClientRect();
+  const pop = document.createElement('div');
+  pop.className = 'pop';
+  pop.id = 'notif-pop';
+  pop.style.cssText = `bottom:${window.innerHeight - rect.top + 8}px;left:${rect.right + 8}px;width:320px;padding:8px`;
+  pop.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px 6px">
+      <div style="font-size:13px;font-weight:700">通知 · 3 条未读</div>
+      <button style="font-size:11.5px;color:var(--muted);padding:2px 6px" onclick="event.stopPropagation();closeAllPops();showToast('（演示）全部已读')">全部已读</button>
+    </div>
+    <div class="notif-item" onclick="closeAllPops();window.location.href='ai-record-jobs.html'">
+      <span class="notif-dot"></span>
+      <div class="notif-body">
+        <div class="notif-title">高一(3)班期中模拟卷 · 已扫描完成</div>
+        <div class="notif-desc">38 份扫描已上传，AI 已完成客观题预批，等待你审核</div>
+        <div class="notif-time">5 分钟前</div>
+      </div>
+    </div>
+    <div class="notif-item" onclick="closeAllPops();window.location.href='school-wiki.html'">
+      <span class="notif-dot"></span>
+      <div class="notif-body">
+        <div class="notif-title">王老师分享了「《荷塘月色》画面捕捉法」</div>
+        <div class="notif-desc">已加入「学校知识库 / 高一语文」，可在备课对话中引用</div>
+        <div class="notif-time">2 小时前</div>
+      </div>
+    </div>
+    <div class="notif-item" onclick="closeAllPops();window.location.href='app-detail.html?app=leave'">
+      <span class="notif-dot"></span>
+      <div class="notif-body">
+        <div class="notif-title">3 条请假审批待处理</div>
+        <div class="notif-desc">高一(5)班 · 张同学 / 李同学 / 王同学 · 病假</div>
+        <div class="notif-time">今天 09:12</div>
+      </div>
+    </div>
+    <div class="notif-item" style="opacity:.7" onclick="closeAllPops();showToast('（演示）查看历史通知')">
+      <span class="notif-dot read"></span>
+      <div class="notif-body">
+        <div class="notif-title">教务处发布了《五月教研计划》</div>
+        <div class="notif-time">昨天 16:30</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(pop);
+  setTimeout(() => document.addEventListener('click', closeAllPops, { once: true }), 50);
+}
+
+function closeAllPops() {
+  document.getElementById('ws-pop')?.remove();
+  document.getElementById('scope-pop')?.remove();
+  document.getElementById('notif-pop')?.remove();
+  document.getElementById('plus-pop')?.remove();
+  document.getElementById('kb-submenu')?.remove();
+  document.getElementById('app-pick-backdrop')?.remove();
+  document.getElementById('app-pick-pop')?.remove();
+  document.getElementById('user-btn')?.classList.remove('open');
+}
+
+function toggleSidebar() {
+  const app = document.getElementById('app');
+  if (!app) return;
+  app.dataset.sidebar = app.dataset.sidebar === 'collapsed' ? 'open' : 'collapsed';
+}
+
+renderCommonApps();
+renderFeaturedResources();
+renderMainIntentChips();
+(function syncGreet() {
+  const el = document.querySelector('.welcome h1');
+  if (el) el.textContent = '张老师，今天想做什么？';
+})();
+</script>
+
+<template id="review-template">
+{
+  "title": "首页 · 老师日常工作台",
+  "summary": "首页是老师进入校园版后的工作台入口，负责收集首轮任务意图、展示常用入口、提醒待处理事项，并把任务交给对话页或对应业务页继续处理。",
+  "sections": [
+    {
+      "id": "home-greeting",
+      "title": "1. 首页问候语",
+      "body": "展示当前老师身份和首页问候。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：当前登录老师。",
+            "用途：确认已进入个人工作台。",
+            "产出：展示老师称呼和一句任务引导。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "进入模块",
+              "text": "老师进入首页问候语区域。"
+            },
+            {
+              "label": "查看或操作",
+              "text": "老师按页面可见入口查看信息或执行操作，页面给出对应反馈。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "老师姓名来自当前登录用户资料；当前页面固定展示“张老师”。",
+            "姓名缺失时使用“老师”作为兜底称呼。",
+            "问候语不区分早中晚，不依赖客户端时间。",
+            "问候语只在页面加载时渲染，不实时刷新。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "展示当前老师称呼和固定任务引导语。",
+            "当前页面固定展示“张老师”；真实数据缺失时使用“老师”。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "未获取到老师姓名",
+              "处理方式": "展示“老师，今天想做什么？”。"
+            },
+            {
+              "场景": "客户端时间异常",
+              "处理方式": "不影响问候语和首页其它功能。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "teacher-login.html",
+              "说明": "登录成功后进入首页并带入老师身份。"
+            },
+            {
+              "关联对象": "chat.html",
+              "说明": "首页任务输入进入新对话。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "姓名缺失时展示“老师”。",
+            "问候语不依赖客户端时间。",
+            "刷新页面后问候语不应闪烁或变成空白。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "home-composer",
+      "title": "2. 顶部 AI 输入入口",
+      "body": "收集老师首轮任务意图，并把模式、范围和附件带到对话页。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要快速发起教学任务的老师。",
+            "用途：在首页直接输入任务，或选择 AI 生成、知识库问答、创建应用三类模式。",
+            "产出：首轮消息、任务模式、知识库范围、AI 能力和附件上下文，进入 chat.html 继续处理。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "直接输入",
+              "text": "老师输入内容后点击发送或按 Enter，进入 chat.html；输入内容作为首轮消息，Shift + Enter 只换行。"
+            },
+            {
+              "label": "AI 生成",
+              "text": "点击 AI 生成后，下方 选项 切换为 AI 组题、教学动画、教学游戏、互动课件、数据回收；hover 能力选项 展示提示卡。"
+            },
+            {
+              "label": "选择 AI 能力",
+              "text": "点击具体能力后，输入框标签变为“AI 生成 · 对应能力”，placeholder 固定为该能力提示；互动课件展示教案上传卡，数据回收展示 HTML 上传卡。"
+            },
+            {
+              "label": "知识库问答",
+              "text": "点击知识库问答后，下方展示我的知识库、学校知识库两个范围，默认选中学校知识库；切换范围时替换当前标签。"
+            },
+            {
+              "label": "创建应用",
+              "text": "点击创建应用后，输入框标签变为“创建应用”，placeholder 引导老师描述要创建的应用。"
+            },
+            {
+              "label": "添加附件",
+              "text": "点击 + 后可添加文件或图片；上传成功后在输入框内容区展示附件标签，支持移除。"
+            },
+            {
+              "label": "发送任务",
+              "text": "发送时把文本、主模式、二级能力、知识库范围和附件上下文带入 chat.html；首页不直接展示 AI 结果。"
+            },
+            {
+              "label": "取消状态",
+              "text": "点击模式标签上的 x 清空主模式；取消互动课件或数据回收后，上传卡片消失，+ 按钮恢复。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "AI 生成、知识库问答、创建应用互斥，同一时间只能选择一个主模式。",
+            "首页和新对话页都不做自动续写；正文必须来自老师输入或明确选择的标签、附件。",
+            "AI 生成二级能力只在 AI 生成模式下出现；取消主模式时同步清空二级能力。",
+            "知识库范围不是 + 菜单能力；知识库问答模式直接展示范围选择。",
+            "知识库问答范围为单选，只能在“我的知识库”和“学校知识库”之间切换。",
+            "普通附件只服务本次任务，合计最多 10 个；不自动进入我的知识库或学校知识库。",
+            "互动课件需要教案文件，数据回收需要 HTML 文件；未上传时可进入对话页继续补充。",
+            "一期 + 菜单只提供添加文件、添加图片，不提供拍照/扫描或添加知识库。",
+            "空输入不能发送；已选模式、范围和附件必须保留。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "进入 chat.html 时需要带入：老师输入内容、当前任务模式、已选 AI 能力、知识库范围、具体知识库和附件信息。",
+            "知识库范围需要区分“我的知识库”和“学校知识库”，并校验当前老师是否有访问权限。",
+            "AI 能力需要保留能力标识和展示名称，便于对话页还原“AI 生成 · 具体能力”的标签。",
+            "附件需要区分文件/图片类型，并展示名称、大小、上传状态和移除状态。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "空输入发送",
+              "处理方式": "提示“请输入内容”，不跳转，不清空已选状态。"
+            },
+            {
+              "场景": "无学校知识库权限",
+              "处理方式": "禁用学校知识库或提示联系管理员。"
+            },
+            {
+              "场景": "知识库范围暂无资料",
+              "处理方式": "允许发送；对话页提示无可引用资料，并建议切换范围或上传资料。"
+            },
+            {
+              "场景": "附件格式不支持",
+              "处理方式": "提示支持格式，保留输入内容和已选模式。"
+            },
+            {
+              "场景": "附件超过 10 个",
+              "处理方式": "阻止继续添加，提示“最多上传 10 个附件”。"
+            },
+            {
+              "场景": "必需文件未上传",
+              "处理方式": "进入对话页后继续提示上传教案文件或 HTML 文件。"
+            },
+            {
+              "场景": "二级能力不可用",
+              "处理方式": "保留 AI 生成模式，提示改选其它能力或普通发送。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "chat.html",
+              "说明": "承接首轮消息、模式、能力、知识库范围和附件上下文。"
+            },
+            {
+              "关联对象": "school-wiki.html / my-wiki.html",
+              "说明": "提供知识库范围和资料权限。"
+            },
+            {
+              "关联对象": "upload-onboarding.html",
+              "说明": "承接长期沉淀资料的上传流程。"
+            },
+            {
+              "关联对象": "ai-qbank.html / ai-record-jobs.html",
+              "说明": "承接 AI 组题和 AI 录题链路。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "AI 生成应切换出 5 个二级能力，并支持 hover 提示。",
+            "选择二级能力后，标签、placeholder 和 chat.html 承接状态一致。",
+            "知识库问答应直接展示我的知识库、学校知识库范围，默认学校知识库。",
+            "互动课件和数据回收应展示对应上传卡，并隐藏左侧 + 按钮。",
+            "+ 菜单只展示添加文件、添加图片。",
+            "附件标签 应展示类型、名称、大小和移除入口，普通附件最多 10 个。",
+            "空输入发送只提示，不跳转，不清空已选状态。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contract-permissions-entry",
+      "title": "3. 商品与权限说明入口",
+      "body": "在首页过稿中提供当前商品、权限点和老师角色默认权限的说明入口；说明内容由独立 HTML 承载，不进入老师端左侧导航。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：参与产品过稿、研发对齐、测试验收和交付说明的人员。",
+            "用途：说明当前产品的商品、权限点和角色默认权限关系。",
+            "产出：从首页过稿面板进入 contract-permissions.html，查看飞象老师校园版商品和权限规则。"
+          ]
+        },
+        {
+          "title": "访问入口",
+          "type": "link",
+          "label": "查看商品与权限说明",
+          "href": "contract-permissions.html"
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "商品与权限说明不是老师端业务功能页，不进入左侧导航。",
+            "飞象老师校园版、飞象作业、飞象作文分别作为商品；一个商品可绑定多个权限点。",
+            "飞象老师校园版商品本次绑定 4 个权限点：飞象老师校园版使用、AI 校本题库管理、学校知识库上传、学校管理。",
+            "飞象老师校园版使用是聚合权限点，包含 AI 录题、AI 校本题库读、我的知识库查看与上传、学校知识库查看。",
+            "本次仅给管理员、教务老师、学科老师新增飞象老师校园版相关权限；作文批改老师、双师授课老师、学习机管理员保持原权限不变。",
+            "首页入口展示只体现老师最终生效权限，不在页面主体展示完整商品和权限配置说明。"
+          ]
+        },
+        {
+          "title": "角色默认权限",
+          "type": "table",
+          "columns": [
+            "角色",
+            "本次变化",
+            "默认权限"
+          ],
+          "rows": [
+            {
+              "角色": "管理员",
+              "本次变化": "新增",
+              "默认权限": "飞象老师校园版使用、学校知识库上传、AI 校本题库管理、学校管理。"
+            },
+            {
+              "角色": "教务老师",
+              "本次变化": "新增",
+              "默认权限": "飞象老师校园版使用、学校管理。"
+            },
+            {
+              "角色": "学科老师",
+              "本次变化": "新增",
+              "默认权限": "飞象老师校园版使用。"
+            },
+            {
+              "角色": "作文批改老师",
+              "本次变化": "不变",
+              "默认权限": "保持原飞象作文相关权限。"
+            },
+            {
+              "角色": "双师授课老师",
+              "本次变化": "不变",
+              "默认权限": "保持原双师授课相关权限。"
+            },
+            {
+              "角色": "学习机管理员",
+              "本次变化": "不变",
+              "默认权限": "保持原学习机管理相关权限。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "contract-permissions.html",
+              "说明": "承载商品、权限点和角色默认权限的完整说明。"
+            },
+            {
+              "关联对象": "admin-teachers.html",
+              "说明": "教师角色选择会影响老师默认权限。"
+            },
+            {
+              "关联对象": "index.html",
+              "说明": "首页按最终生效权限展示老师可用入口。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "首页过稿面板应能打开商品与权限说明页。",
+            "商品与权限说明页不应出现在左侧导航。",
+            "说明页应写清飞象老师校园版商品下的 4 个权限点。",
+            "角色默认权限应与本次确认口径一致。",
+            "作文批改老师、双师授课老师、学习机管理员应标记为本次权限不变。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "common-apps",
+      "title": "4. 常用应用",
+      "body": "展示老师高频应用入口，并支持在编辑态添加或移除。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要快速打开高频应用的老师。",
+            "用途：在首页展示个人常用应用入口。",
+            "产出：最多 10 个轻量图标入口，以及一个编辑态添加弹窗。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开应用",
+              "text": "非编辑态点击应用，在新页面打开目标入口；官方应用按合约状态进入官方首页或介绍页，普通应用进入 app-detail.html。"
+            },
+            {
+              "label": "进入编辑",
+              "text": "点击编辑后展示移除入口和添加应用入口。"
+            },
+            {
+              "label": "添加应用",
+              "text": "点击添加应用打开弹窗，默认停留在“我的收藏”标签页，可切换到“我的应用”。"
+            },
+            {
+              "label": "确认添加",
+              "text": "点击应用右侧“添加”后加入首页；弹窗不关闭，该项变为“已添加”并置灰。"
+            },
+            {
+              "label": "完成编辑",
+              "text": "点击完成退出编辑态，回到普通入口展示。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "首页最多展示 10 个常用应用；一期只支持添加和移除，不支持拖动排序。",
+            "非编辑态不展示添加入口；添加入口只在编辑态出现。",
+            "已达 10 个时，不允许继续添加；点击首页添加应用入口或弹窗内未添加应用的“添加”按钮，均 toast 提示“最多添加 10 个应用”。",
+            "编辑态删除只影响首页入口，不删除应用本身。",
+            "已添加应用不能重复添加。",
+            "“我的收藏”只展示当前老师在校园版已收藏的应用。",
+            "“我的应用”只展示当前老师创建、复制或已加入个人工作区的应用。",
+            "飞象老师精选应用的收藏状态在校园版和个人版双端同步。",
+            "个人版不展示校园版飞象官方或本校应用。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "常用应用展示应用名称、图标、来源、点击去向、是否官方应用、学校开通状态、详情页展示态和是否已添加。",
+            "添加弹窗需要区分“我的收藏”和“我的应用”两个来源。",
+            "收藏关系需要记录：应用、收藏人、收藏状态、收藏时间、来源和所属空间。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "常用应用为空",
+              "处理方式": "展示空状态，并保留编辑入口。"
+            },
+            {
+              "场景": "已达 10 个",
+              "处理方式": "保留添加入口；点击首页添加入口或弹窗内未添加应用的“添加”按钮，统一 toast 提示“最多添加 10 个应用”。"
+            },
+            {
+              "场景": "我的收藏为空",
+              "处理方式": "展示空状态，不混入推荐应用。"
+            },
+            {
+              "场景": "我的应用为空",
+              "处理方式": "展示空状态，不影响“我的收藏”。"
+            },
+            {
+              "场景": "应用入口不可用",
+              "处理方式": "提示暂不可用，不打开空白页。"
+            },
+            {
+              "场景": "主态/客态无法判断",
+              "处理方式": "默认按客态打开，避免误展示管理能力。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "app-square.html",
+              "说明": "应用发现和收藏来源。"
+            },
+            {
+              "关联对象": "my-apps.html",
+              "说明": "沉淀老师已收藏或创建的应用。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "非编辑态应为轻量图标入口，不展示应用说明和添加按钮。",
+            "编辑态才展示移除和添加入口。",
+            "已达 10 个时，两个添加入口都应提示“最多添加 10 个应用”，不能新增第 11 个。",
+            "常用应用不应出现拖动排序。",
+            "官方应用按合约状态分流，普通应用按主态/客态进入详情页。",
+            "禁用、空态、失败态必须有反馈。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "work-feed",
+      "title": "5. 工作动态",
+      "body": "展示近期需要老师查看、确认或继续处理的任务提醒。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要回到待处理事项的老师。",
+            "用途：提醒近期作业、作文和 AI 录题事项。",
+            "产出：首页少量动态卡片，以及进入完整动态列表的入口。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "点击作业动态",
+              "text": "进入对应班级作业学情页。"
+            },
+            {
+              "label": "点击作文动态",
+              "text": "进入作文学情页，查看各班作文批改确认情况。"
+            },
+            {
+              "label": "点击 AI 录题动态",
+              "text": "解析成功进入文件对照页；解析失败进入 AI 录题列表页。"
+            },
+            {
+              "label": "点击全部",
+              "text": "进入 work-feed.html 查看完整动态。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "首页工作动态只做提醒和跳转，不在首页完成批改、确认、讲评或录题校对。",
+            "第一版只接入飞象作业、飞象作文、AI 录题，不做泛通知流。",
+            "卡片标题只展示业务对象名称，状态放在副标题。",
+            "作业动态按班级任务展示；同一作业覆盖多个班级时可展示多张卡。",
+            "作文动态按作文题目聚合；同一题目覆盖多个班级时只展示一张卡。",
+            "AI 录题动态按文件展示；同一文件状态更新时复用同一条动态。",
+            "知识库文件处理、资源更新、应用上新、系统公告不进入第一版工作动态。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "通用展示信息：动态类型、标题、副标题、点击去向、优先级和查看权限。",
+            "作业副标题由班级名称、已提交人数、总人数和待确认数量组成；待确认数量为 0 时不展示。",
+            "作文副标题由覆盖班级数、待处理作文篇数和当前状态组成。",
+            "AI 录题副标题由“AI 录题”、解析状态和题目数量组成；解析失败不展示题目数量。",
+            "首页卡片只展示标题和副标题；不展示操作按钮、时间、来源应用名、家长端状态和“刚刚扫描”tag。",
+            "标题超过一行省略，hover 标题区域展示完整标题。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "暂无动态",
+              "处理方式": "展示轻量空状态。"
+            },
+            {
+              "场景": "目标页不可用",
+              "处理方式": "提示暂不可用，并保留动态。"
+            },
+            {
+              "场景": "同一任务多次更新",
+              "处理方式": "更新同一条动态，不重复堆叠。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "work-feed.html",
+              "说明": "展示全部工作动态。"
+            },
+            {
+              "关联对象": "homework-insight.html / essay-insight.html",
+              "说明": "承接作业和作文学情动态。"
+            },
+            {
+              "关联对象": "ai-record-jobs.html / ai-review.html",
+              "说明": "承接 AI 录题失败列表和解析成功文件对照页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "首页工作动态只展示飞象作业、飞象作文、AI 录题三类。",
+            "卡片结构应为标题 + 副标题。",
+            "作业副标题包含班级和提交数。",
+            "作文副标题包含班级数和待确认/待批改篇数。",
+            "AI 录题副标题包含解析状态和必要题目数量。",
+            "知识库文件处理不应出现在首页或全部动态列表中。",
+            "首页动态卡片不展示时间、tag、家长端状态或操作按钮。"
+          ]
+        },
+        {
+          "title": "第一版接入范围",
+          "type": "table",
+          "columns": [
+            "来源",
+            "触发条件",
+            "点击去向"
+          ],
+          "rows": [
+            {
+              "来源": "飞象作业",
+              "触发条件": "高扫扫描作业完成，老师需要查看或继续批改。",
+              "点击去向": "班级作业学情页。"
+            },
+            {
+              "来源": "飞象作文",
+              "触发条件": "高扫扫描作文完成，老师需要确认批改。",
+              "点击去向": "作文学情页。"
+            },
+            {
+              "来源": "AI 录题",
+              "触发条件": "AI 录题处理完成或需要老师确认。",
+              "点击去向": "解析成功进文件对照页，解析失败进 AI 录题列表页。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "featured-resources",
+      "title": "6. 为您推荐",
+      "body": "展示飞象老师精选资源，卡片信息与资源广场飞象老师精选保持一致。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要发现可复用教学资源的老师。",
+            "用途：在首页推荐少量飞象老师精选资源。",
+            "卡片信息：只展示资源标题、作者、收藏数量和浏览数量，不展示资源类型 tag。",
+            "展示口径：与资源广场飞象老师精选资源卡片保持一致。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "点击资源卡片",
+              "text": "进入资源详情、资源广场或带预设问题的 chat.html。"
+            },
+            {
+              "label": "点击更多",
+              "text": "进入 resource-square.html，默认继续浏览飞象老师精选资源，可切换本校资源。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "为您推荐只使用飞象老师精选资源池。",
+            "卡片不展示课件、互动动画、PPT、官方精选等资源类型标签。",
+            "卡片作者展示老师姓名或教研组名称，不展示班级。",
+            "收藏数量和浏览数量读取资源广场同一套统计口径。",
+            "不使用老师个人最近浏览、最近使用或本校资源补位。",
+            "展示前过滤屏蔽、下架、无权限、审核不通过的资源。",
+            "被过滤资源不占推荐位；不足 4 条时用后续可展示精选资源补位。",
+            "仍不足 4 条时展示实际数量；完全没有资源时展示空状态。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "推荐资源卡片展示资源标题、作者、收藏数量、浏览数量、封面、点击去向和可访问状态。",
+            "资源标题展示资源名称；作者展示老师姓名或教研组名称；收藏数量和浏览数量使用资源广场同一口径。",
+            "资源类型可以保留在资料记录中，但首页为您推荐不渲染资源类型。",
+            "资源来源必须为飞象老师精选；本校资源、官方应用、个人应用不能进入该模块。",
+            "屏蔽资源清单由运营或后端维护，展示前按清单过滤。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "命中屏蔽资源",
+              "处理方式": "不展示，并由下一条可展示资源补位。"
+            },
+            {
+              "场景": "可展示资源不足",
+              "处理方式": "展示实际数量，不用其它来源补齐。"
+            },
+            {
+              "场景": "资源下架或无权限",
+              "处理方式": "卡片不展示；点击前状态变化时提示暂不可用。"
+            },
+            {
+              "场景": "暂无可展示资源",
+              "处理方式": "展示轻量空状态，并保留资源广场入口。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "resource-square.html",
+              "说明": "承接更多飞象老师精选资源浏览。"
+            },
+            {
+              "关联对象": "chat.html",
+              "说明": "承接可直接生成或继续对话的推荐资源。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "为您推荐卡片应展示标题、作者、收藏数量、浏览数量。",
+            "为您推荐卡片不应展示资源类型标签。",
+            "作者不应展示班级。",
+            "收藏数量和浏览数量应与资源广场飞象老师精选一致。",
+            "为您推荐不应出现本校资源、系统公告、工作动态或普通应用。",
+            "配置在屏蔽资源清单中的资源不能出现在首页推荐卡片中。",
+            "点击推荐卡片应进入正确目标页；目标不可访问时需要有明确提示。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "global-sidebar",
+      "title": "7. 左侧导航与全局入口",
+      "body": "提供校园版全局路由、空间身份和账号入口。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要在校园版各模块间切换的老师。",
+            "用途：提供首页、对话、知识库、应用、资源和管理入口。",
+            "产出：当前页面高亮、当前学校空间和账号菜单。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "首页",
+              "text": "点击首页回到 index.html，并高亮首页导航项。"
+            },
+            {
+              "label": "新对话",
+              "text": "点击新对话进入空白对话页。"
+            },
+            {
+              "label": "模块切换",
+              "text": "点击导航项进入对应模块，并高亮当前页面。"
+            },
+            {
+              "label": "账号菜单",
+              "text": "打开账号菜单后可切换空间或退出登录。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "当前学校空间决定可见的学校知识库、学校应用和管理入口。",
+            "普通老师不展示管理员专属入口。",
+            "通知类事项不作为左侧独立入口，统一进入工作动态。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "导航需要知道当前页面、当前学校、老师角色和可访问模块。",
+            "空间切换只改变可见范围，不改变老师个人资料。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "无管理权限",
+              "处理方式": "隐藏学校管理入口。"
+            },
+            {
+              "场景": "切换到无权限空间",
+              "处理方式": "提示无权限，不切换页面。"
+            },
+            {
+              "场景": "当前入口下线",
+              "处理方式": "回到首页，并提示该入口暂不可用。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "teacher-login.html",
+              "说明": "退出登录后返回老师登录页。"
+            },
+            {
+              "关联对象": "admin-teachers.html",
+              "说明": "管理员可见的学校管理入口。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "当前页面应正确高亮。",
+            "普通老师不应看到学校管理入口。",
+            "跨页入口应进入对应业务页面。",
+            "禁用、无权限和失败状态不能静默。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'index.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+</body>
+</html>

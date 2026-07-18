@@ -1,0 +1,471 @@
+/* ============================================================
+   page-header.css · 飞象老师校园版统一页面顶栏
+   --------------------------------------------------------------
+   - 所有页面共用一种顶栏结构：左 = 标题/面包屑，右 = 当前页操作
+   - 滚动时自动压扁（图标缩小、副标题淡出、padding 收缩）
+   - 视觉沿用 v28 既有金色调 + 玻璃态背景
+   ============================================================ */
+
+.page-header{
+  position:sticky;
+  top:0;
+  z-index:50;
+  display:flex;align-items:center;
+  gap:8px;
+  min-height:56px;
+  padding:8px 40px; /* 一行：当前位置 + 视图 + 操作 */
+  background:rgba(255, 255, 255, 0.85); /* 更纯净的玻璃态 */
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,0,0,0.04); /* 更轻的边框 */
+  font-size:13.5px;
+  flex-shrink:0;
+  transition:
+    padding .22s var(--ease, ease),
+    background .22s var(--ease, ease),
+    border-color .22s var(--ease, ease),
+    box-shadow .22s var(--ease, ease);
+}
+
+/* 滚动后的压扁态 */
+.page-header[data-compact="true"]{
+  padding:8px 56px;
+  border-bottom-color:var(--border);
+  box-shadow:0 1px 0 rgba(0,0,0,.02);
+}
+
+/* ───── 左：图标 + 标题/面包屑 + 副标题 ───── */
+.ph-left{
+  display:flex;align-items:center;gap:8px;
+  min-width:0;
+  flex:1 1 auto;
+  max-width:calc(50% - 130px);
+  overflow:hidden;
+}
+
+.ph-icon{
+  width:20px;height:20px;
+  color:var(--gold);
+  flex-shrink:0;
+  transition:width .22s var(--ease, ease), height .22s var(--ease, ease);
+}
+.page-header[data-compact="true"] .ph-icon{
+  width:16px;height:16px;
+}
+
+/* 简单标题模式（chat-history / resource-square / ai-qbank 等） */
+.ph-title{
+  font-size:16px;
+  font-weight:600;
+  color:var(--text-1, #111110);
+  letter-spacing:-.005em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  flex-shrink:0;
+  transition:font-size .22s var(--ease, ease);
+}
+.page-header[data-compact="true"] .ph-title{
+  font-size:14px;
+}
+
+.ph-subtitle{
+  font-size:12.5px;
+  color:var(--text-3);
+  margin-left:6px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+  flex:1 1 auto;
+  opacity:1;
+  max-width:680px;
+  transition:opacity .22s var(--ease, ease), max-width .22s var(--ease, ease), margin-left .22s var(--ease, ease);
+}
+.page-header[data-compact="true"] .ph-subtitle{
+  opacity:0;
+  max-width:0;
+  margin-left:0;
+}
+
+/* ───── 视图上下文栏：路径 + 当前视图动作 ───── */
+.view-context-bar{
+  position:sticky;
+  top:59px;
+  z-index:45;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  min-height:48px;
+  padding:8px 40px;
+  background:rgba(255,255,255,.9);
+  border-bottom:1px solid rgba(0,0,0,.05);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  flex-shrink:0;
+}
+.view-context-actions{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+  margin-left:auto;
+}
+.app[data-view="folder"] .wiki-context-bar{
+  display:none;
+}
+.app[data-chat="open"] .view-context-bar,
+.app[data-chat="empty"] .view-context-bar{
+  display:none;
+}
+
+/* 面包屑模式（school-wiki / wiki-entry / file-preview / my-wiki） */
+.ph-crumb{
+  display:flex;align-items:center;gap:4px;
+  min-width:0;
+  flex:1 1 auto;
+  overflow:hidden;
+  color:var(--text-2);
+}
+.ph-crumb-item{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 8px;border-radius:6px;
+  border:0;
+  background:transparent;
+  color:var(--text-3, #a19f99);
+  cursor:pointer;
+  text-decoration:none;
+  white-space:nowrap;
+  font:inherit;
+  transition:background .15s, color .15s;
+}
+.ph-crumb-item [data-lucide]{ width:14px;height:14px; }
+.ph-crumb-item:hover{ background:rgba(0,0,0,0.04); color:var(--text-1, #111110); }
+.ph-crumb-sep{
+  display:inline-flex;align-items:center;
+  color:var(--text-3, #a19f99);
+  opacity:.5;
+  margin:0 2px;
+}
+.ph-crumb-sep [data-lucide]{ width:14px;height:14px; }
+.ph-crumb-current{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 8px;
+  color:var(--text-1, #111110);
+  font-weight:600;
+  white-space:nowrap;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.ph-crumb-current > span{
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.ph-crumb-current [data-lucide]{ width:14px;height:14px;color:var(--gold, #a87e2c);flex-shrink:0; }
+.ph-crumb-ellipsis{
+  cursor:default;
+  color:var(--text-3);
+}
+.ph-crumb-ellipsis:hover{
+  background:transparent;
+  color:var(--text-3);
+}
+
+/* ───── 间距 ───── */
+.ph-spacer{ flex:0 1 24px; min-width:8px; }
+
+/* ───── 右：当前页操作 ───── */
+.ph-right{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-left:auto;
+  flex-shrink:0;
+}
+.knowledge-header-actions{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.app[data-view="folder"] .wiki-header-actions,
+.app:not([data-view="folder"]) .folder-header-actions{
+  display:none;
+}
+.app:not([data-folder-depth="nested"]) .folder-sort-action{
+  display:none;
+}
+
+/* 文件夹视图参考文件管理器布局：顶部只保留视图切换和当前操作 */
+.app[data-view="folder"] .page-header{
+  min-height:82px;
+  padding:26px 56px 12px;
+  background:#FAF9F5;
+  border-bottom:0;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+.app[data-view="folder"] .page-header .ph-left{
+  display:none;
+}
+.app[data-view="folder"] .page-header .ph-right{
+  width:100%;
+  margin-left:0;
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+}
+.app[data-view="folder"] .page-header .ph-view-switcher{
+  position:static;
+  left:auto;
+  transform:none;
+  height:42px;
+  padding:4px;
+  border-radius:999px;
+  border:0;
+  background:#F0EEE6;
+  box-shadow:none;
+}
+.app[data-view="folder"] .page-header .ph-vs-btn{
+  height:34px;
+  padding:0 18px;
+  border-radius:999px;
+  color:#37342E;
+  font-size:14px;
+  font-weight:520;
+}
+.app[data-view="folder"] .page-header .ph-vs-btn [data-lucide]{
+  width:16px;
+  height:16px;
+}
+.app[data-view="folder"] .page-header .ph-vs-btn.active{
+  background:#fff;
+  box-shadow:0 4px 14px rgba(31,28,22,.10);
+  font-weight:700;
+}
+.app[data-view="folder"] .folder-header-actions{
+  gap:8px;
+  margin-left:auto;
+}
+.app[data-view="folder"] .ph-action{
+  height:36px;
+  padding:0 13px;
+  border:1px solid #E1DBCF;
+  border-radius:9px;
+  background:#FAF9F5;
+  color:#1F1D19;
+  font-size:13px;
+  font-weight:560;
+}
+.app[data-view="folder"] .ph-action:hover{
+  background:#fff;
+  border-color:#D7D0C2;
+}
+.app[data-view="folder"] .ph-action.is-primary{
+  background:#050504;
+  border-color:#050504;
+  color:#fff;
+}
+.app[data-view="folder"] .ph-action.is-primary:hover{
+  background:#1A1916;
+  border-color:#1A1916;
+}
+.app[data-view="folder"] .ph-folder-search{
+  width:280px;
+  justify-content:flex-start;
+  padding:0 18px;
+  border:0;
+  border-radius:999px;
+  background:#F0EEE6;
+  color:#A8A39A;
+  font-weight:500;
+}
+.app[data-view="folder"] .ph-folder-search:hover{
+  background:#EDEAE2;
+  color:#827B70;
+}
+.app[data-view="folder"] .ph-action-sep{
+  display:none;
+}
+
+.ph-action{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 12px;
+  background:transparent;
+  border:1px solid transparent;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:500;
+  color:var(--text-2, #6b6a65);
+  cursor:pointer;
+  font-family:inherit;
+  transition:all .15s;
+}
+.ph-action [data-lucide]{ width:14px;height:14px; }
+.ph-action:hover{
+  background:rgba(0,0,0,0.04);
+  color:var(--text-1, #111110);
+}
+.ph-action:disabled{
+  opacity:.42;
+  cursor:not-allowed;
+}
+.ph-action:disabled:hover{
+  background:transparent;
+  color:var(--text-2, #6b6a65);
+}
+.ph-action.is-meta{
+  background:var(--gold-bg);
+  border-color:rgba(192,142,79,.28);
+  color:var(--gold-deep);
+}
+.ph-action.is-meta [data-lucide]{ color:var(--gold); }
+.ph-action.is-primary{
+  background:var(--text-1);
+  border-color:var(--text-1);
+  color:#fff;
+}
+.ph-action.is-primary:hover{
+  background:#000;
+  border-color:#000;
+  color:#fff;
+}
+.ph-action.is-primary [data-lucide]{ color:#fff; }
+.ph-action.is-danger{
+  color:#B0413E;
+}
+.ph-action.is-danger [data-lucide]{ color:#B0413E; }
+.ph-action.is-danger:hover{
+  background:rgba(176,65,62,.07);
+  border-color:rgba(176,65,62,.18);
+  color:#B0413E;
+}
+.ph-action.is-danger:disabled:hover{
+  background:transparent;
+  border-color:transparent;
+}
+
+/* 图标按钮模式（无文字，只显示图标，用于搜索/更多等 utility 操作） */
+.ph-action.ph-action-icon{
+  padding:6px;
+  width:32px;height:32px;
+  flex:0 0 32px; /* 覆盖 .tb-search 的 flex 宽度 */
+  border-radius:8px;
+  justify-content:center;
+}
+.ph-action.ph-action-icon [data-lucide]{ width:16px;height:16px; }
+
+.ph-action-sep{
+  display:inline-block;
+  width:1px;height:14px;
+  background:rgba(0,0,0,0.08);
+  margin:0 4px;
+  vertical-align:middle;
+}
+
+/* ───── 视图切换器（嵌入式，绝对居中保证视觉平衡） ───── */
+.ph-view-switcher{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  display:inline-flex;align-items:center;
+  background:var(--surface-2, #f4f3ef);
+  border:1px solid var(--border, rgba(0,0,0,0.06));
+  border-radius:8px;
+  padding:2px;
+  gap:1px;
+  height:30px;
+  flex-shrink:0;
+}
+.ph-vs-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  height:24px;padding:0 10px;
+  border:none;background:transparent;
+  font-size:12.5px;color:var(--text-3);
+  border-radius:6px;cursor:pointer;
+  font-family:inherit;
+  transition:all .15s;
+}
+.ph-vs-btn [data-lucide]{ width:13px;height:13px; }
+.ph-vs-btn:hover{ color:var(--text-1); }
+.ph-vs-btn.active{
+  background:#fff;color:var(--text-1);
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+
+/* ───── 搜索（嵌入式） ───── */
+.ph-search{
+  display:inline-flex;align-items:center;gap:7px;
+  height:30px;padding:0 10px 0 11px;border-radius:7px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text-3);
+  font-size:12.5px;
+  transition:all .15s;
+  flex-shrink:0;
+}
+.ph-search:hover,
+.ph-search:focus-within{
+  border-color:var(--gold-light);
+  background:var(--surface-2);
+}
+.ph-search [data-lucide]{ width:13px;height:13px; }
+.ph-search input{
+  border:none;outline:none;background:transparent;
+  font:inherit;color:var(--text-1);
+  width:170px;
+}
+.ph-search input::placeholder{ color:var(--text-3); }
+
+/* ───── 双栏 expanded 时：跨过右栏整条贯通 ───── */
+body[data-page="wiki-entry"] .app[data-right="expanded"] .page-header,
+body[data-page="file-preview"] .app[data-right="expanded"] .page-header{
+  width:calc(200% + 1px);
+  box-shadow:1px 0 0 var(--border);
+}
+
+/* ───── 右栏给 page-header 让位（覆盖 v28.css 原本给 topbar+bcbar 102px 的设置） ───── */
+body[data-page="wiki-entry"] .app[data-right="expanded"] .sidebar-right,
+body[data-page="file-preview"] .app[data-right="expanded"] .sidebar-right{
+  padding-top:60px !important;
+}
+
+/* ───── 对话态：顶栏隐藏（与 v28 行为一致） ───── */
+.app[data-chat="open"] .page-header,
+.app[data-chat="empty"] .page-header{
+  padding-top:0;padding-bottom:0;
+  height:0;
+  opacity:0;
+  overflow:hidden;
+  border:none;
+  pointer-events:none;
+}
+
+/* ───── folder 视图下，wiki-entry 用 fv-list-head 顶替 page-header ───── */
+body[data-page="wiki-entry"] .app[data-view="folder"] .page-header{
+  display:none;
+}
+
+/* ───── 小屏适配 ───── */
+@media (max-width:1280px){
+  .page-header{ padding:8px 32px; }
+  .page-header[data-compact="true"]{ padding:8px 32px; }
+  .view-context-bar{ padding-left:32px; padding-right:32px; }
+}
+@media (max-width:1180px){
+  .ph-subtitle{ display:none; }
+}
+@media (max-width:1080px){
+  .page-header{ padding:8px 20px; gap:6px; }
+  .page-header[data-compact="true"]{ padding:8px 20px; }
+  .view-context-bar{ padding-left:20px; padding-right:20px; }
+  .ph-action{ padding:6px 8px; }
+}
+@media (max-width:960px){
+  .ph-search input{ width:120px; }
+}
+@media (max-width:760px){
+  .page-header{ padding:12px 16px; gap:6px; }
+  .page-header[data-compact="true"]{ padding:6px 16px; }
+  .view-context-bar{ padding-left:16px; padding-right:16px; gap:8px; }
+  .ph-action span{ display:none; }
+  .ph-vs-btn span{ display:none; }
+}

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>飞象老师校园版 · 加入学校</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/v28.css?v=20260521d" />
+<style>
+  html, body { min-height: 100%; margin: 0; }
+  body {
+    background: #f7f5ef;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input, select { font: inherit; }
+  .join-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+  .join-topbar {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    border-bottom: 1px solid rgba(17,17,16,.08);
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(14px);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-weight: 750;
+  }
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: #111110;
+    color: #fff;
+  }
+  .brand-mark [data-lucide] { width: 17px; height: 17px; }
+  .join-main {
+    width: min(560px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 64px 0 72px;
+    display: block;
+  }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid #d3e5d5;
+    background: #eef6f0;
+    color: #2a7f42;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .status-pill [data-lucide] { width: 14px; height: 14px; }
+  .join-card {
+    border: 1px solid var(--border-2);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(36,32,23,.12);
+    overflow: hidden;
+  }
+  .join-card-head {
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .invite-summary {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .school-line {
+    font-size: 20px;
+    line-height: 1.25;
+    font-weight: 750;
+    letter-spacing: 0;
+  }
+  .invite-line {
+    margin-top: 6px;
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+  .stepper {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--text-3);
+    font-size: 12px;
+    font-weight: 650;
+  }
+  .step-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: var(--surface-2);
+    color: var(--text-3);
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .step.active { color: var(--text); }
+  .step.active .step-dot {
+    background: #111110;
+    color: #fff;
+  }
+  .step.done .step-dot {
+    background: var(--gold-bg);
+    color: var(--gold-deep);
+  }
+  .join-card-body {
+    padding: 22px 24px 24px;
+  }
+  .flow-panel { display: none; }
+  .flow-panel.active { display: block; }
+  .field-grid {
+    display: grid;
+    gap: 14px;
+  }
+  .field {
+    display: grid;
+    gap: 7px;
+  }
+  .field label {
+    color: var(--text-2);
+    font-size: 12.5px;
+    font-weight: 650;
+  }
+  .field input,
+  .field select {
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    border: 1px solid #d8d3c9;
+    border-radius: 8px;
+    padding: 0 11px;
+    background: #fff;
+    color: var(--text);
+    outline: 0;
+  }
+  .field input:focus,
+  .field select:focus {
+    border-color: rgba(168,126,44,.72);
+    box-shadow: 0 0 0 3px rgba(168,126,44,.12);
+  }
+  .code-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .btn {
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid #d8d3c9;
+    background: #fff;
+    color: var(--text-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: all .15s ease;
+    white-space: nowrap;
+  }
+  .btn [data-lucide] { width: 15px; height: 15px; }
+  .btn:hover {
+    border-color: rgba(168,126,44,.42);
+    color: var(--gold-deep);
+    background: var(--gold-bg);
+  }
+  .btn.primary {
+    width: 100%;
+    border-color: #111110;
+    background: #111110;
+    color: #fff;
+  }
+  .btn.primary:hover {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+  }
+  .form-actions {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .fine-print {
+    color: var(--text-3);
+    font-size: 11.5px;
+    text-align: center;
+  }
+  .confirm-box {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fbfaf7;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .confirm-title {
+    font-size: 13px;
+    font-weight: 750;
+    margin-bottom: 8px;
+  }
+  .confirm-list {
+    display: grid;
+    gap: 8px;
+    color: var(--text-2);
+    font-size: 12.5px;
+  }
+  .confirm-list span {
+    color: var(--text-3);
+    margin-right: 8px;
+  }
+  .success-state {
+    text-align: center;
+    padding: 14px 0 2px;
+  }
+  .success-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #eef6f0;
+    color: #2a7f42;
+  }
+  .success-icon [data-lucide] { width: 28px; height: 28px; }
+  .success-title {
+    font-size: 19px;
+    font-weight: 750;
+  }
+  .success-copy {
+    margin: 8px auto 20px;
+    max-width: 320px;
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+  .link-warning {
+    display: none;
+    margin: 0 24px 18px;
+    border: 1px solid #f0c7bd;
+    background: #fff1ee;
+    color: #9d3d2d;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 12.5px;
+  }
+  .link-warning.visible { display: block; }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    background: rgba(17,17,16,.92);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 22px;
+    font-size: 12.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+    z-index: 9999;
+    backdrop-filter: blur(6px);
+  }
+  @media (max-width: 860px) {
+    .join-topbar { padding: 0 18px; }
+    .join-main {
+      width: calc(100% - 32px);
+      padding: 30px 0 48px;
+    }
+  }
+  @media (max-width: 520px) {
+    .join-card-head,
+    .join-card-body { padding-left: 18px; padding-right: 18px; }
+    .invite-summary { flex-direction: column; gap: 10px; }
+    .school-line { font-size: 18px; }
+    .stepper { grid-template-columns: 1fr; }
+    .code-row { grid-template-columns: 1fr; }
+    .btn { width: 100%; }
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body>
+<div class="join-page">
+  <header class="join-topbar">
+    <div class="brand">
+      <div class="brand-mark"><i data-lucide="sparkles"></i></div>
+      <span>飞象老师校园版</span>
+    </div>
+  </header>
+
+  <main class="join-main">
+    <section class="join-card" id="joinCard">
+      <div class="join-card-head">
+        <div class="invite-summary">
+          <div>
+            <div class="school-line">加入北京市实验中学</div>
+            <div class="invite-line"><span id="expireText">张老师邀请你加入 · 有效期至 2026-06-08 10:18</span></div>
+          </div>
+          <div class="status-pill" id="linkStatus"><i data-lucide="shield-check"></i><span>邀请链接有效</span></div>
+        </div>
+        <div class="stepper">
+          <div class="step active" data-step="1"><span class="step-dot">1</span><span>手机号验证</span></div>
+          <div class="step" data-step="2"><span class="step-dot">2</span><span>确认身份</span></div>
+          <div class="step" data-step="3"><span class="step-dot">3</span><span>进入学校</span></div>
+        </div>
+      </div>
+      <div class="link-warning" id="linkWarning">这个邀请链接已失效。请联系学校管理员重新发送邀请链接。</div>
+      <div class="join-card-body">
+        <div class="flow-panel active" id="phonePanel">
+          <div class="field-grid">
+            <div class="field">
+              <label>手机号</label>
+              <input id="phoneInput" inputmode="numeric" value="13800138012" />
+            </div>
+            <div class="field">
+              <label>验证码</label>
+              <div class="code-row">
+                <input id="codeInput" inputmode="numeric" placeholder="输入 6 位验证码" />
+                <button class="btn" onclick="sendCode()"><i data-lucide="message-circle"></i>获取验证码</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn primary" onclick="goStep(2)" data-track="/click/feixiangCampusJoinSchoolPage/continueJoin | 点击继续加入学校 | 无">继续</button>
+            <div class="fine-print">手机号仅用于确认老师账号，不会展示给学生。</div>
+          </div>
+        </div>
+
+        <div class="flow-panel" id="profilePanel">
+          <div class="confirm-box">
+            <div class="confirm-title">即将加入</div>
+            <div class="confirm-list">
+              <div><span>学校</span>北京市实验中学</div>
+              <div><span>角色</span>学科老师</div>
+              <div><span>手机号</span><strong id="confirmPhone">138 0013 8012</strong></div>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label>姓名</label>
+              <input id="nameInput" value="张明" />
+            </div>
+            <div class="field">
+              <label>任教学科</label>
+              <select id="subjectInput">
+                <option>语文</option>
+                <option>数学</option>
+                <option>英语</option>
+                <option>物理</option>
+                <option>化学</option>
+                <option>生物</option>
+                <option>历史</option>
+                <option>地理</option>
+                <option>政治</option>
+                <option>信息技术</option>
+                <option>体育</option>
+                <option>美术</option>
+                <option>音乐</option>
+                <option>其他</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn primary" onclick="goStep(3)" data-track="/click/feixiangCampusJoinSchoolPage/confirmJoin | 确认加入学校 | 无">确认加入</button>
+            <button class="btn" onclick="goStep(1)">返回修改手机号</button>
+          </div>
+        </div>
+
+        <div class="flow-panel" id="successPanel">
+          <div class="success-state">
+            <div class="success-icon"><i data-lucide="check"></i></div>
+            <div class="success-title">已加入北京市实验中学</div>
+            <div class="success-copy">你现在可以进入学校空间，访问学校知识库、应用广场和共享资源。</div>
+            <button class="btn primary" onclick="enterSchool()"><i data-lucide="arrow-right"></i>进入学校空间</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  let toastTimer = null;
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.style.opacity = '0', 2200);
+  }
+
+  function setSteps(step) {
+    document.querySelectorAll('.step').forEach((item) => {
+      const value = Number(item.dataset.step);
+      item.classList.toggle('active', value === step);
+      item.classList.toggle('done', value < step);
+    });
+  }
+
+  function goStep(step) {
+    if (document.body.dataset.linkState === 'expired') {
+      showToast('邀请链接已过期');
+      return;
+    }
+    document.querySelectorAll('.flow-panel').forEach((panel) => panel.classList.remove('active'));
+    setSteps(step);
+    if (step === 1) {
+      document.getElementById('phonePanel').classList.add('active');
+    }
+    if (step === 2) {
+      const rawPhone = document.getElementById('phoneInput').value.replace(/\s/g, '');
+      document.getElementById('confirmPhone').textContent = formatPhone(rawPhone);
+      document.getElementById('profilePanel').classList.add('active');
+    }
+    if (step === 3) {
+      document.getElementById('successPanel').classList.add('active');
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function formatPhone(phone) {
+    const normalized = phone || '13800138012';
+    return normalized.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3');
+  }
+
+  function sendCode() {
+    showToast('验证码已发送');
+  }
+
+  function enterSchool() {
+    window.location.href = 'index.html';
+  }
+
+  function setLinkState(state) {
+    document.body.dataset.linkState = state;
+    const status = document.getElementById('linkStatus');
+    const warning = document.getElementById('linkWarning');
+    const cardBody = document.querySelector('.join-card-body');
+    warning.classList.toggle('visible', state === 'expired');
+    cardBody.style.opacity = state === 'expired' ? '.48' : '1';
+    cardBody.style.pointerEvents = state === 'expired' ? 'none' : 'auto';
+    if (state === 'valid') {
+      status.innerHTML = '<i data-lucide="shield-check"></i><span>邀请链接有效</span>';
+      goStep(1);
+    }
+    if (state === 'expired') {
+      status.innerHTML = '<i data-lucide="circle-alert"></i><span>邀请链接已过期</span>';
+    }
+    if (state === 'joined') {
+      status.innerHTML = '<i data-lucide="badge-check"></i><span>你已加入本校</span>';
+      goStep(3);
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function applyInviteFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const state = params.get('state') || 'valid';
+    const invite = params.get('invite');
+    if (invite) {
+      const expireText = document.getElementById('expireText');
+      expireText.textContent = state === 'expired'
+        ? '张老师邀请你加入 · 链接已失效：' + invite
+        : '张老师邀请你加入 · 有效期至 2026-06-08 10:18';
+    }
+    setLinkState(state);
+  }
+
+  document.body.dataset.linkState = 'valid';
+  applyInviteFromUrl();
+  if (window.lucide) lucide.createIcons();
+</script>
+<template id="review-template">
+{
+  "title": "加入学校版 · 邀请老师入校",
+  "summary": "加入学校版页面承接管理员邀请，让老师确认学校、完成手机号验证并进入学校空间。",
+  "sections": [
+    {
+      "id": "join-school-summary",
+      "title": "1. 邀请确认",
+      "body": "单卡片顶部展示学校名称、邀请人和链接状态，让老师确认后直接进入手机号验证。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：收到学校邀请的老师。",
+            "用途：确认学校名称、邀请人和链接状态。",
+            "产出：是否可继续手机号验证。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开邀请",
+              "text": "老师点击管理员发送的学校邀请链接。"
+            },
+            {
+              "label": "确认学校",
+              "text": "卡片顶部展示学校名称、邀请人和邀请状态。"
+            },
+            {
+              "label": "判断身份",
+              "text": "老师确认这是自己的学校后继续手机号验证。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "学校名称必须在首屏清楚展示，避免误加入。",
+            "邀请链接只对应一个学校。",
+            "已加入老师再次打开应提示已在学校内。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "邀请确认展示学校名称、邀请人、链接状态和有效期。",
+            "链接状态决定是否允许继续验证。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "邀请过期",
+              "处理方式": "提示链接已失效，建议联系管理员重新发送。"
+            },
+            {
+              "场景": "学校不存在",
+              "处理方式": "提示邀请不可用。"
+            },
+            {
+              "场景": "已加入学校",
+              "处理方式": "展示已加入状态，并提供进入学校空间。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "admin-teachers.html",
+              "说明": "管理员创建邀请并查看加入状态。"
+            },
+            {
+              "关联对象": "手机号验证",
+              "说明": "未登录老师在本页完成手机号验证。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "学校名称和邀请人展示正确。",
+            "过期或无效链接不能继续。",
+            "老师已在学校时提示已加入。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "join-school-form",
+      "title": "2. 手机号验证",
+      "body": "手机号验证用于确认老师账号，验证后补充姓名和任教学科。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：准备加入学校的老师。",
+            "用途：验证手机号，并补充姓名和任教学科。",
+            "产出：账号身份、老师资料和入校申请结果。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "输入手机号",
+              "text": "老师输入本人手机号。"
+            },
+            {
+              "label": "获取验证码",
+              "text": "点击获取验证码后发送短信验证码。"
+            },
+            {
+              "label": "输入验证码",
+              "text": "填写验证码并提交。"
+            },
+            {
+              "label": "补充身份",
+              "text": "验证后补充姓名和任教学科。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "手机号是学校成员识别的主凭据。",
+            "验证码错误不能加入学校。",
+            "老师默认以学科老师身份加入，管理员可在学校管理中调整角色。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "手机号验证包含手机号、验证码、姓名、任教学科和验证状态。",
+            "提交结果需要关联当前学校邀请。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "手机号格式错误",
+              "处理方式": "即时提示并阻止获取验证码。"
+            },
+            {
+              "场景": "验证码错误或过期",
+              "处理方式": "提示重新输入或重新获取。"
+            },
+            {
+              "场景": "手机号已加入本校",
+              "处理方式": "直接展示已加入状态，并提供进入学校空间。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "手机号验证",
+              "说明": "本页完成验证码发送、校验和账号确认。"
+            },
+            {
+              "关联对象": "admin-teachers.html",
+              "说明": "提交后成员列表更新为已加入。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "验证码错误时有提示。",
+            "必填资料缺失不能提交。",
+            "同一手机号重复加入时能识别。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "join-school-success",
+      "title": "3. 加入成功",
+      "body": "加入成功页告诉老师已加入学校，并引导进入学校空间。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：已完成加入流程的老师。",
+            "用途：确认加入成功，并进入学校空间。",
+            "产出：学校空间入口和后续工作台跳转。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "加入成功",
+              "text": "验证通过后展示成功状态和学校名称。"
+            },
+            {
+              "label": "进入学校空间",
+              "text": "点击进入学校空间跳转校园版首页。"
+            },
+            {
+              "label": "稍后继续",
+              "text": "再次访问邀请链接时保持已加入状态。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "成功态只在成员关系建立后出现。",
+            "加入成功不迁移个人资料，只增加学校空间入口。",
+            "若管理员后续停用成员，老师将失去学校空间权限。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "成功页展示学校名称、老师姓名和进入学校空间入口。",
+            "加入结果需要回写学校成员列表。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "加入失败",
+              "处理方式": "保留表单信息并提示原因。"
+            },
+            {
+              "场景": "登录状态失效",
+              "处理方式": "提示重新登录后继续加入。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "index.html",
+              "说明": "加入后进入校园版首页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "加入成功后可进入首页。",
+            "成员列表能看到新加入老师。",
+            "重复刷新不会重复创建成员。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'join-school.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+</body>
+</html>

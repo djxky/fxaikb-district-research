@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>飞象老师校园版 · 老师登录</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/v28.css?v=20260521d" />
+<style>
+  :root {
+    --ink: #111110;
+    --muted: #68645d;
+    --faint: #9d9990;
+    --line: rgba(17, 17, 16, .1);
+    --gold: #a87e2c;
+    --green: #4a755b;
+    --bg: #f8f6f0;
+  }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; margin: 0; }
+  body {
+    color: var(--ink);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.9), rgba(248,246,240,.98)),
+      repeating-linear-gradient(90deg, rgba(168,126,44,.045) 0 1px, transparent 1px 46px),
+      repeating-linear-gradient(180deg, rgba(74,117,91,.035) 0 1px, transparent 1px 46px);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  button, input { font: inherit; }
+  .page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+  .topbar {
+    height: 62px;
+    padding: 0 clamp(18px, 4vw, 44px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    border-bottom: 1px solid rgba(17,17,16,.07);
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(16px);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    font-weight: 760;
+  }
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    flex: none;
+    background: #111110;
+    color: #fff;
+  }
+  .brand-mark [data-lucide] { width: 17px; height: 17px; }
+  .main {
+    width: min(960px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: clamp(42px, 8vw, 84px) 0 64px;
+    display: grid;
+    grid-template-columns: minmax(0, .92fr) minmax(340px, 390px);
+    gap: clamp(28px, 6vw, 64px);
+    align-items: center;
+  }
+  .school-panel {
+    min-height: 330px;
+    padding: clamp(24px, 4vw, 38px);
+    border: 1px solid rgba(17,17,16,.08);
+    border-radius: 12px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.84), rgba(255,255,255,.54)),
+      linear-gradient(135deg, rgba(168,126,44,.12), rgba(74,117,91,.1));
+    box-shadow: 0 22px 62px rgba(36,32,23,.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .school-badge {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: #fff;
+    color: var(--gold);
+    box-shadow: 0 12px 26px rgba(36,32,23,.1);
+  }
+  .school-badge [data-lucide] { width: 28px; height: 28px; }
+  .eyebrow {
+    margin-top: 28px;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 760;
+  }
+  h1 {
+    margin: 12px 0 14px;
+    max-width: 560px;
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.1;
+    letter-spacing: 0;
+  }
+  .lead {
+    max-width: 520px;
+    margin: 0;
+    color: #47443f;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+  .custom-note {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  .custom-note [data-lucide] {
+    width: 15px;
+    height: 15px;
+    color: var(--green);
+  }
+  .login-card {
+    border: 1px solid rgba(17,17,16,.1);
+    border-radius: 12px;
+    background: rgba(255,255,255,.96);
+    box-shadow: 0 24px 70px rgba(36,32,23,.12);
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 24px 24px 18px;
+    border-bottom: 1px solid rgba(17,17,16,.08);
+  }
+  .card-kicker {
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 760;
+  }
+  .card-title {
+    margin-top: 7px;
+    font-size: 22px;
+    font-weight: 780;
+  }
+  .card-subtitle {
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .card-body {
+    padding: 22px 24px 24px;
+  }
+  .field-grid {
+    display: grid;
+    gap: 14px;
+  }
+  .field {
+    display: grid;
+    gap: 7px;
+  }
+  .field label {
+    color: #4f4c45;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+  .field input {
+    width: 100%;
+    height: 42px;
+    border: 1px solid #d8d3c9;
+    border-radius: 8px;
+    padding: 0 11px;
+    background: #fff;
+    color: var(--ink);
+    outline: 0;
+  }
+  .field input:focus {
+    border-color: rgba(168,126,44,.72);
+    box-shadow: 0 0 0 3px rgba(168,126,44,.12);
+  }
+  .field.error input {
+    border-color: #c85b4a;
+    box-shadow: 0 0 0 3px rgba(200,91,74,.12);
+  }
+  .error-text {
+    min-height: 17px;
+    color: #a33d2f;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .code-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .btn {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid #d8d3c9;
+    background: #fff;
+    color: #4f4c45;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s ease;
+  }
+  .btn [data-lucide] { width: 15px; height: 15px; }
+  .btn:hover {
+    border-color: rgba(168,126,44,.42);
+    color: #815e18;
+    background: #fbf5e6;
+  }
+  .btn.primary {
+    width: 100%;
+    height: 42px;
+    margin-top: 18px;
+    border-color: #111110;
+    background: #111110;
+    color: #fff;
+  }
+  .btn.primary:hover {
+    border-color: #000;
+    background: #000;
+    color: #fff;
+  }
+  .agreement {
+    margin-top: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .agreement input {
+    width: 14px;
+    height: 14px;
+    margin: 3px 0 0;
+    accent-color: #111110;
+    flex: none;
+  }
+  .agreement a {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .agreement.error {
+    color: #963728;
+  }
+  .demo-state {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(17,17,16,.08);
+  }
+  .demo-state-title {
+    margin-bottom: 8px;
+    color: var(--faint);
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+  .demo-state-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .demo-state-options button {
+    min-height: 30px;
+    border: 1px solid #d8d3c9;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .demo-state-options button.active {
+    border-color: #111110;
+    background: #111110;
+    color: #fff;
+  }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    z-index: 9999;
+    transform: translateX(-50%);
+    padding: 10px 18px;
+    border-radius: 22px;
+    background: rgba(17,17,16,.92);
+    color: #fff;
+    font-size: 12.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+    backdrop-filter: blur(6px);
+  }
+  @media (max-width: 820px) {
+    .main {
+      width: calc(100% - 32px);
+      padding-top: 30px;
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+    .school-panel { min-height: auto; }
+  }
+  @media (max-width: 520px) {
+    .topbar { padding-inline: 16px; }
+    .brand span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .card-head, .card-body { padding-left: 18px; padding-right: 18px; }
+    .code-row { grid-template-columns: 1fr; }
+    .btn { width: 100%; }
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body>
+<div class="page">
+  <header class="topbar">
+    <a class="brand" href="product-intro.html" aria-label="返回飞象老师校园版官网">
+      <span class="brand-mark"><i data-lucide="sparkles"></i></span>
+      <span>飞象老师校园版</span>
+    </a>
+  </header>
+
+  <main class="main">
+    <section class="school-panel" aria-labelledby="school-title">
+      <div>
+        <div class="school-badge"><i data-lucide="school"></i></div>
+        <div class="eyebrow">学校专属入口</div>
+        <h1 id="school-title"><span id="schoolName">北京市实验中学</span>老师登录</h1>
+        <p class="lead">使用手机号进入本校飞象老师空间。登录页支持按学校配置校徽、校训和封面图。</p>
+      </div>
+      <div class="custom-note"><i data-lucide="settings-2"></i><span>管理员 C 端可设置校徽、校训与封面图。</span></div>
+    </section>
+
+    <section class="login-card" aria-labelledby="login-title">
+      <div class="card-head">
+        <div class="card-title" id="login-title">手机号验证码登录</div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field">
+            <label for="phoneInput">手机号</label>
+            <input id="phoneInput" inputmode="numeric" value="13800138012" />
+            <div class="error-text" id="phoneError"></div>
+          </div>
+          <div class="field">
+            <label for="codeInput">验证码</label>
+            <div class="code-row">
+              <input id="codeInput" inputmode="numeric" placeholder="输入 6 位验证码" />
+              <button class="btn" type="button" onclick="sendCode()"><i data-lucide="message-circle"></i>获取验证码</button>
+            </div>
+            <div class="error-text" id="codeError"></div>
+          </div>
+        </div>
+        <button class="btn primary" type="button" onclick="enterCampus()" data-track="/click/feixiangCampusLoginPage/login | 点击登录 | 无"><i data-lucide="arrow-right"></i>登录</button>
+        <label class="agreement">
+          <input id="agreementInput" type="checkbox" />
+          <span>已阅读并同意飞象老师校园版的<a href="javascript:void(0)" onclick="showToast('（演示）打开用户协议')">《用户协议》</a>和<a href="javascript:void(0)" onclick="showToast('（演示）打开隐私政策')">《隐私政策》</a></span>
+        </label>
+        <div class="demo-state" aria-label="登录错误状态演示">
+          <div class="demo-state-title">演示状态</div>
+          <div class="demo-state-options">
+            <button class="active" type="button" data-state="normal" onclick="setLoginState('normal', this)">正常登录</button>
+            <button type="button" data-state="code-error" onclick="setLoginState('code-error', this)">验证码错误</button>
+            <button type="button" data-state="code-expired" onclick="setLoginState('code-expired', this)">验证码过期</button>
+            <button type="button" data-state="account-blocked" onclick="setLoginState('account-blocked', this)">账号异常</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  let toastTimer = null;
+  let demoLoginState = 'normal';
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.style.opacity = '0', 2200);
+  }
+
+  function applySchoolConfig() {
+    const params = new URLSearchParams(window.location.search);
+    const school = params.get('school') || '北京市实验中学';
+    document.getElementById('schoolName').textContent = school;
+    document.title = school + ' · 飞象老师校园版登录';
+    if (params.get('logout') === '1') {
+      setTimeout(() => showToast('已退出校园版登录，个人版登录态保持不变'), 120);
+    }
+  }
+
+  function normalizePhone() {
+    return document.getElementById('phoneInput').value.replace(/\s/g, '');
+  }
+
+  function setLoginState(state, button) {
+    demoLoginState = state;
+    document.querySelectorAll('.demo-state-options button').forEach((item) => item.classList.remove('active'));
+    if (button) button.classList.add('active');
+    clearErrors();
+  }
+
+  function clearErrors() {
+    document.querySelectorAll('.field').forEach((field) => field.classList.remove('error'));
+    document.getElementById('phoneError').textContent = '';
+    document.getElementById('codeError').textContent = '';
+    document.getElementById('agreementInput').closest('.agreement').classList.remove('error');
+  }
+
+  function setFieldError(inputId, message) {
+    const input = document.getElementById(inputId);
+    input.closest('.field').classList.add('error');
+    document.getElementById(inputId === 'phoneInput' ? 'phoneError' : 'codeError').textContent = message;
+  }
+
+  function validatePhone() {
+    const phone = normalizePhone();
+    if (!phone) {
+      setFieldError('phoneInput', '请输入手机号。');
+      return false;
+    }
+    if (!/^1\d{10}$/.test(phone)) {
+      setFieldError('phoneInput', '请输入 11 位中国大陆手机号。');
+      return false;
+    }
+    return true;
+  }
+
+  function validateAgreement() {
+    const agreement = document.getElementById('agreementInput');
+    if (!agreement.checked) {
+      agreement.closest('.agreement').classList.add('error');
+      showToast('请先阅读并同意《用户协议》和《隐私政策》。');
+      return false;
+    }
+    return true;
+  }
+
+  function sendCode() {
+    clearErrors();
+    if (!validatePhone()) return;
+    showToast('验证码已发送');
+  }
+
+  function enterCampus() {
+    clearErrors();
+    if (!validatePhone()) return;
+    if (!validateAgreement()) return;
+    if (demoLoginState === 'code-error') {
+      setFieldError('codeInput', '验证码不正确，请重新输入。');
+      return;
+    }
+    if (demoLoginState === 'code-expired') {
+      setFieldError('codeInput', '验证码已过期，请重新获取。');
+      return;
+    }
+    if (demoLoginState === 'account-blocked') {
+      showToast('当前手机号暂未开通校园版或账号状态异常，请联系学校管理员。');
+      return;
+    }
+    showToast('登录成功，正在进入校园版');
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 420);
+  }
+
+  applySchoolConfig();
+  if (window.lucide) lucide.createIcons();
+</script>
+<template id="review-template">
+{
+  "title": "老师官网登录页",
+  "summary": "老师登录页提供学校专属入口和手机号验证码登录，确保老师以正确身份进入校园版。",
+  "sections": [
+    {
+      "id": "teacher-login-school-brand",
+      "title": "1. 学校专属入口",
+      "body": "学校专属入口展示学校名称、品牌和登录说明，帮助老师确认自己进入的是对应学校空间。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：未登录的学校老师。",
+            "用途：确认当前进入的是对应学校空间。",
+            "展示项：学校名称、品牌和登录说明。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开登录页",
+              "text": "老师访问校园版登录页。"
+            },
+            {
+              "label": "查看学校信息",
+              "text": "页面展示学校名称、校徽、校训、封面图和登录提示。"
+            },
+            {
+              "label": "切换入口",
+              "text": "如从邀请链接进入，登录后继续加入学校流程。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "学校信息应清楚可见，避免老师登录到错误空间。",
+            "学校校徽、校训和封面图由管理员 C 端设置，登录页只读取并展示当前学校配置。",
+            "学校入口不代表已加入学校，仍需账号身份校验。",
+            "已登录老师访问登录页可提示进入工作台。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "学校专属入口展示学校名称、品牌标识和登录说明。",
+            "入口需要识别当前学校空间。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "学校入口失效",
+              "处理方式": "提示入口不可用，提供联系管理员。"
+            },
+            {
+              "场景": "已登录",
+              "处理方式": "提示已登录并提供进入首页。"
+            },
+            {
+              "场景": "从邀请进入",
+              "处理方式": "登录成功后继续加入学校，而不是停留登录页。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "join-school.html",
+              "说明": "邀请流程中的未登录老师先登录再继续加入。"
+            },
+            {
+              "关联对象": "index.html",
+              "说明": "登录成功进入首页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "学校名称和品牌展示正确。",
+            "错误学校链接不能误导进入其它空间。",
+            "未登录状态不展示工作台内容。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "teacher-login-phone",
+      "title": "2. 手机号验证码登录",
+      "body": "手机号验证码登录用于识别老师个人账号，并决定其学校空间权限。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：使用手机号登录的老师。",
+            "用途：识别个人账号，并判断学校空间权限。",
+            "产出：登录态、老师身份和可访问范围。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "输入手机号",
+              "text": "老师输入手机号。"
+            },
+            {
+              "label": "获取验证码",
+              "text": "点击获取验证码，按钮进入倒计时。"
+            },
+            {
+              "label": "输入验证码",
+              "text": "输入验证码后提交登录。"
+            },
+            {
+              "label": "登录成功",
+              "text": "进入首页或继续未完成的加入学校流程。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "手机号格式正确后才能获取验证码。",
+            "验证码错误或过期不能登录。",
+            "未加入学校的账号登录后应看到加入/联系管理员引导。",
+            "退出校园版登录态只影响校园版，不连带退出个人版登录态。",
+            "勾选协议是登录前置条件。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "登录展示信息包括手机号、验证码状态、老师身份、学校成员状态和登录结果。",
+            "手机号按页面规则脱敏或限制展示。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "手机号格式错误",
+              "处理方式": "输入框下提示错误。"
+            },
+            {
+              "场景": "未勾选协议",
+              "处理方式": "提示先同意协议。"
+            },
+            {
+              "场景": "验证码错误",
+              "处理方式": "提示重新输入。"
+            },
+            {
+              "场景": "账号不在学校",
+              "处理方式": "登录后提示未加入学校或联系管理员。"
+            },
+            {
+              "场景": "验证码发送过频",
+              "处理方式": "按钮倒计时并提示稍后再试。"
+            },
+            {
+              "场景": "退出校园版",
+              "处理方式": "清除校园版登录态并回到登录页，个人版登录态保持不变。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "index.html",
+              "说明": "登录成功进入老师首页。"
+            },
+            {
+              "关联对象": "join-school.html",
+              "说明": "邀请来源登录后继续加入学校。"
+            },
+            {
+              "关联对象": "admin-teachers.html",
+              "说明": "学校成员状态由管理页维护。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "验证码错误时有提示。",
+            "未加入学校的账号不能直接进入学校空间。",
+            "登录成功后进入首页并带入老师身份。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'teacher-login.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+</body>
+</html>

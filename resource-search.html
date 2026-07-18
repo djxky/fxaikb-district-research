@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞象老师校园版 · 搜索资源</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/page-header.css" />
+<link rel="stylesheet" href="assets/review.css" />
+<style>
+  :root{--bg:#faf9f6;--surface:#fff;--ink:#111110;--muted:#6b6a65;--faint:#a19f99;--line:rgba(0,0,0,.06);--line-strong:rgba(0,0,0,.12);--gold:#a87e2c;--gold-soft:#fbf5e6;--radius-lg:18px}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  button,input{font:inherit;border:0;background:none;outline:0}
+  button{cursor:pointer}
+  .app{height:100vh;display:grid;grid-template-columns:240px minmax(0,1fr)}
+  .main{display:flex;flex-direction:column;overflow-y:auto}
+  .search-head{position:sticky;top:0;z-index:10;padding:18px 40px 0;background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4)}
+  .search-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .back-btn{width:34px;height:34px;border-radius:10px;color:var(--muted);display:grid;place-items:center}
+  .back-btn:hover{background:#f1f0ec;color:var(--ink)}
+  .search-box{height:42px;min-width:300px;width:min(520px,58vw);display:flex;align-items:center;gap:10px;padding:0 14px;border:1px solid var(--line);border-radius:21px;background:#fff;transition:border-color .15s,box-shadow .15s}
+  .search-box:focus-within{border-color:rgba(168,126,44,.42);box-shadow:0 0 0 3px rgba(168,126,44,.09)}
+  .search-box [data-lucide]{width:16px;height:16px;color:var(--muted);flex-shrink:0}
+  .search-box input{flex:1;min-width:0;font-size:15px}
+  .search-submit{height:34px;padding:0 16px;border-radius:17px;background:var(--gold-soft);color:var(--gold);font-size:13px;font-weight:650}
+  .search-submit:hover{background:#f4e7c4}
+  .source-tabs-row,.subject-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .source-tabs-row::-webkit-scrollbar,.subject-tabs::-webkit-scrollbar{display:none}
+  .source-tabs-row{padding-bottom:8px}
+  .subject-tabs{padding-bottom:12px}
+  .source-tab,.subject-tab{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;padding:8px 18px;border-radius:18px;color:var(--muted);font-size:13.5px;font-weight:500;white-space:nowrap;transition:background .15s,color .15s}
+  .source-tab{height:30px;padding:0 12px;border-radius:15px;font-size:12.5px}
+  .source-tab:hover,.subject-tab:hover{color:var(--ink);background:#f1f0ec}
+  .source-tab.active,.subject-tab.active{color:var(--gold);background:var(--gold-soft);font-weight:650}
+  .grid-wrap{padding:28px 40px 80px;max-width:1480px;margin:0 auto;width:100%}
+  .content-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column;text-align:left;cursor:pointer;transition:all .25s;text-decoration:none;color:inherit}
+  .card:hover{border-color:var(--line-strong);box-shadow:0 12px 28px rgba(0,0,0,.06);transform:translateY(-2px)}
+  .card-cover{height:130px;position:relative;display:grid;place-items:center;color:rgba(255,255,255,.85)}
+  .card-cover.mint{background:linear-gradient(135deg,#edf5ee,#c8e0cd)}.card-cover.lilac{background:linear-gradient(135deg,#f5f0f6,#ddc8e3)}.card-cover.sky{background:linear-gradient(135deg,#eff4f9,#c8d8e8)}.card-cover.cream{background:linear-gradient(135deg,#fdfaf3,#f0deb3)}.card-cover.coral{background:linear-gradient(135deg,#fbf0f1,#ecc7ca)}.card-cover.sand{background:linear-gradient(135deg,#f7f2e8,#e3d4ae)}.card-cover.mist{background:linear-gradient(135deg,#f1f3f5,#cdd5dd)}.card-cover.peach{background:linear-gradient(135deg,#fbf3eb,#f0d3b8)}
+  .card-cover-icon{opacity:.45}.card-cover-icon svg{width:38px;height:38px}
+  .card-tag{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;color:var(--ink)}
+  .card-stats{position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;padding:3px 8px;border-radius:6px;font-size:10.5px;font-weight:600;display:flex;align-items:center;gap:4px}
+  .card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;min-height:110px}
+  .card-title{font-size:15.5px;font-weight:650;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card-author{display:flex;align-items:center;gap:8px;margin-top:auto;color:var(--faint);font-size:12px}
+  .author-avatar{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+  .card-author-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .card-fav{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 8px;border-radius:7px;color:var(--faint);font-size:12px;font-weight:600;flex-shrink:0;cursor:pointer;transition:background .12s,color .12s}
+  .card-fav:hover{background:var(--bg);color:var(--gold)}.card-fav.is-on{background:var(--gold-soft);color:var(--gold)}.card-fav svg{width:12px;height:12px}.card-fav.is-on svg{fill:currentColor}
+  .empty{grid-column:1/-1;padding:64px 0;color:var(--faint);text-align:center}
+  @media (max-width:1280px){.content-grid{grid-template-columns:repeat(3,1fr)}.search-head,.grid-wrap{padding-left:28px;padding-right:28px}}
+  @media (max-width:960px){.content-grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:720px){.app{grid-template-columns:1fr}.content-grid{grid-template-columns:1fr}.search-row{align-items:stretch}.search-box{width:100%;min-width:0}}
+</style>
+</head>
+<body data-page="resource-search">
+<div class="app">
+  <aside id="feixiang-sidebar"></aside>
+  <main class="main">
+    <div class="search-head">
+      <div class="search-row">
+        <button class="back-btn" type="button" title="返回资源广场" onclick="location.href='resource-square.html'"><i data-lucide="chevron-left"></i></button>
+        <label class="search-box">
+          <i data-lucide="search"></i>
+          <input id="search-input" type="text" autocomplete="off" placeholder="快速搜索资源">
+        </label>
+        <button class="search-submit" id="search-submit" type="button" data-track="/click/feixiangCampusResourceSquarePage/search | 搜索资源 | resourceSource#STRING">搜索</button>
+      </div>
+      <div class="source-tabs-row" id="source-tabs">
+        <button class="source-tab" data-source="global" data-track="/click/feixiangCampusResourceSquarePage/selectSource | 切换资源来源 | resourceSource#STRING">飞象老师精选</button>
+        <button class="source-tab" data-source="school" data-track="/click/feixiangCampusResourceSquarePage/selectSource | 切换资源来源 | resourceSource#STRING">本校资源</button>
+      </div>
+      <div class="subject-tabs" id="subject-tabs"></div>
+    </div>
+    <div class="grid-wrap"><div class="content-grid" id="grid"></div></div>
+  </main>
+</div>
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('resources');</script>
+<script>
+  const RESOURCES = [
+    { title:'《荷塘月色》画面捕捉法 · 课堂活动', tag:'课件', cover:'mint', subject:'chinese', source:'school', author:'王老师', avatar:'王', avatarColor:'#4a755b', views:'4.9万', fav:821, icon:'book-open' },
+    { title:'文言虚词配对小游戏 · 必考 12 个', tag:'互动动画', cover:'lilac', subject:'chinese', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'3.2万', fav:412, icon:'gamepad-2' },
+    { title:'现代散文阅读 5 步法 · 附课堂讲义', tag:'PPT', cover:'sky', subject:'chinese', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'2.8万', fav:356, icon:'presentation' },
+    { title:'议论文 8 大常用角度 + 范文导读', tag:'范文', cover:'cream', subject:'chinese', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'8.1万', fav:1240, icon:'crown' },
+    { title:'二次函数图像与性质 · 互动动画', tag:'互动动画', cover:'sky', subject:'math', source:'school', author:'张老师', avatar:'张', avatarColor:'#53759e', views:'5.4万', fav:678, icon:'shapes' },
+    { title:'初中几何辅助线 12 招 · 解题模板', tag:'题单', cover:'sand', subject:'math', source:'school', author:'刘老师', avatar:'刘', avatarColor:'#a87e2c', views:'6.7万', fav:932, icon:'compass' },
+    { title:'相似三角形判定与应用 · 中考冲刺', tag:'题单', cover:'cream', subject:'math', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'7.5万', fav:1102, icon:'crown' },
+    { title:'一次函数实际应用题 · 速解技巧', tag:'课件', cover:'mint', subject:'math', source:'school', author:'黄老师', avatar:'黄', avatarColor:'#4a755b', views:'3.6万', fav:489, icon:'book-open' },
+    { title:'高中英语完形填空高频词 200 个', tag:'题单', cover:'lilac', subject:'english', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'4.3万', fav:612, icon:'spell-check' },
+    { title:'英语作文万能开头与结尾模板', tag:'范文', cover:'mist', subject:'english', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'3.9万', fav:521, icon:'pen-tool' },
+    { title:'牛顿三大定律 · 经典实验视频集', tag:'视频', cover:'coral', subject:'physics', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'2.5万', fav:348, icon:'play-circle' },
+    { title:'电路图解题 7 步法 · 含中考真题', tag:'课件', cover:'sky', subject:'physics', source:'school', author:'周老师', avatar:'周', avatarColor:'#53759e', views:'3.1万', fav:412, icon:'zap' },
+    { title:'化学方程式配平大全 · 初三总复习', tag:'题单', cover:'mint', subject:'chemistry', source:'school', author:'赵老师', avatar:'赵', avatarColor:'#4a755b', views:'4.0万', fav:583, icon:'flask-conical' },
+    { title:'细胞分裂动画演示 · 减数分裂全过程', tag:'互动动画', cover:'peach', subject:'biology', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'2.2万', fav:287, icon:'dna' },
+    { title:'中国近代史时间轴 · 互动梳理', tag:'互动动画', cover:'sand', subject:'history', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'1.9万', fav:245, icon:'landmark' },
+    { title:'世界气候类型分布 · 高考填图集训', tag:'题单', cover:'mist', subject:'geography', source:'global', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', views:'2.4万', fav:312, icon:'globe' }
+  ];
+  const SUBJECT_LABELS = { all:'推荐', chinese:'语文', math:'数学', english:'英语', physics:'物理', chemistry:'化学', biology:'生物', history:'历史', geography:'地理' };
+  const SUBJECT_ORDER = ['chinese','math','english','physics','chemistry','biology','history','geography'];
+  const SOURCE_LABELS = { global:'飞象老师精选', school:'本校资源' };
+  const ICONS = {
+    'book-open':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+    'gamepad-2':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258A4 4 0 0 0 17.32 5z"/></svg>',
+    'presentation':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></svg>',
+    'crown':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>',
+    'shapes':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3 4 9h8z"/><circle cx="17" cy="7" r="3"/><rect x="4" y="13" width="8" height="8" rx="1"/></svg>',
+    'compass':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+    'spell-check':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m6 16 6-12 6 12"/><path d="M8 12h8"/><path d="m16 20 2 2 4-4"/></svg>',
+    'pen-tool':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>',
+    'play-circle':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
+    'zap':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    'flask-conical':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/></svg>',
+    'dna':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M2 9c6.667 6 13.333 0 20 6"/></svg>',
+    'landmark':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>',
+    'globe':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>'
+  };
+  const params = new URLSearchParams(location.search);
+  let query = params.get('q') || '';
+  let source = ['global','school'].includes(params.get('source')) ? params.get('source') : 'global';
+  let subject = params.get('subject') || 'all';
+  const input = document.getElementById('search-input');
+  const grid = document.getElementById('grid');
+  input.value = query;
+  function esc(value){ return String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+  function subjectsForSource(){
+    const available = new Set(RESOURCES.filter(r => r.source === source).map(r => r.subject));
+    return ['all', ...SUBJECT_ORDER.filter(item => available.has(item))];
+  }
+  function updateUrl(){
+    const next = new URLSearchParams({ q: query, source, subject });
+    history.replaceState(null, '', `resource-search.html?${next.toString()}`);
+  }
+  function renderTabs(){
+    document.querySelectorAll('.source-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.source === source));
+    const subjects = subjectsForSource();
+    if(!subjects.includes(subject)) subject = 'all';
+    document.getElementById('subject-tabs').innerHTML = subjects.map(item => `<button class="subject-tab ${item === subject ? 'active' : ''}" data-subject="${item}">${SUBJECT_LABELS[item] || item}</button>`).join('');
+  }
+  function render(){
+    renderTabs();
+    const q = query.trim().toLowerCase();
+    const list = RESOURCES.filter(resource => {
+      const sourceMatched = resource.source === source;
+      const subjectMatched = subject === 'all' || resource.subject === subject;
+      const queryMatched = !q || (resource.title + resource.tag + resource.author + (SUBJECT_LABELS[resource.subject] || '')).toLowerCase().includes(q);
+      return sourceMatched && subjectMatched && queryMatched;
+    });
+    grid.innerHTML = list.length ? list.map(resource => `<a class="card" href="resource-detail.html?resource=${encodeURIComponent(resource.title)}" data-track="/click/feixiangCampusResourceSquarePage/openResource | 打开资源 | resourceSource#STRING,contentType#STRING">
+      <div class="card-cover ${resource.cover}">
+        <span class="card-tag">${esc(resource.tag)}</span>
+        <div class="card-cover-icon">${ICONS[resource.icon] || ''}</div>
+        <span class="card-stats"><i data-lucide="eye"></i>${esc(resource.views)}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${esc(resource.title)}</div>
+        <div class="card-author">
+          <div class="author-avatar" style="background:${esc(resource.avatarColor)}">${esc(resource.avatar)}</div>
+          <span class="card-author-name">${esc(resource.author)}</span>
+          <span class="card-fav" role="button" tabindex="0" data-favorite data-count="${Number(resource.fav)||0}" title="收藏"><i data-lucide="star"></i><span>${Number(resource.fav)||0}</span></span>
+        </div>
+      </div>
+    </a>`).join('') : '<div class="empty">暂时没有匹配的资源</div>';
+    if(window.lucide) lucide.createIcons();
+    bindFavorites();
+    updateUrl();
+  }
+  function submit(){
+    query = input.value.trim();
+    if(!query){ input.focus(); return; }
+    render();
+  }
+  function bindFavorites(){
+    grid.querySelectorAll('[data-favorite]').forEach(btn => {
+      btn.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const on = btn.classList.toggle('is-on');
+        const base = Number(btn.dataset.count) || 0;
+        btn.querySelector('span').textContent = String(base + (on ? 1 : 0));
+      });
+    });
+  }
+  document.getElementById('search-submit').addEventListener('click', submit);
+  input.addEventListener('keydown', event => {
+    if(event.key === 'Enter' && !event.isComposing){ event.preventDefault(); submit(); }
+  });
+  document.getElementById('source-tabs').addEventListener('click', event => {
+    const btn = event.target.closest('.source-tab');
+    if(!btn) return;
+    source = btn.dataset.source || 'global';
+    subject = 'all';
+    render();
+  });
+  document.getElementById('subject-tabs').addEventListener('click', event => {
+    const btn = event.target.closest('.subject-tab');
+    if(!btn) return;
+    subject = btn.dataset.subject || 'all';
+    render();
+  });
+  render();
+</script>
+<template id="review-template">
+{
+  "title": "搜索资源 · 结果页",
+  "summary": "搜索资源页用于在资源来源和学科范围内查找资源，并把结果承接到资源详情页。",
+  "sections": [
+    {
+      "id": "resource-search-filter",
+      "title": "1. 搜索、来源与学科筛选",
+      "body": "老师可以在资源来源和学科范围内搜索资源，页面用 链接状态保留当前状态。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：从资源广场发起搜索或直接进入搜索页的老师。",
+            "用途：按关键词、来源和学科定位资源。",
+            "产出：当前条件下的资源结果列表。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "进入搜索页",
+              "text": "读取链接中的关键词、资源来源和学科范围，搜索框、来源分类、学科分类还原当前状态。"
+            },
+            {
+              "label": "提交搜索",
+              "text": "点击搜索或按 Enter，按资源标题、标签、作者和学科匹配。"
+            },
+            {
+              "label": "切换来源",
+              "text": "切换飞象老师精选或本校资源后，在同一关键词和学科范围内刷新结果。"
+            },
+            {
+              "label": "切换学科",
+              "text": "切换学科后，结果只展示当前来源下匹配该学科的资源。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "来源包含飞象老师精选和本校资源。",
+            "学科标签页 根据当前来源下实际有资源的学科生成。",
+            "搜索只在当前来源和学科范围内生效。",
+            "本校资源作者展示校园版老师身份信息。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "搜索条件包含关键词、来源范围、学科、资源类型和当前分类。",
+            "从资源广场进入时需要保留来源和二级分类。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "链接状态缺失或无效",
+              "处理方式": "使用默认来源和全部学科。"
+            },
+            {
+              "场景": "无结果",
+              "处理方式": "展示空状态，保留筛选条件。"
+            },
+            {
+              "场景": "来源无权限",
+              "处理方式": "展示切换来源或联系管理员。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "resource-square.html",
+              "说明": "资源广场搜索入口来源。"
+            },
+            {
+              "关联对象": "resource-detail.html",
+              "说明": "资源结果承接页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "输入关键词后资源结果收敛。",
+            "切换来源或学科后条件同步更新。",
+            "无结果时展示清空筛选入口。",
+            "页面文案不出现技术参数名。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resource-result-card",
+      "title": "2. 资源结果卡片",
+      "body": "结果卡片帮助老师判断资源来源、学科和可复用价值。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：查看资源搜索结果的老师。",
+            "用途：快速判断资源是否值得打开、收藏或继续查看。",
+            "产出：资源详情页跳转和卡片收藏状态。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "浏览结果",
+              "text": "老师查看资源标题、标签、作者、来源和摘要。"
+            },
+            {
+              "label": "打开资源",
+              "text": "点击卡片主体进入资源详情页。"
+            },
+            {
+              "label": "收藏资源",
+              "text": "点击收藏按钮切换当前资源收藏态，页面不跳转。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "卡片点击进入资源详情，不在搜索页直接预览完整资源。",
+            "收藏不改变资源归属。",
+            "飞象老师精选和本校资源不能混排到错误来源分类。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "资源卡片展示资源标题、作者、来源、收藏数量、浏览数量和点击去向。",
+            "资源类型和权限状态影响卡片展示和跳转。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "资源已下架",
+              "处理方式": "点击时提示不可用，并保留结果列表。"
+            },
+            {
+              "场景": "收藏失败",
+              "处理方式": "保留原收藏状态并提示。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "resource-detail.html",
+              "说明": "点击结果进入详情。"
+            },
+            {
+              "关联对象": "my-apps.html",
+              "说明": "收藏后的资源可回到我的作品查看。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "结果卡片展示标题、作者、收藏数量和浏览数量。",
+            "无权限或下架资源不能打开。",
+            "点击资源进入正确目标页。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>

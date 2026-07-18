@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>飞象 AI · AI 录题进度</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/v28.css?v=20260521d" />
+  <link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/shared/v28-modals.css?v=20260522a" />
+<link rel="stylesheet" href="assets/page-header.css" />
+<style>
+  /* AI 录题进度页 · 本地上传或知识库沉淀任务进入这里查看结果 */
+  .recp-page{
+    max-width:1080px;
+    margin:0 auto;
+    padding:24px 22px 96px;
+  }
+  body[data-subpage="ai-record-jobs"] .app{
+    grid-template-columns:minmax(0,1fr) 0 !important;
+  }
+  body[data-subpage="ai-record-jobs"] #feixiang-sidebar{
+    display:none !important;
+  }
+  body[data-subpage="ai-record-jobs"] .workspace{
+    min-width:0;
+  }
+  body[data-subpage="ai-record-jobs"] .page-header{
+    overflow:visible;
+  }
+  body[data-subpage="ai-record-jobs"] .ph-left{
+    max-width:none;
+    overflow:visible;
+  }
+  .recp-home-btn{
+    display:inline-flex;
+    align-items:center;
+    height:32px;
+    width:32px;
+    justify-content:center;
+    border:1px solid #E0DCD2;
+    border-radius:8px;
+    background:#FFFFFF;
+    color:#5A5550;
+    text-decoration:none;
+    flex-shrink:0;
+    transition:background .12s,border-color .12s,color .12s;
+  }
+  .recp-home-btn:hover{
+    background:#FAFAF8;
+    border-color:#D4CFC8;
+    color:#1A1A1A;
+  }
+  .recp-home-btn [data-lucide]{
+    width:15px;
+    height:15px;
+  }
+  .recp-bcbar{
+    display:flex; align-items:center; gap:6px;
+    font-size:12px; color:var(--text-3);
+    margin-bottom:18px;
+  }
+  .recp-bcbar a{
+    color:var(--text-3);
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:3px;
+    padding:3px 6px;
+    border-radius:5px;
+    transition:background-color .12s, color .12s;
+    cursor:pointer;
+  }
+  .recp-bcbar a:hover{ background:var(--surface-2); color:var(--text); }
+  .recp-bcbar > [data-lucide]{ width:11px; height:11px; color:var(--text-4); }
+  .recp-bcbar .recp-bcbar-current{ color:var(--text); font-weight:500; padding:3px 6px; }
+
+  /* Hero 区 · 大字品牌 + 副标题 + 主按钮 */
+  .recp-hero{
+    display:flex; align-items:flex-start; gap:24px;
+    padding:24px 28px;
+    background:linear-gradient(135deg, #FBF7EE 0%, #FAFAF7 100%);
+    border:1px solid #ECE3CC;
+    border-radius:14px;
+    margin-bottom:20px;
+  }
+  .recp-hero-text{
+    flex:1; min-width:0;
+  }
+  .recp-hero-title{
+    font-size:32px;
+    font-weight:700;
+    letter-spacing:-.012em;
+    line-height:1.15;
+    color:#1A1A1A;
+    margin-bottom:6px;
+  }
+  .recp-hero-title .recp-brand{
+    background:linear-gradient(135deg,#D9B96A 0%,#A87E2C 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    font-style:italic;
+    font-weight:800;
+    margin-right:4px;
+  }
+  .recp-hero-sub{
+    font-size:13px;
+    color:var(--text-2);
+    line-height:1.7;
+    max-width:480px;
+  }
+  .recp-hero-actions{
+    display:flex; align-items:center; gap:8px;
+    flex-shrink:0;
+  }
+  .recp-record-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    height:38px;
+    padding:0 18px;
+    border-radius:8px;
+    border:none;
+    background:linear-gradient(135deg,#C9A76E 0%,#A87E2C 100%);
+    color:#fff;
+    font-size:13.5px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    box-shadow:0 2px 6px rgba(168,126,44,.28);
+    transition:filter .12s, box-shadow .12s, transform .08s;
+  }
+  .recp-record-btn:hover{ filter:brightness(1.05); box-shadow:0 4px 12px rgba(168,126,44,.34); }
+  .recp-record-btn:active{ transform:translateY(1px); }
+  .recp-record-btn [data-lucide]{ width:15px; height:15px; }
+
+  .record-upload-zone{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    min-height:220px;
+    padding:22px 24px;
+    margin-bottom:12px;
+    border:1.5px dashed #D6BF87;
+    border-radius:14px;
+    background:linear-gradient(180deg,#FFFDF8 0%,#FBF7EF 100%);
+    cursor:pointer;
+    text-align:center;
+    transition:background .14s,border-color .14s,box-shadow .14s,transform .12s;
+  }
+  .record-upload-zone:hover,
+  .record-upload-zone.is-dragover{
+    background:#FFF9EC;
+    border-color:#A87E2C;
+    box-shadow:0 0 0 4px rgba(168,126,44,.10), inset 0 0 0 1px rgba(168,126,44,.10);
+  }
+  .record-upload-zone.is-dragover{
+    transform:translateY(-1px);
+  }
+  .record-upload-icon{
+    width:54px;
+    height:54px;
+    border-radius:16px;
+    display:grid;
+    place-items:center;
+    color:#A87E2C;
+    background:rgba(168,126,44,.10);
+    flex-shrink:0;
+  }
+  .record-upload-icon [data-lucide]{width:26px;height:26px}
+  .record-upload-main{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+  }
+  .record-upload-title{font-size:15px;font-weight:700;color:var(--text)}
+  .record-upload-sub{
+    max-width:420px;
+    font-size:12.5px;
+    line-height:1.7;
+    color:var(--text-3);
+  }
+  .record-upload-action{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    height:34px;
+    padding:0 18px;
+    border-radius:9px;
+    border:1px solid #E4D6B5;
+    background:#fff;
+    color:#7A5D20;
+    font-size:13px;
+    font-weight:650;
+    flex-shrink:0;
+    box-shadow:0 1px 2px rgba(30,24,14,.04);
+  }
+  .record-local-list{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin:-3px 0 10px;
+    max-height:84px;
+    overflow:auto;
+  }
+  .record-local-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 9px;
+    border:1px solid #ECE3CC;
+    border-radius:9px;
+    background:#FFFDF9;
+    font-size:12.5px;
+  }
+  .record-local-item [data-lucide]{width:14px;height:14px;color:#A87E2C;flex-shrink:0}
+  .record-local-name{
+    min-width:0;
+    flex:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:var(--text);
+    font-weight:500;
+  }
+  .record-local-size{font-size:11px;color:var(--text-4);flex-shrink:0}
+  .record-local-remove{
+    width:22px;
+    height:22px;
+    display:grid;
+    place-items:center;
+    border:0;
+    border-radius:6px;
+    background:transparent;
+    color:var(--text-3);
+    cursor:pointer;
+  }
+  .record-local-remove:hover{background:var(--surface-3);color:var(--text)}
+  .v28m[data-doc="ai-record-dialog"]{
+    width:min(620px, calc(100vw - 36px));
+    max-height:min(720px, calc(100vh - 64px));
+  }
+  .v28m[data-doc="ai-record-dialog"] .v28m-body{
+    padding:12px 18px 8px;
+  }
+  .v28m[data-doc="ai-record-dialog"] .v28m-foot{
+    padding:12px 18px;
+  }
+
+  /* 列表区头部 */
+  .recp-list-head{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+  }
+  .recp-list-title{
+    font-size:16px;
+    font-weight:700;
+    color:var(--text);
+    letter-spacing:-.005em;
+  }
+  .recp-list-meta{
+    font-size:12px;
+    color:var(--text-3);
+    font-weight:400;
+  }
+  .recp-toolbar{
+    margin-left:auto;
+    display:flex; align-items:center; gap:8px;
+  }
+  .recp-tool-select,
+  .recp-tool-search{
+    height:30px;
+    border:1px solid #D8D3C9;
+    border-radius:7px;
+    background:#FFFFFF;
+    font-size:12.5px;
+    color:var(--text);
+    font-family:inherit;
+    transition:border-color .12s, box-shadow .12s;
+  }
+  .recp-tool-select{
+    padding:0 26px 0 10px;
+    cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239A968F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 8px center;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  .recp-tool-select:hover,
+  .recp-tool-select:focus{
+    border-color:#A87E2C;
+    outline:none;
+    box-shadow:0 0 0 3px rgba(168,126,44,.10);
+  }
+  .recp-tool-search{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:0 10px;
+    width:200px;
+  }
+  .recp-tool-search [data-lucide]{ width:12px; height:12px; color:var(--text-3); flex-shrink:0; }
+  .recp-tool-search input{
+    flex:1; min-width:0;
+    border:none; outline:none; background:transparent;
+    font-size:12.5px;
+    color:var(--text);
+    font-family:inherit;
+    height:28px;
+  }
+  .recp-tool-search input::placeholder{ color:var(--text-4); }
+  .recp-tool-search:focus-within{
+    border-color:#A87E2C;
+    box-shadow:0 0 0 3px rgba(168,126,44,.10);
+  }
+
+  /* 任务列表容器 · 扁平时间倒序 · 不分组（避免状态切换时任务跳组） */
+  .recp-items{
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+    overflow:hidden;
+  }
+
+  /* 列表项 */
+  .recp-item{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 14px;
+    border-bottom:1px solid var(--border);
+    font-size:13px;
+    color:var(--text);
+    transition:background-color .12s;
+  }
+  .recp-item:last-child{ border-bottom:none; }
+  .recp-item:hover{ background:#FCFAF5; }
+
+  .recp-item-icon{
+    width:36px; height:36px;
+    border-radius:7px;
+    display:inline-flex; align-items:center; justify-content:center;
+    color:#fff;
+    flex-shrink:0;
+  }
+  .recp-item-icon [data-lucide]{ width:16px; height:16px; }
+  .recp-item-icon--pdf{ background:#D93D2A; }
+  .recp-item-icon--docx{ background:#2B5BD7; }
+  .recp-item-icon--image{ background:#13966E; }
+
+  .recp-item-main{
+    flex:1; min-width:0;
+  }
+  .recp-item-name-line{
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:4px;
+  }
+  .recp-item-name{
+    font-size:13.5px;
+    font-weight:500;
+    color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    max-width:520px;
+  }
+  .recp-item-state{
+    display:inline-flex; align-items:center; gap:3px;
+    padding:2px 8px;
+    border-radius:10px;
+    font-size:11px;
+    font-weight:500;
+    flex-shrink:0;
+  }
+  .recp-item-state [data-lucide]{ width:11px; height:11px; }
+  .recp-item-state.is-parsing{ background:#FBF7EE; color:#A87E2C; border:1px solid #ECE3CC; }
+  .recp-item-state.is-pending{ background:#EAF1FF; color:#2B5BD7; border:1px solid #C7DBFF; }
+  .recp-item-state.is-done{ background:#EEF6F0; color:#2A8F47; border:1px solid #D3E5D5; }
+  .recp-item-state.is-failed{ background:#FFEEE9; color:#D93D2A; border:1px solid #F5C9BB; }
+  .recp-item-state .is-spin{ animation:recp-spin .9s linear infinite; }
+  @keyframes recp-spin{ to{ transform:rotate(360deg); } }
+
+  .recp-item-sub{
+    display:flex; align-items:center; gap:6px;
+    font-size:11.5px;
+    color:var(--text-4);
+    flex-wrap:wrap;
+  }
+  .recp-item-sub > span{ flex-shrink:0; }
+  .recp-item-sub .sep{ color:var(--text-4); opacity:.6; }
+  .recp-item-sub .recp-item-meta-strong{ color:var(--text-2); font-weight:500; }
+  .recp-item-kb{
+    display:inline-flex; align-items:center; gap:3px;
+    color:var(--text-2);
+    font-weight:500;
+  }
+  .recp-item-kb [data-lucide]{ width:11px; height:11px; color:var(--gold-deep); }
+
+  .recp-item-actions{
+    display:flex; align-items:center; gap:6px;
+    flex-shrink:0;
+  }
+  .recp-item-action{
+    display:inline-flex; align-items:center; gap:4px;
+    height:30px;
+    padding:0 12px;
+    border-radius:6px;
+    border:1px solid #D8D3C9;
+    background:#fff;
+    color:var(--text-2);
+    font-size:12px;
+    font-weight:500;
+    cursor:pointer;
+    text-decoration:none;
+    font-family:inherit;
+    transition:all .12s;
+  }
+  .recp-item-action [data-lucide]{ width:13px; height:13px; }
+  .recp-item-action:hover{ border-color:#A87E2C; color:#7A5615; background:#FBF7EE; }
+  .recp-item-action.is-primary{
+    background:linear-gradient(135deg,#C9A76E 0%,#A87E2C 100%);
+    color:#fff;
+    border:none;
+    box-shadow:0 1px 3px rgba(168,126,44,.28);
+  }
+  .recp-item-action.is-primary:hover{ filter:brightness(1.05); box-shadow:0 2px 6px rgba(168,126,44,.36); }
+  .recp-item-action.is-muted{
+    background:transparent;
+    border-color:transparent;
+    color:var(--text-3);
+    cursor:default;
+    pointer-events:none;
+  }
+
+  /* 进度百分比 */
+  .recp-progress{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:11.5px;
+    color:#A87E2C;
+    font-weight:500;
+    font-variant-numeric:tabular-nums;
+  }
+  .recp-progress-bar{
+    width:80px; height:4px;
+    background:#F2EEE5;
+    border-radius:2px;
+    overflow:hidden;
+    position:relative;
+  }
+  .recp-progress-bar-fill{
+    height:100%;
+    background:linear-gradient(90deg,#D9B96A 0%,#A87E2C 100%);
+    border-radius:2px;
+    transition:width .4s ease-out;
+  }
+
+  /* 已入库角标 */
+  .recp-committed-badge{
+    display:inline-flex; align-items:center; gap:3px;
+    padding:1px 6px;
+    border-radius:4px;
+    background:#EEF6F0;
+    color:#2A8F47;
+    font-size:10.5px;
+    font-weight:500;
+    border:1px solid #D3E5D5;
+  }
+  .recp-committed-badge [data-lucide]{ width:10px; height:10px; }
+
+  /* 空态 */
+  .recp-empty{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:80px 20px;
+    text-align:center;
+  }
+  .recp-empty-icon{
+    width:56px; height:56px;
+    border-radius:50%;
+    background:var(--surface-2);
+    display:inline-flex; align-items:center; justify-content:center;
+    margin-bottom:14px;
+  }
+  .recp-empty-icon [data-lucide]{
+    width:24px; height:24px;
+    color:var(--text-3);
+  }
+  .recp-empty-title{
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  .recp-empty-sub{
+    font-size:12.5px;
+    color:var(--text-3);
+    margin-bottom:18px;
+    max-width:320px;
+    line-height:1.6;
+  }
+
+  /* 搜索无结果 */
+  .recp-noresult{
+    padding:32px 14px;
+    text-align:center;
+    font-size:12.5px;
+    color:var(--text-3);
+  }
+  .recp-noresult [data-lucide]{ width:16px; height:16px; vertical-align:-3px; margin-right:4px; }
+
+  /* 时间相对显示 */
+  .recp-rel-time{ color:var(--text-4); }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="ai-qbank" data-subpage="ai-record-jobs">
+
+<div class="app" id="app" data-view="wiki" data-chat="closed">
+  <aside class="sidebar-left" id="feixiang-sidebar"></aside>
+
+  <main class="workspace">
+    <!-- 统一页面顶栏 · 新页面打开后不展示面包屑 -->
+    <header class="page-header" data-page-header="ai-record-jobs">
+      <div class="ph-left">
+        <a class="recp-home-btn" href="index.html" title="回到首页">
+          <i data-lucide="home"></i>
+        </a>
+        <i class="ph-icon" data-lucide="sparkles"></i>
+        <h1 class="ph-title">AI 录题</h1>
+      </div>
+    </header>
+
+    <div class="workspace-scroll">
+      <section class="recp-page">
+        <div class="recp-hero">
+          <div class="recp-hero-text">
+            <h1 class="recp-hero-title"><span class="recp-brand">Ai</span>录题</h1>
+            <p class="recp-hero-sub">上传本地 PDF / Word，或从学校知识库勾选沉淀后，AI 自动解析题面 / 答案 / 知识点 / 难度。<br/>老师在这里查看进度、校对结果，并确认入库。</p>
+          </div>
+          <div class="recp-hero-actions">
+            <button class="recp-record-btn" id="recp-record-btn" data-doc="ai-record-entry" data-track="/click/feixiangCampusAiRecordPage/openRecordDialog | 打开 AI 录题弹窗 | 无">
+              <i data-lucide="sparkles"></i>
+              <span>+ AI 录题</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="recp-list-head">
+          <span class="recp-list-title">任务列表</span>
+          <span class="recp-list-meta" id="recp-list-meta"></span>
+          <div class="recp-toolbar">
+            <select class="recp-tool-select" id="recp-filter-state">
+              <option value="">全部状态</option>
+              <option value="review-pending">待校对</option>
+              <option value="parsing">解析中</option>
+              <option value="committed">已入库</option>
+              <option value="failed">失败</option>
+            </select>
+            <label class="recp-tool-search">
+              <i data-lucide="search"></i>
+              <input id="recp-search-input" type="text" placeholder="搜索文件名…" autocomplete="off" />
+            </label>
+          </div>
+        </div>
+
+        <div id="recp-list-root"></div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="sidebar-right"></aside>
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('apps');</script>
+<script src="assets/v28-shell.js?v=20260522b"></script>
+<script src="assets/v28.js?v=20260522e"></script>
+<script src="assets/shared/v28-modals.js?v=20260522a"></script>
+<script src="assets/page-header.js"></script>
+<script>
+  (function(){
+    const RECORD_STORAGE_KEY = 'v28-ai-record-jobs';
+    const root = document.getElementById('recp-list-root');
+    const metaEl = document.getElementById('recp-list-meta');
+    const stateSel = document.getElementById('recp-filter-state');
+    const searchInp = document.getElementById('recp-search-input');
+    const recordBtn = document.getElementById('recp-record-btn');
+
+    /* —— 视图状态 —— */
+    let filterState = '';
+    let keyword = '';
+
+    function localJobs(){
+      try{
+        const raw = localStorage.getItem(RECORD_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      }catch(_){
+        return [];
+      }
+    }
+    function saveLocalJobs(jobs){
+      try{ localStorage.setItem(RECORD_STORAGE_KEY, JSON.stringify(jobs)); }catch(_){}
+    }
+    function stableQuestionCount(name){
+      let h = 5381;
+      String(name || '').split('').forEach(ch => { h = ((h * 33) ^ ch.charCodeAt(0)) >>> 0; });
+      return 6 + (Math.abs(h) % 19);
+    }
+    function createLocalJobs(files){
+      const jobs = localJobs();
+      const now = Date.now();
+      const created = files.map((file, index) => ({
+        id: 'rec-' + Math.random().toString(36).slice(2, 10),
+        fileId: file.id,
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        kbLabel: file.kbLabel,
+        state: 'parsing',
+        createdAt: now + index,
+        parseDoneAt: null,
+        committedAt: null,
+        questionCount: stableQuestionCount(file.name),
+        _parseMs: 8000 + index * 900
+      }));
+      saveLocalJobs(jobs.concat(created));
+      scheduleLocalFinish(created);
+      return created;
+    }
+    function scheduleLocalFinish(jobs){
+      jobs.forEach(job => {
+        const elapsed = Date.now() - job.createdAt;
+        const left = Math.max(400, (job._parseMs || 8000) - elapsed);
+        window.setTimeout(() => {
+          const all = localJobs();
+          const target = all.find(item => item.id === job.id);
+          if(!target || target.state !== 'parsing') return;
+          target.state = 'review-pending';
+          target.parseDoneAt = Date.now();
+          saveLocalJobs(all);
+          renderList();
+          if(window.V28RecordJobs && V28RecordJobs.syncTriggerBadge) V28RecordJobs.syncTriggerBadge();
+          showToast(`AI 已解析完《${target.fileName}》· ${target.questionCount} 题待校对`);
+        }, left);
+      });
+    }
+    function ensureLocalParsingTimers(){
+      const all = localJobs();
+      let dirty = false;
+      all.forEach(job => {
+        if(job.state !== 'parsing') return;
+        const elapsed = Date.now() - job.createdAt;
+        if(elapsed >= (job._parseMs || 8000)){
+          job.state = 'review-pending';
+          job.parseDoneAt = Date.now();
+          dirty = true;
+        } else {
+          scheduleLocalFinish([job]);
+        }
+      });
+      if(dirty) saveLocalJobs(all);
+    }
+
+    /* —— 状态元数据 ——
+     * 不再分组,统一按 createdAt 倒序扁平展示,避免任务在 parsing → review-pending 状态跳变时
+     * 视觉位置突然变化导致老师"刚才那个任务怎么不见了"的错觉
+     */
+    const STATE_META = {
+      'review-pending': { label:'待校对', cls:'is-pending', icon:'circle-dot',     spin:false },
+      'parsing':        { label:'解析中', cls:'is-parsing', icon:'loader-2',       spin:true  },
+      'failed':         { label:'失败',   cls:'is-failed',  icon:'x-circle',       spin:false },
+      'committed':      { label:'已入库', cls:'is-done',    icon:'check-circle-2', spin:false }
+    };
+
+    /* —— 辅助 —— */
+    function escHtml(s){
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+    function fmtRelTime(ts){
+      if(!ts) return '';
+      const delta = Date.now() - ts;
+      if(delta < 60_000) return '刚刚';
+      if(delta < 3600_000) return Math.floor(delta / 60_000) + ' 分钟前';
+      if(delta < 86_400_000) return Math.floor(delta / 3600_000) + ' 小时前';
+      return Math.floor(delta / 86_400_000) + ' 天前';
+    }
+    /* 解析中进度 = (已用时 / 总解析时长) 百分比，最大 95% (留 5% 给完成切换) */
+    function calcProgress(job){
+      if(!job._parseMs) return 0;
+      const elapsed = Date.now() - job.createdAt;
+      const ratio = Math.min(elapsed / job._parseMs, 0.95);
+      return Math.max(2, Math.round(ratio * 100));
+    }
+
+    /* —— 列表过滤 ——
+     * 排序统一按 createdAt 倒序（V28RecordJobs.list() 已经是新→旧）
+     * 不再做状态分组,避免任务状态切换时跳位
+     */
+    function buildView(){
+      const all = window.V28RecordJobs ? V28RecordJobs.list() : localJobs().sort((a, b) => b.createdAt - a.createdAt);
+
+      const kw = keyword.trim().toLowerCase();
+      const filtered = all.filter(j => {
+        if(filterState && j.state !== filterState) return false;
+        if(kw && !j.fileName.toLowerCase().includes(kw)) return false;
+        return true;
+      });
+
+      return { all, filtered };
+    }
+
+    /* —— 渲染列表 —— */
+    function renderList(){
+      const { all, filtered } = buildView();
+
+      /* 头部 meta · 总览数据保留,作为"现在状态如何"的快速感知 */
+      if(metaEl){
+        if(all.length === 0){
+          metaEl.textContent = '';
+        } else {
+          const parsing = all.filter(j => j.state === 'parsing').length;
+          const pending = all.filter(j => j.state === 'review-pending').length;
+          const parts = [];
+          if(pending) parts.push(`${pending} 个待校对`);
+          if(parsing) parts.push(`${parsing} 个解析中`);
+          parts.push(`共 ${all.length} 个任务`);
+          metaEl.textContent = '· ' + parts.join(' · ');
+        }
+      }
+
+      /* 空态 */
+      if(all.length === 0){
+        root.innerHTML = `
+          <div class="recp-empty">
+            <div class="recp-empty-icon"><i data-lucide="inbox"></i></div>
+            <div class="recp-empty-title">暂无任务</div>
+          </div>
+        `;
+        if(window.lucide) lucide.createIcons();
+        return;
+      }
+      if(filtered.length === 0){
+        root.innerHTML = `
+          <div class="recp-noresult">
+            <i data-lucide="folder-search"></i>没有匹配的任务，可调整筛选或搜索条件。
+          </div>
+        `;
+        if(window.lucide) lucide.createIcons();
+        return;
+      }
+
+      /* 扁平时间倒序渲染（V28RecordJobs.list 已经按 createdAt 倒序） */
+      root.innerHTML = `<div class="recp-items">${filtered.map(renderItem).join('')}</div>`;
+      if(window.lucide) lucide.createIcons();
+      bindRowActions();
+    }
+
+    function renderItem(job){
+      const meta = STATE_META[job.state];
+      const ext = (job.fileType || '').toLowerCase();
+      const isImage = ['jpg', 'jpeg', 'png'].includes(ext);
+      const iconCls = isImage ? 'recp-item-icon--image' : (ext === 'docx' || ext === 'doc' ? 'recp-item-icon--docx' : 'recp-item-icon--pdf');
+      const itemIcon = isImage ? 'image' : 'file-text';
+
+      /* 时间 */
+      const timeStr =
+        job.committedAt ? `已入库 · ${fmtRelTime(job.committedAt)}` :
+        job.parseDoneAt ? `解析完成 · ${fmtRelTime(job.parseDoneAt)}` :
+        `提交于 ${fmtRelTime(job.createdAt)}`;
+
+      /* 解析中进度 */
+      const progressHtml = job.state === 'parsing'
+        ? (() => {
+            const pct = calcProgress(job);
+            return `
+              <div class="recp-progress">
+                <div class="recp-progress-bar"><div class="recp-progress-bar-fill" style="width:${pct}%"></div></div>
+                <span>${pct}%</span>
+              </div>
+            `;
+          })()
+        : '';
+
+      /* 题数 chip */
+      const qInfo = job.state !== 'parsing'
+        ? `<span class="sep">·</span><span class="recp-item-meta-strong">${job.questionCount} 题</span>`
+        : '';
+
+      /* 已入库角标（在文件名右侧，提示去重） */
+      const committedBadge = job.state === 'committed'
+        ? `<span class="recp-committed-badge"><i data-lucide="check"></i>已入库 ${job.questionCount} 题</span>`
+        : '';
+
+      /* 操作区 */
+      let actions = '';
+      if(job.state === 'review-pending'){
+        actions = `
+          <a class="recp-item-action is-primary" href="ai-review.html?jobId=${job.id}" data-track="/click/feixiangCampusAiRecordPage/goReview | 去校对 | jobStatus#STRING">
+            去校对<i data-lucide="arrow-right"></i>
+          </a>
+        `;
+      } else if(job.state === 'committed'){
+        actions = `
+          <button class="recp-item-action" data-action="re-record" data-jobid="${job.id}" title="再次解析此文件，会与已入库题目合并；可能产生重复题">
+            <i data-lucide="refresh-cw"></i>重新录题
+          </button>
+        `;
+      } else if(job.state === 'failed'){
+        actions = `
+          <button class="recp-item-action" data-action="retry" data-jobid="${job.id}">
+            <i data-lucide="rotate-cw"></i>重新解析
+          </button>
+        `;
+      } else if(job.state === 'parsing'){
+        actions = `<span class="recp-item-action is-muted">解析中…</span>`;
+      }
+
+      return `
+        <div class="recp-item" data-jobid="${job.id}">
+          <span class="recp-item-icon ${iconCls}"><i data-lucide="${itemIcon}"></i></span>
+          <div class="recp-item-main">
+            <div class="recp-item-name-line">
+              <span class="recp-item-name" title="${escHtml(job.fileName)}">${escHtml(job.fileName)}</span>
+              <span class="recp-item-state ${meta.cls}">
+                <i data-lucide="${meta.icon}" class="${meta.spin ? 'is-spin' : ''}"></i>${meta.label}
+              </span>
+              ${committedBadge}
+            </div>
+            <div class="recp-item-sub">
+              ${progressHtml}
+              ${progressHtml ? '<span class="sep">·</span>' : ''}
+              <span class="recp-item-kb"><i data-lucide="library"></i>来源：${escHtml(job.kbLabel || '本地上传')}</span>
+              <span class="sep">·</span>
+              <span>${escHtml(job.fileSize || '')}</span>
+              ${qInfo}
+              <span class="sep">·</span>
+              <span class="recp-rel-time">${escHtml(timeStr)}</span>
+            </div>
+          </div>
+          <div class="recp-item-actions">${actions}</div>
+        </div>
+      `;
+    }
+
+    function bindRowActions(){
+      /* 重新录题（已入库 → 二次确认 → 再开 RecordDialog 默认勾选这个文件） */
+      root.querySelectorAll('[data-action="re-record"]').forEach(el => {
+        el.addEventListener('click', event => {
+          event.preventDefault();
+          event.stopPropagation();
+          const id = el.getAttribute('data-jobid');
+          const j = (window.V28RecordJobs && V28RecordJobs.get(id)) || localJobs().find(job => job.id === id);
+          if(!j) return;
+          if(!confirm(`《${j.fileName}》已入库 ${j.questionCount} 题。\n再次录题会与已有题目合并，可能产生重复题。\n\n确认重新录题？`)) return;
+          openRecordDialog({ preselectFileIds:[j.fileId] });
+        });
+      });
+      /* 失败重试（演示态：toast 提示） */
+      root.querySelectorAll('[data-action="retry"]').forEach(el => {
+        el.addEventListener('click', () => {
+          showToast('（演示）失败重试由后台重新排队解析');
+        });
+      });
+    }
+
+    function openRecordFallback(opts){
+      opts = opts || {};
+      const localUploads = [];
+      const selected = new Set();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'v28m-overlay open';
+      const dialog = document.createElement('div');
+      dialog.className = 'v28m size-md open';
+      dialog.dataset.doc = 'ai-record-dialog';
+      dialog.innerHTML = `
+        <div class="v28m-head">
+          <div class="v28m-title">
+            AI 录题 · 上传要解析的文件
+            <div class="v28m-title-sub">仅支持 PDF / Word · 本地上传后，AI 解析为题目并进入校对任务</div>
+          </div>
+          <button class="v28m-close" data-close aria-label="关闭"><i data-lucide="x"></i></button>
+        </div>
+        <div class="v28m-body v28-src-body">
+          <label class="record-upload-zone" id="record-upload-zone">
+            <span class="record-upload-icon"><i data-lucide="upload-cloud"></i></span>
+            <span class="record-upload-main">
+              <span class="record-upload-title">拖拽 PDF / Word 到这里，或选择本地文件</span>
+              <span class="record-upload-sub">支持 .pdf / .doc / .docx；上传后生成独立录题任务，需要老师校对后入题库。知识库资料请在知识库上传或文件列表中勾选沉淀。</span>
+            </span>
+            <span class="record-upload-action">选择文件</span>
+            <input id="record-upload-input" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple hidden />
+          </label>
+          <div class="record-local-list" id="record-local-list"></div>
+        </div>
+        <div class="v28m-foot">
+          <span class="v28m-foot-meta" id="record-fallback-meta">请上传或拖入要解析的文件</span>
+          <button class="v28m-btn" data-close>取消</button>
+          <button class="v28m-btn primary" id="record-fallback-submit" disabled data-track="/click/feixiangCampusAiRecordPage/submitLocalFile | 提交本地文件录题 | fileCount#INT32,fileType#STRING">
+            <i data-lucide="sparkles"></i><span>开始 AI 录题 (0)</span>
+          </button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      document.body.appendChild(dialog);
+
+      let canOverlayClose = false;
+      const close = () => { overlay.remove(); dialog.remove(); };
+      setTimeout(() => { canOverlayClose = true; }, 180);
+      overlay.addEventListener('click', event => {
+        if(!canOverlayClose || event.target !== overlay) return;
+        close();
+      });
+      dialog.addEventListener('click', event => event.stopPropagation());
+      dialog.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', event => {
+        event.stopPropagation();
+        close();
+      }));
+
+      const uploadZone = dialog.querySelector('#record-upload-zone');
+      const uploadInput = dialog.querySelector('#record-upload-input');
+      const localList = dialog.querySelector('#record-local-list');
+      const submit = dialog.querySelector('#record-fallback-submit');
+      const meta = dialog.querySelector('#record-fallback-meta');
+
+      function formatBytes(size){
+        if(!Number.isFinite(size)) return '';
+        if(size >= 1024 * 1024) return (size / 1024 / 1024).toFixed(size >= 10 * 1024 * 1024 ? 0 : 1) + ' MB';
+        if(size >= 1024) return Math.round(size / 1024) + ' KB';
+        return size + ' B';
+      }
+      function normalizeLocalFiles(fileList){
+        const files = Array.from(fileList || []);
+        let skipped = 0;
+        files.forEach(file => {
+          const ext = (file.name.split('.').pop() || '').toLowerCase();
+          if(!['pdf','doc','docx'].includes(ext)){
+            skipped += 1;
+            return;
+          }
+          const dup = localUploads.some(item => item.name === file.name && item.rawSize === file.size);
+          if(dup) return;
+          const item = {
+            id: 'local-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
+            name: file.name,
+            type: ext === 'pdf' ? 'pdf' : 'docx',
+            size: formatBytes(file.size),
+            rawSize: file.size,
+            kbLabel: '本地上传',
+            group: '本地上传',
+            isLocal: true
+          };
+          localUploads.push(item);
+          selected.add(item.id);
+        });
+        if(skipped) showToast(`已忽略 ${skipped} 个非 PDF / Word 文件`);
+        renderLocalUploads();
+        syncFooter();
+      }
+      function renderLocalUploads(){
+        if(!localUploads.length){
+          localList.innerHTML = '';
+          return;
+        }
+        localList.innerHTML = localUploads.map(file => `
+          <div class="record-local-item" data-local-id="${file.id}">
+            <i data-lucide="${file.type === 'pdf' ? 'file-text' : 'file'}"></i>
+            <span class="record-local-name" title="${escHtml(file.name)}">${escHtml(file.name)}</span>
+            <span class="record-local-size">${escHtml(file.size)}</span>
+            <button class="record-local-remove" type="button" data-remove-local="${file.id}" title="移除">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        `).join('');
+        if(window.lucide) lucide.createIcons();
+      }
+      function syncFooter(){
+        const n = selected.size;
+        meta.textContent = n ? `已选 ${n} 个文件 · 提交后每个文件生成 1 个独立任务` : '请上传或拖入要解析的文件';
+        submit.disabled = n === 0;
+        submit.querySelector('span').textContent = `开始 AI 录题 (${n})`;
+      }
+      localList.addEventListener('click', event => {
+        const removeBtn = event.target.closest('[data-remove-local]');
+        if(!removeBtn) return;
+        const id = removeBtn.dataset.removeLocal;
+        const idx = localUploads.findIndex(file => file.id === id);
+        if(idx >= 0) localUploads.splice(idx, 1);
+        selected.delete(id);
+        renderLocalUploads();
+        syncFooter();
+      });
+      uploadZone.addEventListener('dragover', event => {
+        event.preventDefault();
+        uploadZone.classList.add('is-dragover');
+      });
+      uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('is-dragover');
+      });
+      uploadZone.addEventListener('drop', event => {
+        event.preventDefault();
+        uploadZone.classList.remove('is-dragover');
+        normalizeLocalFiles(event.dataTransfer && event.dataTransfer.files);
+      });
+      uploadInput.addEventListener('change', () => {
+        normalizeLocalFiles(uploadInput.files);
+        uploadInput.value = '';
+      });
+      submit.addEventListener('click', () => {
+        const files = localUploads.filter(file => selected.has(file.id));
+        if(!files.length) return;
+        const jobs = createLocalJobs(files);
+        close();
+        if(typeof opts.onSubmit === 'function') opts.onSubmit(jobs);
+        renderList();
+      });
+
+      renderLocalUploads();
+      syncFooter();
+      if(window.lucide) lucide.createIcons();
+    }
+
+    /* —— 主入口：打开 V28RecordDialog —— */
+    function openRecordDialog(opts){
+      const payload = {
+        preselectFileIds: opts && opts.preselectFileIds,
+        onSubmit: (jobs) => {
+          if(jobs && jobs.length){
+            showToast(`已开始解析 ${jobs.length} 个文件 · 解析完成会自动通知`);
+          }
+          /* 留在 09，不跳转，主动滚动到列表顶部新任务 */
+          requestAnimationFrame(() => {
+            const first = root.querySelector('.recp-item');
+            if(first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+          });
+        }
+      };
+      /* 校园版使用内置新建流程: + AI 录题 → 选择文件 → 开始解析 → 任务进度 */
+      openRecordFallback(payload);
+    }
+
+    /* —— 事件绑定 —— */
+    if(recordBtn){
+      recordBtn.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        openRecordDialog();
+      });
+    }
+    if(stateSel){
+      stateSel.addEventListener('change', e => { filterState = e.target.value; renderList(); });
+    }
+    if(searchInp){
+      searchInp.addEventListener('input', e => { keyword = e.target.value; renderList(); });
+    }
+
+    /* —— 初始化 + 订阅状态变化 + 周期刷新（更新进度条/相对时间） —— */
+    function init(){
+      ensureLocalParsingTimers();
+      renderList();
+      if(window.V28RecordJobs && V28RecordJobs.subscribe){
+        V28RecordJobs.subscribe(() => {
+          renderList();
+        });
+      }
+    }
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+    /* 1s 节奏更新解析中进度条 + 相对时间 · 不依赖 subscribe */
+    setInterval(() => {
+      const hasParsing = window.V28RecordJobs && V28RecordJobs.parsingCount() > 0;
+      if(hasParsing) renderList();
+    }, 1000);
+  })();
+</script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'ai-record-jobs.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+<template id="review-template">
+{
+  "title": "AI 录题 · 上传解析与任务列表",
+  "summary": "AI 录题页管理本地上传和知识库沉淀产生的录题任务，核心是让老师知道每份资料当前处在哪个状态。",
+  "sections": [
+    {
+      "id": "ai-record-entry",
+      "title": "1. 创建录题任务",
+      "body": "创建录题任务用于从本地选择 PDF / Word，让 AI 提取题目草稿；知识库资料不在本页手动选择，而是在知识库上传或文件列表中勾选沉淀后进入任务列表。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要把资料转成题库题目的老师。",
+            "用途：本地上传 PDF / Word 创建 AI 解析任务；知识库沉淀任务在本页查看进度和结果。",
+            "边界：AI 录题页不提供从知识库手动选择文件；知识库文件需在知识库上传或文件列表中勾选沉淀。",
+            "页面定位：AI 录题与 AI 校本题库同为独立产品页，从应用入口新页面打开；左侧不展示知识库导航，顶部提供首页按钮返回校园版首页。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "点击上传",
+              "text": "老师点击“+ AI 录题”或上传区域，从本地选择资料。"
+            },
+            {
+              "label": "选择文件",
+              "text": "选择 PDF、Word 资料，可一次选择多个文件。"
+            },
+            {
+              "label": "确认上传",
+              "text": "确认后生成录题任务，并进入解析中状态。"
+            },
+            {
+              "label": "继续工作",
+              "text": "老师可离开页面，稍后从任务列表回到校对。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "上传后只创建待解析任务，不直接进入题库。",
+            "知识库资料不在本页选择；老师在知识库勾选沉淀后，系统自动创建 AI 录题任务。",
+            "同一文件重复上传时需要提示可能重复。",
+            "文件归属默认当前老师，可按学校规则进入个人或学校题库。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "上传资料信息：文件名、文件类型、大小、来源方式、上传状态。",
+            "任务创建后记录解析状态、创建时间、校对入口和来源；知识库沉淀任务需记录知识库路径或文件来源。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "格式不支持",
+              "处理方式": "本地上传提示支持 PDF、Word；知识库沉淀仅处理 PDF、Word、单张图片。"
+            },
+            {
+              "场景": "文件过大",
+              "处理方式": "提示压缩或分拆上传。"
+            },
+            {
+              "场景": "重复文件",
+              "处理方式": "提示已存在相似任务，老师可继续上传或查看原任务。"
+            },
+            {
+              "场景": "上传中断",
+              "处理方式": "保留失败状态，允许重新上传。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "ai-review.html",
+              "说明": "解析完成后进入校对页。"
+            },
+            {
+              "关联对象": "ai-qbank.html",
+              "说明": "校对入库后题目进入题库。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "知识库资料不在 AI 录题页手动选择；老师在知识库勾选沉淀后，任务进入本页查看。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "创建任务入口不出现从知识库选择。",
+            "上传后只生成解析任务，不直接进入题库。",
+            "格式不支持、文件过大、上传中断均有明确反馈。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-record-list",
+      "title": "2. 任务状态列表",
+      "body": "按状态展示录题任务和下一步操作。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要跟进录题进度的老师。",
+            "用途：查看解析中、待校对、已入库、解析失败等任务状态。",
+            "产出：任务列表、状态筛选和可执行主操作。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "查看全部任务",
+              "text": "进入页面后先看到待校对任务，其次是解析中、解析失败、已入库任务；同一状态内按最近更新时间倒序展示。"
+            },
+            {
+              "label": "筛选状态",
+              "text": "点击状态筛选后，只展示对应状态的任务；再次切回全部时恢复默认优先级和排序。"
+            },
+            {
+              "label": "查看任务行",
+              "text": "每条任务展示文件名、资料来源、解析状态、题目数量、更新时间和当前可执行动作。"
+            },
+            {
+              "label": "处理待校对",
+              "text": "待校对任务展示“去校对”，点击进入校对页。"
+            },
+            {
+              "label": "处理失败任务",
+              "text": "解析失败任务展示失败原因和重试入口；点击重试后重新进入解析中。"
+            },
+            {
+              "label": "查看已入库",
+              "text": "已入库任务展示入库题量，可回看但不再作为待办。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "任务默认按处理优先级展示：待校对优先，其次解析中、解析失败、已入库；同一优先级内按最近更新时间倒序。",
+            "状态筛选只改变当前任务列表展示，不改变任务状态。",
+            "解析中任务不能进入校对或入库，只能等待刷新或取消。",
+            "待校对任务只能通过校对页确认入库，不能在列表中直接入库。",
+            "已入库任务再次重新录题需二次确认，避免重复入库。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "任务行展示文件名、资料来源、解析状态、题目数量、更新时间、失败原因和当前动作。",
+            "状态包括解析中、待校对、已入库、解析失败；不同状态使用清晰的文字和视觉区分。",
+            "当前动作根据状态变化：待校对显示去校对，解析失败显示重试或查看原因，解析中显示等待状态，已入库显示回看或入库结果。",
+            "排序展示为待处理优先、最近更新优先，不向老师暴露内部排序信息。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "任务为空",
+              "处理方式": "展示空状态和创建录题任务入口。"
+            },
+            {
+              "场景": "当前筛选无任务",
+              "处理方式": "展示该状态暂无任务，并允许切回全部任务。"
+            },
+            {
+              "场景": "解析超时",
+              "处理方式": "显示解析中但提示可能较慢，允许稍后刷新或回到列表。"
+            },
+            {
+              "场景": "重新录题",
+              "处理方式": "弹出确认，说明可能生成重复题。"
+            },
+            {
+              "场景": "任务不存在或无权限",
+              "处理方式": "提示任务已删除或无权限，并刷新任务列表。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "ai-review.html",
+              "说明": "待校对任务进入校对。"
+            },
+            {
+              "关联对象": "ai-qbank.html",
+              "说明": "已入库任务的题目可在题库使用。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "默认列表先展示待校对任务，同状态内按最近更新时间倒序。",
+            "状态筛选后列表、数量和空状态同步变化。",
+            "解析中、待校对、已入库、解析失败状态可区分。",
+            "待校对任务进入校对页，解析失败任务可重试，已入库任务不再作为待办。",
+            "任务不存在或无权限时不进入空白页。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-record-review",
+      "title": "3. 进入校对",
+      "body": "待校对任务进入校对页，确认后才能入库。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要确认 AI 提取结果的老师。",
+            "用途：从待校对任务进入逐题校对。",
+            "产出：校对入口、入库结果和任务状态更新。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "点击去校对",
+              "text": "待校对任务的主按钮进入校对页。"
+            },
+            {
+              "label": "检查题目",
+              "text": "老师在校对页逐题查看题干、选项、答案和解析。"
+            },
+            {
+              "label": "确认入库",
+              "text": "校对完成后提交入库，任务状态变为已入库。"
+            },
+            {
+              "label": "返回列表",
+              "text": "返回任务列表时该任务不再出现在待校对列表中。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "只有待校对任务可进入确认入库。",
+            "未完成必填项的题目需要标记并阻止整批入库或允许剔除。",
+            "入库后任务状态不可再回到待校对，除非重新录题。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "校对入口展示文件名、题目数量、当前校对状态和入库状态。",
+            "只有待校对任务展示可进入校对的主操作；解析中、解析失败、已入库任务展示各自状态反馈。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "任务仍在解析",
+              "处理方式": "点击校对提示解析未完成。"
+            },
+            {
+              "场景": "题目不完整",
+              "处理方式": "在校对页标红缺失内容，提示修正后提交。"
+            },
+            {
+              "场景": "任务已入库",
+              "处理方式": "再次点击校对进入只读回看或提示已完成。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "ai-review.html",
+              "说明": "承接逐题校对与确认入库。"
+            },
+            {
+              "关联对象": "compose-sheet.html",
+              "说明": "入库后的题目可进入组题。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "只有待校对任务可进入确认入库。",
+            "题目不完整时阻止入库或要求剔除。",
+            "入库后任务状态变为已入库，不回到待校对。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>

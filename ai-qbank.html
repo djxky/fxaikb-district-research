@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>飞象 AI · AI 校本题库</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/v28.css?v=20260521d" />
+  <link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/shared/v28-modals.css?v=20260522a" />
+<link rel="stylesheet" href="assets/page-header.css" />
+<style>
+  .qbk-page{
+    max-width:1200px;
+    margin:0 auto;
+    padding:20px 22px 96px;
+  }
+  body[data-page="ai-qbank"] .app{
+    grid-template-columns:minmax(0,1fr) 0 !important;
+  }
+  body[data-page="ai-qbank"] #feixiang-sidebar{
+    display:none !important;
+  }
+  body[data-page="ai-qbank"] .workspace{
+    min-width:0;
+  }
+  body[data-page="ai-qbank"] .page-header{
+    overflow:visible;
+  }
+  body[data-page="ai-qbank"] .ph-left{
+    max-width:none;
+    overflow:visible;
+  }
+  .qbk-home-btn{
+    display:inline-flex;
+    align-items:center;
+    height:32px;
+    width:32px;
+    justify-content:center;
+    border:1px solid #E0DCD2;
+    border-radius:8px;
+    background:#FFFFFF;
+    color:#5A5550;
+    font-size:13px;
+    font-weight:500;
+    text-decoration:none;
+    white-space:nowrap;
+    transition:background .12s,border-color .12s,color .12s;
+  }
+  .qbk-home-btn:hover{
+    background:#FAFAF8;
+    border-color:#D4CFC8;
+    color:#1A1A1A;
+  }
+  .qbk-home-btn [data-lucide]{
+    width:15px;
+    height:15px;
+  }
+  .qbk-scope-picker{
+    position:relative;
+    flex-shrink:0;
+    margin-left:2px;
+  }
+  .qbk-scope-trigger{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    height:32px;
+    padding:0 12px;
+    border:1px solid #E0DCD2;
+    border-radius:16px;
+    background:#FFFFFF;
+    color:#1A1A1A;
+    font-size:13px;
+    font-weight:600;
+    white-space:nowrap;
+    transition:background .12s,border-color .12s,box-shadow .12s;
+  }
+  .qbk-scope-trigger:hover,
+  .qbk-scope-picker.is-open .qbk-scope-trigger{
+    background:#FAFAF8;
+    border-color:#D4CFC8;
+  }
+  .qbk-scope-trigger [data-lucide]{
+    width:14px;
+    height:14px;
+    color:#2F7CF6;
+    transition:transform .14s ease;
+  }
+  .qbk-scope-picker.is-open .qbk-scope-trigger [data-lucide]{
+    transform:rotate(180deg);
+  }
+  .qbk-scope-pop{
+    position:absolute;
+    top:38px;
+    left:0;
+    z-index:80;
+    display:none;
+    width:360px;
+    overflow:hidden;
+    border:1px solid #E0DCD2;
+    border-radius:12px;
+    background:#FFFFFF;
+    box-shadow:0 18px 42px rgba(40,32,16,.14);
+  }
+  .qbk-scope-picker.is-open .qbk-scope-pop{
+    display:grid;
+    grid-template-columns:150px 1fr;
+  }
+  .qbk-scope-col{
+    padding:8px;
+  }
+  .qbk-scope-col + .qbk-scope-col{
+    border-left:1px solid #ECE9E2;
+  }
+  .qbk-scope-option{
+    width:100%;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:0 10px;
+    border-radius:7px;
+    color:#3A3A3A;
+    font-size:13px;
+    text-align:left;
+  }
+  .qbk-scope-option:hover{
+    background:#FAFAF8;
+  }
+  .qbk-scope-option.active{
+    background:#EAF3FF;
+    color:#1F6FEB;
+    font-weight:600;
+  }
+  .qbk-scope-option [data-lucide]{
+    width:13px;
+    height:13px;
+  }
+  .qbk-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:14px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--border);
+  }
+  .qbk-h1{
+    font-size:26px;
+    font-weight:600;
+    color:var(--text-1);
+    letter-spacing:-.012em;
+  }
+  .qbk-h1-meta{
+    font-size:13px;
+    color:var(--text-3);
+    font-weight:400;
+    margin-left:6px;
+  }
+  /* 搜索框 · 跟 filter 行内并列 · 紧凑高度对齐筛选下拉 */
+  .qbk-fsearch{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:0 12px;
+    height:30px;
+    min-width:200px;
+    max-width:240px;
+    margin-left:auto;
+    transition:border-color .12s, box-shadow .12s;
+  }
+  .qbk-fsearch:focus-within{
+    border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(168,126,44,.08);
+  }
+  .qbk-fsearch [data-lucide]{ width:13px;height:13px;color:var(--text-3);flex-shrink:0; }
+  .qbk-fsearch input{
+    border:none;
+    outline:none;
+    font-size:12px;
+    color:#1A1A1A;
+    background:transparent;
+    width:100%;
+    height:24px;
+    padding:0;
+    font-family:inherit;
+  }
+  .qbk-fsearch input::placeholder{ color:#9A968F; }
+  .qbk-filter{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 14px;
+    margin-bottom:14px;
+    background:#FAFAF8;
+    border:1px solid #ECE9E2;
+    border-radius:9px;
+  }
+  .qbk-filter-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .qbk-flabel{
+    font-size:11.5px;
+    color:#9A968F;
+    margin-right:2px;
+    white-space:nowrap;
+  }
+  .qbk-select{
+    appearance:none;
+    -webkit-appearance:none;
+    border:1px solid #D8D3C9;
+    border-radius:6px;
+    background:#fff;
+    color:#3A3A3A;
+    font-size:12px;
+    padding:5px 28px 5px 10px;
+    min-width:116px;
+    line-height:1.2;
+    cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%239A968F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 8px center;
+  }
+  .qbk-select:focus{
+    border-color:#A87E2C;
+    outline:none;
+  }
+
+  .qbk-body{
+    display:grid;
+    grid-template-columns:200px 1fr;
+    gap:18px;
+    padding-bottom:72px;
+  }
+  .qbk-side{
+    border-right:1px solid #ECE9E2;
+    padding-right:14px;
+    max-height:calc(100vh - 280px);
+    overflow-y:auto;
+  }
+  .qbk-side-tabs{
+    display:flex;
+    gap:2px;
+    padding:2px;
+    background:#F0EDE7;
+    border-radius:7px;
+    margin-bottom:12px;
+  }
+  .qbk-side-tab{
+    flex:1;
+    text-align:center;
+    padding:5px 8px;
+    border-radius:5px;
+    font-size:12px;
+    color:#7A766F;
+    cursor:pointer;
+    font-weight:500;
+  }
+  .qbk-side-tab.active{ background:#FFFFFF;color:#1A1A1A;box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  .qbk-side-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 8px;
+    border-radius:5px;
+    font-size:12px;
+    color:#4A4642;
+    cursor:pointer;
+    line-height:1.5;
+  }
+  .qbk-side-row:hover{ background:rgba(0,0,0,.04); }
+  .qbk-side-row.active{ background:rgba(201,167,110,.14);color:#1A1A1A;font-weight:600; }
+  .qbk-side-row span:first-child{
+    flex:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .qbk-side-n{ font-size:10.5px;color:#9A968F;font-variant-numeric:tabular-nums; }
+  .qbk-side-tip{
+    margin-top:18px;
+    padding:8px 10px;
+    font-size:11px;
+    color:#A87E2C;
+    background:#FBF7EE;
+    border:1px solid #F0E8D2;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    line-height:1.5;
+  }
+  .qbk-side-tip [data-lucide]{ width:11px;height:11px;flex-shrink:0; }
+
+  .qbk-list{ display:flex;flex-direction:column;gap:10px;min-width:0; }
+  .qbk-list-meta{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-size:12px;
+    color:#9A968F;
+    padding:0 2px 4px;
+  }
+  .qbk-list-meta > span:first-child{ flex:1; }
+  .qbk-list-meta b{ color:#3A3A3A;font-weight:600; }
+
+  .qitem{
+    background:#FFFFFF;
+    border:1px solid #ECE9E2;
+    border-radius:10px;
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    transition:border-color .12s, box-shadow .12s;
+  }
+  .qitem:hover{ border-color:#D4CFC8;box-shadow:0 1px 4px rgba(0,0,0,.04); }
+  .qitem-src-line{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:11.5px;
+    color:#7A766F;
+    padding:3px 9px;
+    background:#FAFAF8;
+    border:1px solid #ECE9E2;
+    border-radius:5px;
+    align-self:flex-start;
+    line-height:1.5;
+  }
+  .qitem-src-line [data-lucide]{ width:12px;height:12px;color:#9A968F; }
+  .qitem-src-line b{ color:#3A3A3A;font-weight:500; }
+  .qitem-head{ display:flex;align-items:center;gap:6px;flex-wrap:wrap; }
+  .qitem-tag{
+    font-size:11px;
+    padding:1.5px 7px;
+    border-radius:4px;
+    background:#F0EDE7;
+    color:#5A5550;
+    letter-spacing:.02em;
+    display:inline-flex;
+    align-items:center;
+    gap:3px;
+  }
+  .qitem-tag.t-type{ background:#EEEAE0;color:#5A5550;font-weight:500; }
+  .qitem-tag.t-kp{ background:#F1EBDC;color:#7A5615; }
+  .qitem-tag.diff-mid{ background:#F2EDE0;color:#7A5615;font-weight:500; }
+  .qitem-tag.diff-hard{ background:#F5E5E5;color:#8A3A3A;font-weight:500; }
+  .qitem-stem{ font-size:13.5px;line-height:1.75;color:#1A1A1A; }
+  .qitem-opts{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:4px 18px;
+    padding:2px 0;
+  }
+  .qopt{ font-size:12.5px;color:#3A3A3A;line-height:1.7; }
+  .qitem-foot{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding-top:8px;
+    border-top:1px dashed #ECE9E2;
+  }
+  .qitem-op{
+    font-size:11.5px;
+    padding:5px 10px;
+    border-radius:6px;
+    color:#7A766F;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+  }
+  .qitem-op [data-lucide]{ width:13px;height:13px; }
+</style>
+<link rel="stylesheet" href="assets/review.css?v=20260615-qbank-bottom" />
+</head>
+<body data-page="ai-qbank">
+
+<div class="app" id="app" data-view="wiki" data-chat="closed">
+  <aside class="sidebar-left" id="feixiang-sidebar"></aside>
+
+  <main class="workspace">
+    <!-- 统一页面顶栏 · page-header -->
+    <header class="page-header" data-page-header="ai-qbank">
+      <div class="ph-left">
+        <a class="qbk-home-btn" href="index.html" title="回到首页">
+          <i data-lucide="home"></i>
+        </a>
+        <i class="ph-icon" data-lucide="help-circle"></i>
+        <h1 class="ph-title">AI 校本题库</h1>
+        <div class="qbk-scope-picker" id="qbk-scope-picker">
+          <button class="qbk-scope-trigger" id="qbk-scope-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+            <span id="qbk-scope-label">初中数学</span>
+            <i data-lucide="chevron-down"></i>
+          </button>
+          <div class="qbk-scope-pop" id="qbk-scope-pop"></div>
+        </div>
+        <span class="ph-subtitle">将知识库里的题目结构化展示，方便老师查看、筛选与解析</span>
+      </div>
+    </header>
+
+    <div class="workspace-scroll">
+      <section class="qbk-page">
+
+        <div class="qbk-filter">
+          <div class="qbk-filter-item">
+            <span class="qbk-flabel">题型</span>
+            <select class="qbk-select">
+              <option>全部</option>
+              <option>选择题</option>
+              <option>填空题</option>
+              <option>解答题</option>
+              <option>应用题</option>
+            </select>
+          </div>
+          <div class="qbk-filter-item">
+            <span class="qbk-flabel">难度</span>
+            <select class="qbk-select">
+              <option>全部</option>
+              <option>易</option>
+              <option>中</option>
+              <option>难</option>
+            </select>
+          </div>
+          <div class="qbk-fsearch">
+            <i data-lucide="search"></i>
+            <input type="text" placeholder="搜题干 / 知识点 / 文件…" />
+          </div>
+        </div>
+
+        <div class="qbk-body">
+          <aside class="qbk-side">
+            <div class="qbk-side-tabs">
+              <span class="qbk-side-tab active">知识点</span>
+              <span class="qbk-side-tab">教材章节</span>
+            </div>
+            <div class="qbk-side-row active"><span>二次函数</span><span class="qbk-side-n">12</span></div>
+            <div class="qbk-side-row"><span>一元二次方程</span><span class="qbk-side-n">9</span></div>
+            <div class="qbk-side-row"><span>全等三角形</span><span class="qbk-side-n">8</span></div>
+            <div class="qbk-side-row"><span>函数图像</span><span class="qbk-side-n">6</span></div>
+            <div class="qbk-side-row"><span>勾股定理</span><span class="qbk-side-n">5</span></div>
+            <div class="qbk-side-row"><span>分类讨论</span><span class="qbk-side-n">3</span></div>
+            <div class="qbk-side-row"><span>数形结合</span><span class="qbk-side-n">3</span></div>
+            <div class="qbk-side-tip"><i data-lucide="sparkles"></i>知识点由 AI 自动打标</div>
+          </aside>
+
+          <main class="qbk-list">
+            <div class="qbk-list-meta">
+              <span>当前：<b id="qbk-current-scope">数学 › 二次函数</b> · 共 12 题</span>
+            </div>
+
+            <article class="qitem">
+              <div class="qitem-src-line"><i data-lucide="file-text"></i><b>AI 自动识别 · 初中数学教研组 · 2024 杭州中考真题.pdf</b> · 第 17 题 · 引用 2</div>
+              <div class="qitem-head">
+                <span class="qitem-tag t-type">选择题</span>
+                <span class="qitem-tag diff-mid">中等</span>
+                <span class="qitem-tag t-kp">二次函数</span>
+              </div>
+              <div class="qitem-stem">如图，二次函数 y = x² − 2x − 3 的图像与 x 轴的交点坐标是（　　）</div>
+              <div class="qitem-opts">
+                <span class="qopt">A. (−1, 0)（3, 0）</span>
+                <span class="qopt">B. (1, 0)（−3, 0）</span>
+                <span class="qopt">C. (−1, 0)（−3, 0）</span>
+                <span class="qopt">D. (1, 0)（3, 0）</span>
+              </div>
+              <div class="qitem-foot">
+                <span class="qitem-op"><i data-lucide="book-open"></i>解析</span>
+              </div>
+            </article>
+
+            <article class="qitem">
+              <div class="qitem-src-line"><i data-lucide="file-text"></i><b>AI 自动识别 · 初中数学教研组 · 二次函数图像与性质·教案.docx</b> · 第 9 页</div>
+              <div class="qitem-head">
+                <span class="qitem-tag t-type">解答题</span>
+                <span class="qitem-tag diff-hard">难</span>
+                <span class="qitem-tag t-kp">待定系数法</span>
+              </div>
+              <div class="qitem-stem">已知抛物线 y = ax² + bx + c 过点 (1, 0)、(3, 0)，顶点纵坐标为 −1，求 a、b、c 的值。</div>
+              <div class="qitem-foot">
+                <span class="qitem-op"><i data-lucide="book-open"></i>解析</span>
+              </div>
+            </article>
+
+            <article class="qitem">
+              <div class="qitem-src-line"><i data-lucide="file-text"></i><b>AI 录题入库 · 二次函数图像与性质·教案.docx</b> · 第 11 页</div>
+              <div class="qitem-head">
+                <span class="qitem-tag t-type">应用题</span>
+                <span class="qitem-tag diff-mid">中等</span>
+                <span class="qitem-tag t-kp">顶点坐标</span>
+                <span class="qitem-tag t-kp">实际情境</span>
+              </div>
+              <div class="qitem-stem">一球从高台抛出，忽略空气阻力，其运动轨迹满足 h = −5t² + 20t + 3（h 单位：米，t 单位：秒），求球达到最高点的时间及高度。</div>
+              <div class="qitem-foot">
+                <span class="qitem-op"><i data-lucide="book-open"></i>解析</span>
+              </div>
+            </article>
+          </main>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="sidebar-right"></aside>
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('apps');</script>
+<script src="assets/v28-shell.js?v=20260522b"></script>
+<script src="assets/v28.js?v=20260522e"></script>
+<script src="assets/shared/v28-modals.js?v=20260522a"></script>
+<script src="assets/page-header.js"></script>
+<script>
+  (function(){
+    const scopeData = {
+      '小学': ['语文', '数学', '英语', '科学'],
+      '初中': ['语文', '数学', '英语', '物理', '化学', '生物', '科学', '历史'],
+      '高中': ['语文', '数学', '英语', '物理', '化学', '生物', '政治', '历史', '地理']
+    };
+    let currentStage = '初中';
+    let currentSubject = '数学';
+    const scopePicker = document.getElementById('qbk-scope-picker');
+    const scopeTrigger = document.getElementById('qbk-scope-trigger');
+    const scopePop = document.getElementById('qbk-scope-pop');
+    const scopeLabel = document.getElementById('qbk-scope-label');
+    const currentScope = document.getElementById('qbk-current-scope');
+
+    function syncScopeLabel(){
+      if(scopeLabel) scopeLabel.textContent = `${currentStage}${currentSubject}`;
+      if(currentScope) currentScope.textContent = `${currentSubject} › 二次函数`;
+    }
+
+    function renderScopePop(){
+      if(!scopePop) return;
+      const stageHtml = Object.keys(scopeData).map(stage => `
+        <button class="qbk-scope-option ${stage === currentStage ? 'active' : ''}" type="button" data-stage="${stage}" data-track="/click/feixiangCampusAiQbankPage/changeScope | 切换题库范围 | scopeType#STRING">
+          <span>${stage}</span>
+          <i data-lucide="chevron-right"></i>
+        </button>
+      `).join('');
+      const subjectHtml = scopeData[currentStage].map(subject => `
+        <button class="qbk-scope-option ${subject === currentSubject ? 'active' : ''}" type="button" data-subject="${subject}" data-track="/click/feixiangCampusAiQbankPage/changeScope | 切换题库范围 | scopeType#STRING">
+          <span>${subject}</span>
+        </button>
+      `).join('');
+      scopePop.innerHTML = `
+        <div class="qbk-scope-col">${stageHtml}</div>
+        <div class="qbk-scope-col">${subjectHtml}</div>
+      `;
+      if(window.lucide) lucide.createIcons();
+    }
+
+    function setScopeOpen(open){
+      if(!scopePicker || !scopeTrigger) return;
+      scopePicker.classList.toggle('is-open', open);
+      scopeTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    if(scopeTrigger){
+      scopeTrigger.addEventListener('click', event => {
+        event.stopPropagation();
+        renderScopePop();
+        setScopeOpen(!scopePicker.classList.contains('is-open'));
+      });
+    }
+    if(scopePop){
+      scopePop.addEventListener('click', event => {
+        const stageBtn = event.target.closest('[data-stage]');
+        const subjectBtn = event.target.closest('[data-subject]');
+        if(stageBtn){
+          currentStage = stageBtn.dataset.stage;
+          if(!scopeData[currentStage].includes(currentSubject)){
+            currentSubject = scopeData[currentStage][0];
+          }
+          syncScopeLabel();
+          renderScopePop();
+          return;
+        }
+        if(subjectBtn){
+          currentSubject = subjectBtn.dataset.subject;
+          syncScopeLabel();
+          renderScopePop();
+          setScopeOpen(false);
+        }
+      });
+    }
+    document.addEventListener('click', event => {
+      if(scopePicker && !scopePicker.contains(event.target)) setScopeOpen(false);
+    });
+    document.addEventListener('keydown', event => {
+      if(event.key === 'Escape') setScopeOpen(false);
+    });
+    syncScopeLabel();
+    renderScopePop();
+
+  })();
+</script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'ai-qbank.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+<template id="review-template">
+{
+  "title": "AI 校本题库 · 搜题、筛题、查看",
+  "summary": "AI 校本题库页第一期覆盖按范围/题型/难度/关键词筛题、按知识点或教材章节聚合浏览、查看解析和进入 AI 录题；题目默认按录入时间倒序展示，题目操作只保留解析。",
+  "sections": [
+    {
+      "id": "qbank-filter",
+      "title": "1. 筛选区",
+      "body": "按范围、题型、难度、关键词和左侧聚合项收敛题目列表。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要从校本题库中定位题目的老师。",
+            "用途：通过顶部范围、题型、难度、关键词，以及左侧知识点/教材章节聚合项筛题。",
+            "产出：当前筛选条件、当前聚合项、结果数量和按录入时间倒序排列的题目列表。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "选择范围",
+              "text": "老师在顶部范围下拉中选择当前题库范围，例如初中数学；范围变化后刷新左侧聚合项和题目列表。"
+            },
+            {
+              "label": "切换聚合维度",
+              "text": "老师在左侧切换知识点或教材章节，列表展示对应聚合项下的题目数量和题目卡片。"
+            },
+            {
+              "label": "选择聚合项",
+              "text": "点击知识点或章节行后，当前范围文案更新为“学科 › 聚合项”，题目列表按该聚合项收敛。"
+            },
+            {
+              "label": "筛选题型和难度",
+              "text": "老师选择题型或难度后，列表在当前范围和聚合项内继续按交集过滤。"
+            },
+            {
+              "label": "输入关键词",
+              "text": "老师输入题干片段、知识点或文件名后，列表在当前条件内继续收敛。"
+            },
+            {
+              "label": "清空或无结果处理",
+              "text": "无匹配题目时展示空状态和清空筛选入口，并保留 AI 录题入口用于补充题目。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "顶部范围、左侧聚合项、题型、难度、关键词之间按交集过滤。",
+            "题目列表默认按录入时间倒序展示，最新录入的题目排在前面；当前页面不提供单独排序控件。",
+            "筛选只影响当前列表展示，不改变题目归属、来源、入库状态或录入时间。",
+            "第一期不提供题库来源筛选，也不展示“学校知识库 / 我的知识库”来源标签。",
+            "知识点由 AI 自动打标；难度、题型、知识点等标签未稳定识别时，不作为题库可用性的硬前提。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "顶部范围：当前学段/学科范围，例如“初中数学”。",
+            "左侧聚合：知识点、教材章节、每个聚合项下的题目数量。",
+            "筛选项：题型、难度、关键词；关键词支持题干片段、知识点、文件名。",
+            "列表状态：当前范围文案、结果总数、空状态、清空筛选入口。",
+            "排序逻辑：按录入时间倒序；筛选后仍在结果集内保持最新录入优先。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "筛选无结果",
+              "处理方式": "展示无结果说明、清空筛选入口和 AI 录题入口。"
+            },
+            {
+              "场景": "关键词为空",
+              "处理方式": "按当前范围、聚合项、题型和难度展示结果。"
+            },
+            {
+              "场景": "聚合项题目数为 0",
+              "处理方式": "保留聚合项但展示空状态，允许切换其它聚合项或清空条件。"
+            },
+            {
+              "场景": "AI 标签不稳定",
+              "处理方式": "题目仍可展示；知识点、难度等标签作为辅助信息，不阻止老师查看解析。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "ai-record-jobs.html",
+              "说明": "当题库没有合适题目时，可进入 AI 录题补充题目。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "切换顶部范围后，左侧聚合项、当前范围文案、题目数量和列表同步更新。",
+            "切换知识点/教材章节和具体聚合项后，列表按该聚合项收敛。",
+            "题型、难度、关键词与当前范围/聚合项按交集过滤。",
+            "筛选后仍保持录入时间倒序。",
+            "无结果时展示清空筛选入口和 AI 录题入口。",
+            "第一期不出现题库来源筛选和单独排序控件。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qbank-list",
+      "title": "2. 题目列表",
+      "body": "按录入时间倒序展示题目卡片，并提供解析入口。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：正在判断题目是否可用的老师。",
+            "用途：浏览题目内容、标签、来源和答案/解析摘要。",
+            "产出：题目卡片列表，以及每道题唯一操作“解析”。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "浏览题目",
+              "text": "老师查看题目卡片，识别来源、题型、难度、知识点、题干和选项。"
+            },
+            {
+              "label": "查看解析",
+              "text": "点击题目卡片底部“解析”，查看答案、解析步骤和来源说明。"
+            },
+            {
+              "label": "返回筛选",
+              "text": "若题目不符合需求，老师继续切换范围、聚合项、题型、难度或关键词。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "题目卡片默认按录入时间倒序展示，最新录入的题目排在前面；页面不提供手动排序。",
+            "第一期题目卡片操作只保留解析，不展示查看详情、收藏、纠错、相似题、添加题目、题目篮或去组题入口。",
+            "第一期题目卡片不展示“学校知识库 / 我的知识库”来源标签。",
+            "题目卡片需要展示原始来源信息，包括来源文件、页码或位置、录入方式。",
+            "录入方式可区分为 AI 录题入库、文件识别入库、飞象练习册/试卷来源；若无法确定，不应强行标成 AI 自动识别。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "卡片来源行：录入方式、来源组织或作者、来源文件名、页码/题号/引用次数。",
+            "题目标签：题型、难度、知识点；可展示多个知识点标签。",
+            "题目内容：题干、选项；主观题可不展示选项。",
+            "解析入口：卡片底部只展示“解析”操作。",
+            "排序口径：录入时间；默认倒序，不在页面上展示排序控件。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "题目缺少答案或解析",
+              "处理方式": "卡片仍展示题干；点击解析时提示答案/解析不完整。"
+            },
+            {
+              "场景": "题目来源无权限或不可访问",
+              "处理方式": "卡片可展示摘要；点击解析时提示无权限或来源不可访问。"
+            },
+            {
+              "场景": "题目被删除或已下架",
+              "处理方式": "从列表移除；若已在当前列表中被点击，提示题目不可用并刷新列表。"
+            },
+            {
+              "场景": "来源页码或位置缺失",
+              "处理方式": "保留来源文件名和录入方式，不展示空页码。"
+            },
+            {
+              "场景": "标签识别不确定",
+              "处理方式": "题目仍可浏览和解析；不确定标签不作为筛选命中的唯一依据。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "file-preview.html",
+              "说明": "学校知识库生成的题目可追溯到原文资料。"
+            },
+            {
+              "关联对象": "ai-record-jobs.html",
+              "说明": "题库没有合适题目时，可进入 AI 录题补充题目。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "题目列表默认按录入时间倒序，最新录入题目排在前面。",
+            "题目卡片只展示“解析”操作，不出现查看详情、收藏、纠错、相似题、添加题目、题目篮或去组题入口。",
+            "题目卡片展示来源行、题型、难度、知识点、题干、选项和解析入口。",
+            "来源行展示来源文件、页码或位置、录入方式；缺失项不展示空占位。",
+            "缺少答案/解析、来源无权限、题目不可用时均有明确反馈。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qbank-record-entry",
+      "title": "3. AI 录题入口",
+      "body": "从题库进入 AI 录题，补充当前题库缺少的题目。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：在题库中没有找到合适题目的老师。",
+            "用途：上传本地试卷或资料，生成待校对题目草稿。",
+            "边界：录题是独立能力，不能等同于 AI 组题自动附带能力。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "点击 AI 录题",
+              "text": "老师从题库页点击 AI 录题入口。"
+            },
+            {
+              "label": "选择资料",
+              "text": "进入录题任务页后上传资料；第一版优先支持结构清晰的 Word、PDF，图片可作为补充识别，PPT 暂不作为稳定切题范围。"
+            },
+            {
+              "label": "解析任务",
+              "text": "资料上传后生成解析任务，老师可等待或稍后查看。"
+            },
+            {
+              "label": "回到题库",
+              "text": "校对入库后，新题回到题库列表，可继续按题型、难度、知识点和教材章节筛选，并查看解析。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "AI 录题不是直接入库，必须经过老师校对确认。",
+            "从题库进入录题时，应保留“补充题目”的任务心智。",
+            "录题成功后的来源标记应能追溯到上传资料。",
+            "只有校对确认后的题目才进入正式题库；未校对草稿不出现在题库列表。",
+            "如果资料中只有少部分题或题目结构不完整，可以生成待校对草稿，但需要提示识别不确定。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "录题入口需要带入当前题库上下文和上传资料任务。",
+            "上传资料生成待校对草稿；校对确认后写入题库，并保留来源文件、页码或位置。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "资料格式不支持",
+              "处理方式": "在上传页提示支持格式，不创建任务。"
+            },
+            {
+              "场景": "解析失败",
+              "处理方式": "任务列表显示失败并提供重新录题。"
+            },
+            {
+              "场景": "老师未校对",
+              "处理方式": "题目不进入正式题库。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "ai-record-jobs.html",
+              "说明": "创建和查看 AI 录题任务。"
+            },
+            {
+              "关联对象": "ai-review.html",
+              "说明": "校对解析出的题目。"
+            },
+            {
+              "关联对象": "ai-qbank.html",
+              "说明": "入库题目回流到题库列表。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "AI 录题入口进入本地文件上传任务。",
+            "录题资料不能从知识库选择。",
+            "未校对题目不进入正式题库。",
+            "入库后新题可回到题库列表查看。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>

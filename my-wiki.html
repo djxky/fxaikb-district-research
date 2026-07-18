@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>飞象老师校园版 · 我的知识库</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/v28.css?v=20260708uploadcheckbox" />
+<link rel="stylesheet" href="assets/shared/v28-modals.css?v=20260521g" />
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/page-header.css?v=20260708uploadcheckbox" />
+<style>
+  .mem-btn{
+    height:26px;
+    padding:0 10px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text-3);
+    font-size:12px;
+    font-family:inherit;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .mem-btn:hover{
+    border-color:var(--gold-light);
+    color:var(--gold-deep);
+    background:var(--surface-2);
+  }
+
+  .learned-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(23, 19, 12, .24);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s var(--ease);
+    z-index:115;
+  }
+  .learned-panel{
+    position:fixed;
+    top:0;right:0;bottom:0;
+    width:min(460px, calc(100vw - 20px));
+    background:var(--surface);
+    border-left:1px solid var(--border);
+    box-shadow:-12px 0 36px rgba(30,24,14,.12);
+    transform:translateX(102%);
+    transition:transform .22s var(--ease);
+    z-index:116;
+    display:flex;
+    flex-direction:column;
+  }
+  body[data-learned-panel="open"] .learned-overlay{
+    opacity:1;
+    pointer-events:auto;
+  }
+  body[data-learned-panel="open"] .learned-panel{
+    transform:translateX(0);
+  }
+  .learned-head{
+    height:54px;
+    padding:0 14px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
+  }
+  .learned-title{
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
+  }
+  .learned-close{
+    margin-left:auto;
+    width:28px;height:28px;border-radius:8px;
+    display:grid;place-items:center;
+    color:var(--text-3);
+    transition:all .15s;
+    cursor:pointer;
+  }
+  .learned-close:hover{
+    background:var(--surface-3);
+    color:var(--text-2);
+  }
+  .learned-close [data-lucide]{ width:14px;height:14px; }
+  .learned-tabs-wrap{
+    padding:10px 12px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .learned-panel .canvas-tabs{
+    gap:6px;
+    width:100%;
+  }
+  .learned-panel .cv-tab{
+    flex:1;
+    justify-content:center;
+  }
+  .learned-body{
+    padding:12px;
+    overflow:auto;
+    min-height:0;
+  }
+  .learned-pane{ display:none; }
+  .learned-pane.active{ display:block; }
+  .learned-step{
+    padding:10px 11px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:8px;
+    font-size:12.8px;
+    line-height:1.65;
+    color:var(--text-2);
+  }
+  .learned-step b{ color:var(--text); }
+  .learned-groups{
+    display:flex;
+    gap:7px;
+    margin-bottom:10px;
+  }
+  .learned-chip{
+    height:28px;
+    padding:0 11px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text-3);
+    font-size:12px;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .learned-chip.active{
+    border-color:rgba(168,126,44,.36);
+    background:var(--gold-bg);
+    color:var(--gold-deep);
+    font-weight:600;
+  }
+  .learned-rule{
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    border-radius:10px;
+    padding:10px 11px;
+    margin-bottom:8px;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .learned-rule:hover{
+    transform:translateY(-1px);
+    box-shadow:0 6px 18px rgba(30,24,14,.09);
+  }
+  .learned-rule-main{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    font-size:12.8px;
+    line-height:1.55;
+    color:var(--text-2);
+  }
+  .learned-rule-main [data-lucide]{
+    width:14px;height:14px;
+    color:var(--gold);
+    margin-top:2px;
+    flex-shrink:0;
+  }
+  .learned-rule-meta{
+    margin-top:6px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:11.5px;
+    color:var(--text-4);
+  }
+  .learned-rule-actions{
+    margin-left:auto;
+    display:flex;
+    gap:6px;
+  }
+  .kb-home-section{ animation:fade-up .55s .14s var(--ease) both; }
+  .kb-section-intro{
+    margin:-4px 0 14px;
+    color:var(--text-2);
+    font-size:13px;
+    line-height:1.65;
+  }
+  .kb-card-grid{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+    gap:10px;
+  }
+  .kb-entry-card{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-start;
+    row-gap:5px;
+    min-height:92px;
+    padding:13px 14px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#fff;
+    color:var(--text-2);
+    cursor:pointer;
+    text-align:left;
+    transition:border-color .15s var(--ease), box-shadow .15s var(--ease), transform .15s var(--ease);
+  }
+  .kb-entry-card:hover{
+    border-color:rgba(168,126,44,.32);
+    box-shadow:0 4px 14px rgba(30,24,14,.06);
+    transform:translateY(-1px);
+  }
+  .kb-entry-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    width:100%;
+    min-width:0;
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
+  }
+  .kb-entry-title [data-lucide]{
+    width:15px;
+    height:15px;
+    color:var(--gold);
+    flex-shrink:0;
+  }
+  .kb-entry-card p{
+    margin:0;
+    width:100%;
+    font-size:12.5px;
+    line-height:1.45;
+    color:var(--text-2);
+  }
+  .kb-update-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+  }
+  .kb-update-row{
+    width:100%;
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) auto;
+    gap:12px;
+    align-items:center;
+    padding:11px 0;
+    border:0;
+    border-bottom:1px dashed var(--border-3);
+    background:transparent;
+    text-align:left;
+    cursor:pointer;
+  }
+  .kb-update-list li:last-child .kb-update-row{ border-bottom:0; }
+  .kb-update-row:hover .kb-update-title{ color:var(--gold-deep); }
+  .kb-update-row:hover .kb-update-desc{ color:var(--text); }
+  .kb-update-title{
+    color:var(--text);
+    font-size:13px;
+    font-weight:700;
+  }
+  .kb-update-desc{
+    margin-top:3px;
+    color:var(--text-2);
+    font-size:12.5px;
+    line-height:1.55;
+  }
+  .kb-update-time{
+    color:var(--text-3);
+    font-size:11.5px;
+    white-space:nowrap;
+  }
+  @media (max-width:1180px){
+    .kb-card-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width:860px){
+    .kb-card-grid{ grid-template-columns:1fr; }
+    .kb-update-row{ grid-template-columns:1fr; }
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="personal-home">
+
+<div class="app" id="app" data-view="wiki" data-chat="closed" data-kb="personal">
+
+  <!-- ════════════ 左栏 · 飞象老师校园版统一侧边栏 ════════════ -->
+  <aside class="sidebar-left" id="feixiang-sidebar"></aside>
+
+  <!-- ════════════ 中栏 · 工作区 ════════════ -->
+  <main class="workspace">
+
+    <!-- 统一页面顶栏 · page-header -->
+    <header class="page-header" data-page-header="my-wiki">
+      <div class="ph-left">
+        <nav class="ph-crumb knowledge-header-crumb" aria-label="面包屑" data-root-name="我的知识库" data-root-icon="bookmark">
+          <span class="ph-crumb-current"><i data-lucide="bookmark"></i><span>我的知识库</span></span>
+          <span class="ph-crumb-sep" aria-hidden="true"><i data-lucide="chevron-right"></i></span>
+          <span class="ph-crumb-current"><span>Wiki 首页</span></span>
+        </nav>
+      </div>
+      <div class="ph-right">
+        <div class="ph-view-switcher" role="tablist" aria-label="视图切换">
+          <button class="ph-vs-btn vs-btn active" data-view="wiki" onclick="switchView('wiki')" role="tab" aria-selected="true" data-track="/click/feixiangCampusSchoolWikiPage/switchView | 切换知识库视图 | viewType#STRING,kbScope#STRING"><i data-lucide="book-open"></i><span>Wiki</span></button>
+          <button class="ph-vs-btn vs-btn" data-view="graph" onclick="switchView('graph')" role="tab" aria-selected="false" data-track="/click/feixiangCampusSchoolWikiPage/switchView | 切换知识库视图 | viewType#STRING,kbScope#STRING"><i data-lucide="git-branch"></i><span>知识图谱</span></button>
+          <button class="ph-vs-btn vs-btn" data-view="folder" onclick="switchView('folder')" role="tab" aria-selected="false" data-track="/click/feixiangCampusSchoolWikiPage/switchView | 切换知识库视图 | viewType#STRING,kbScope#STRING"><i data-lucide="folder"></i><span>文件夹</span></button>
+        </div>
+        <div class="knowledge-header-actions wiki-header-actions">
+          <button class="ph-action ph-action-icon tb-search" onclick="toggleTopSearch(event)" title="搜索我的知识库" aria-expanded="false" data-track="/click/feixiangCampusSchoolWikiPage/search | 搜索知识库 | kbScope#STRING">
+            <i data-lucide="search"></i>
+          </button>
+          <span class="ph-action-sep" aria-hidden="true"></span>
+          <button class="ph-action" data-doc="share-btn-personal-home" onclick="V28ShareDialog.open({ context:'personal-home', kbName:'张老师的知识库' })" title="分享">
+            <i data-lucide="share-2"></i><span>分享</span>
+          </button>
+        </div>
+        <div class="knowledge-header-actions folder-header-actions">
+          <button class="ph-action ph-action-icon tb-search" onclick="toggleTopSearch(event)" title="搜索我的知识库文件" aria-expanded="false">
+            <i data-lucide="search"></i>
+          </button>
+          <span class="ph-action-sep" aria-hidden="true"></span>
+          <button class="ph-action" onclick="openCreateFolderPop(event)" title="新建文件夹">
+            <i data-lucide="folder-plus"></i><span>新建文件夹</span>
+          </button>
+          <button class="ph-action folder-sort-action" onclick="showToast('（演示）按上传时间 / 名称 / 大小排序')" title="排序">
+            <i data-lucide="arrow-up-down"></i><span>排序</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主滚动区 -->
+    <div class="workspace-scroll">
+
+      <article class="wiki-page" id="view-wiki">
+
+        <!-- ───── Hero · 个人知识库门牌 ───── -->
+        <header class="wiki-hero">
+          <div class="wiki-hero-row">
+            <div class="wiki-hero-main">
+              <div class="wiki-hero-badge">
+                <i data-lucide="bookmark"></i>
+                我的知识库
+              </div>
+              <h1 class="wiki-hero-title" id="hero-title">张老师 · <em>个人知识库</em></h1>
+              <p class="wiki-hero-sub" id="hero-sub">
+                个人教学资料会在这里沉淀为可检索、可追溯的 Wiki。
+              </p>
+            </div>
+            <div class="wiki-hero-actions">
+              <button class="hero-upload-btn" onclick="personalUploadToCurrentFolder()" data-track="/click/feixiangCampusSchoolWikiPage/uploadFile | 点击上传资料 | kbScope#STRING">
+                <i data-lucide="upload"></i>
+                上传资料
+              </button>
+            </div>
+          </div>
+          <div class="wiki-hero-meta" id="hero-meta-counts">
+            <span class="item"><b id="hero-count">41</b> 份资料</span>
+            <span class="sep">·</span>
+            <span class="item"><b>16</b> 个主题</span>
+            <span class="sep">·</span>
+            <span class="item">上次更新 <b>今天 10:42</b></span>
+          </div>
+        </header>
+
+        <!-- ───── 演示数据区（统一视觉容器） ───── -->
+        <section class="demo-zone" id="demo-zone">
+          <header class="demo-zone-head">
+            <div class="dz-head-left">
+              <i data-lucide="sparkles"></i>
+              <span>以下为演示数据</span>
+            </div>
+            <button class="dz-clear" onclick="clearDemoData()">
+              <i data-lucide="trash-2"></i>
+              一键清空
+            </button>
+          </header>
+
+          <section class="subject-section kb-home-section">
+            <h2 class="wiki-h2">
+              教学主题
+            </h2>
+            <p class="kb-section-intro">按教材、知识点和专题组织演示资料，点击主题可进入对应 Wiki。</p>
+
+            <h3 class="wiki-h3">
+              九年级数学
+            </h3>
+            <p class="subject-para">
+              <a class="wlink wlink-active" onclick="openWiki('二次函数图像与性质')">二次函数图像与性质</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('函数图像变换')">函数图像变换</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('相似三角形判定与应用')">相似三角形判定与应用</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('圆与三角形综合')">圆与三角形综合</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('一元二次方程根的判别式')">一元二次方程根的判别式</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('锐角三角函数应用')">锐角三角函数应用</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('平面直角坐标系综合')">平面直角坐标系综合</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('反比例函数')">反比例函数</a>
+            </p>
+
+            <h3 class="wiki-h3">
+              中考专题
+            </h3>
+            <p class="subject-para">
+              <a class="wlink" onclick="openWiki('中考压轴 · 函数综合')">中考压轴 · 函数综合</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('动点问题与变化规律')">动点问题与变化规律</a>
+            </p>
+
+            <h3 class="wiki-h3">
+              教学方法 · 我的笔记
+            </h3>
+            <p class="subject-para">
+              <a class="wlink" onclick="openWiki('分层练习设计法')">分层练习设计法</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('错题归因模板')">错题归因模板</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('课堂提问 4 类问句')">课堂提问 4 类问句</a>
+            </p>
+
+            <h3 class="wiki-h3">
+              学情分析 · 八(3)班
+            </h3>
+            <p class="subject-para">
+              <a class="wlink" onclick="openWiki('八(3)班数学薄弱点画像')">八(3)班数学薄弱点画像</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('本学期作业完成质量趋势')">本学期作业完成质量趋势</a>
+              <span class="sep">·</span>
+              <a class="wlink" onclick="openWiki('学困生跟进档案')">学困生跟进档案</a>
+            </p>
+          </section>
+
+          <section class="kb-home-section" id="personal-workflows">
+            <h2 class="wiki-h2">教学场景</h2>
+            <p class="kb-section-intro">和学校知识库保持同一套入口，只是这里展示的是个人演示资料。</p>
+            <div class="kb-card-grid">
+              <button class="kb-entry-card" onclick="openWiki('备课资源')">
+                <span class="kb-entry-title"><i data-lucide="book-open"></i>备课资源</span>
+                <p>教案、课件、导入活动</p>
+              </button>
+              <button class="kb-entry-card" onclick="openWiki('课堂教学')">
+                <span class="kb-entry-title"><i data-lucide="presentation"></i>课堂教学</span>
+                <p>板书、追问、课堂案例</p>
+              </button>
+              <button class="kb-entry-card" onclick="openWiki('作业与测评')">
+                <span class="kb-entry-title"><i data-lucide="clipboard-check"></i>作业与测评</span>
+                <p>练习、测验、错题分析</p>
+              </button>
+              <button class="kb-entry-card" onclick="openWiki('复习备考')">
+                <span class="kb-entry-title"><i data-lucide="target"></i>复习备考</span>
+                <p>中考专题、一模二模、讲评资料</p>
+              </button>
+            </div>
+          </section>
+
+          <section class="kb-home-section">
+            <h2 class="wiki-h2">
+              近期更新
+            </h2>
+            <p class="kb-section-intro">这里展示演示资料如何被 AI 归入主题、更新 Wiki，并能追溯到文件夹里的原文件。</p>
+            <ul class="kb-update-list">
+              <li>
+                <button class="kb-update-row" onclick="openWiki('圆与三角形综合')">
+                  <div>
+                    <div class="kb-update-title">圆与三角形综合已生成 Wiki</div>
+                    <div class="kb-update-desc">由切线性质、内切外接、辅助线套路等 6 份资料整理而来。</div>
+                  </div>
+                  <span class="kb-update-time">今天 10:42</span>
+                </button>
+              </li>
+              <li>
+                <button class="kb-update-row" onclick="openWiki('二次函数图像与性质')">
+                  <div>
+                    <div class="kb-update-title">二次函数图像与性质补充板书图解</div>
+                    <div class="kb-update-desc">新增图像平移、对称轴和顶点坐标的课堂板书素材。</div>
+                  </div>
+                  <span class="kb-update-time">今天 09:18</span>
+                </button>
+              </li>
+              <li>
+                <button class="kb-update-row" onclick="openWiki('八(3)班数学薄弱点画像')">
+                  <div>
+                    <div class="kb-update-title">八(3)班周测卷已归入学情主题</div>
+                    <div class="kb-update-desc">错题统计更新，关联二次函数和相似三角形两个薄弱点。</div>
+                  </div>
+                  <span class="kb-update-time">昨天</span>
+                </button>
+              </li>
+              <li>
+                <button class="kb-update-row" onclick="openWiki('相似三角形判定与应用')">
+                  <div>
+                    <div class="kb-update-title">相似三角形公开课设计已归入主题</div>
+                    <div class="kb-update-desc">补充课堂追问、例题迁移和学生易错提醒。</div>
+                  </div>
+                  <span class="kb-update-time">本周</span>
+                </button>
+              </li>
+            </ul>
+          </section>
+        </section>
+
+      </article>
+    </div>
+
+    <!-- ════════════ 文件夹视图（v28.js · renderPersonalFolderView 渲染） ════════════ -->
+    <section class="folder-view" id="view-folder"></section>
+
+    <!-- ════════════ 对话流（chat 态显示） ════════════ -->
+    <div class="chat-stream" id="view-chat">
+      <div class="chat-head">
+        <nav class="ch-breadcrumb" aria-label="面包屑">
+          <button class="bc-item" onclick="backToKnowledgeBase()" title="回到 初中数学教研组">
+            <i data-lucide="library"></i>
+            <span id="bc-from">初中数学教研组</span>
+          </button>
+          <span class="bc-sep" aria-hidden="true">
+            <i data-lucide="chevron-right"></i>
+          </span>
+          <span class="bc-current">
+            <i data-lucide="message-square-text"></i>
+            <span id="ch-title">围绕《二次函数》出 5 道分层练习</span>
+          </span>
+        </nav>
+        <div class="ch-spacer"></div>
+        <button class="ch-ctx" data-kb-picker-trigger onclick="openKbPicker(this)" title="选择飞象基于哪些知识库回答">
+          <i data-lucide="library"></i>
+          <span class="ctx-name">我的知识库</span>
+          <i data-lucide="chevron-down"></i>
+        </button>
+      </div>
+
+      <!-- 空对话态：老师自由输入欢迎页 -->
+      <div class="chat-empty" id="chat-empty">
+        <div class="ce-hero">
+          <div class="ce-brand">
+            <span class="ce-brand-dot">飞</span>
+            <span class="ce-brand-name">飞象 AI</span>
+            <span class="ce-brand-sep">·</span>
+            <span class="ce-brand-tag">老师的 AI 助手</span>
+          </div>
+          <h1 class="ce-greet" id="ce-greet">下午好，张老师</h1>
+        </div>
+
+        <div class="ce-composer">
+          <textarea id="ce-input" rows="2"
+            placeholder="想做什么？告诉飞象，或先选一个工具…"
+            oninput="autosize(this);refreshCeSend()"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ceSend()}"></textarea>
+
+          <div class="ce-chips">
+            <button class="ce-chip" data-chip="quiz" onclick="ceToggleChip('quiz')">
+              <i data-lucide="sparkles"></i><span>AI 组题</span>
+            </button>
+            <button class="ce-chip" data-chip="slides" onclick="ceToggleChip('slides')">
+              <i data-lucide="layout"></i><span>多页课件</span>
+            </button>
+            <button class="ce-chip" data-chip="anim" onclick="ceToggleChip('anim')">
+              <i data-lucide="play-circle"></i><span>教学动画</span>
+            </button>
+            <button class="ce-chip" data-chip="game" onclick="ceToggleChip('game')">
+              <i data-lucide="gamepad-2"></i><span>教学游戏</span>
+            </button>
+            <button class="ce-chip more" onclick="showToast('更多工具规划中：教案、学情分析、AI 翻译润色…')">
+              <i data-lucide="more-horizontal"></i>
+            </button>
+          </div>
+
+          <div class="ce-foot">
+            <div class="ce-foot-left">
+              <button class="ce-icon-btn" title="附件" onclick="showToast('（演示）添加附件')">
+                <i data-lucide="paperclip"></i>
+              </button>
+              <button class="ce-icon-btn" title="语音输入" onclick="showToast('（演示）语音输入')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+              </button>
+              <span class="ce-divider"></span>
+              <button class="ce-kb-attach" data-kb-picker-trigger onclick="openKbPicker(this)" title="选择飞象基于哪些知识库回答">
+                <i data-lucide="library"></i>
+                <span id="ce-kb-label">我的知识库</span>
+                <i data-lucide="chevron-down" class="chev"></i>
+              </button>
+            </div>
+            <button class="ce-send idle" id="ce-send" onclick="ceSend()" title="发送（Enter）" data-track="/click/feixiangCampusChatPage/sendMessage | 发送对话消息 | mode#STRING,kbScope#STRING,attachmentCount#INT32">
+              <i data-lucide="arrow-up"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="chat-body" id="chat-body">
+        <!-- 用户消息 -->
+        <div class="chat-msg user">
+          <div class="msg-bubble" id="chat-user-text">
+            围绕「二次函数图像与性质」出 5 道分层练习，A/B/C 三难度，给八(3)班用
+          </div>
+        </div>
+
+        <!-- AI 回复（带流式效果 + 引用 + 操作） -->
+        <div class="chat-msg ai" id="chat-ai-msg">
+          <div class="msg-avatar">F</div>
+          <div class="msg-content">
+            <p id="chat-ai-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中间底部输入 -->
+      <div class="chat-composer">
+        <div class="cc-wrap">
+          <div class="cc-input">
+            <textarea id="cc-textarea" rows="1" placeholder="继续问飞象，比如「再难一点」「换个出题角度」…"
+              oninput="autosize(this);refreshCcSend()"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendInChat()}"></textarea>
+            <button class="cc-btn" title="附件" onclick="showToast('（演示）添加附件')">
+              <i data-lucide="paperclip"></i>
+            </button>
+            <button class="cc-btn send idle" id="cc-send" title="发送（Enter）" onclick="sendInChat()">
+              <i data-lucide="arrow-up"></i>
+            </button>
+          </div>
+          <div class="cc-hint">
+            <b>Enter</b> 发送 · <b>Shift+Enter</b> 换行 · 回到 Wiki 可点右上角 ×
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ 底部 Command Bar ════════════ -->
+    <div class="bottom-bar" id="bottom-bar" data-mode="knowledge-qa">
+
+      <div class="bb-wrap">
+        <!-- 默认一行：知识库范围 + 问答输入 + 发送 -->
+        <div class="bb-input">
+          <button class="bb-ctx" tabindex="-1" title="当前知识库范围：我的知识库">
+            <i data-lucide="library" class="lead"></i>
+            <span class="ctx-name">我的知识库</span>
+          </button>
+          <textarea id="bb-textarea" rows="1" placeholder="基于我的知识库提问…"
+            oninput="autosize(this);refreshBarSend()"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitFromBar()}"></textarea>
+          <button class="bb-input-btn send idle" id="bb-send" title="发送（Enter）" onclick="submitFromBar()">
+            <i data-lucide="arrow-up"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ════════════ 右栏 · Canvas（chat 态下 1:1） ════════════ -->
+  <aside class="sidebar-right">
+
+    <!-- Canvas 顶部 tab 切换 -->
+    <div class="canvas-head">
+      <div class="canvas-tabs" id="canvas-tabs">
+        <button class="cv-tab active" data-cv="wiki" onclick="switchCanvas('wiki')">
+          <i data-lucide="book-open"></i>
+          Wiki
+          <span class="cv-tab-meta">· 二次函数</span>
+        </button>
+        <button class="cv-tab" data-cv="quiz" onclick="switchCanvas('quiz')" hidden id="cv-tab-quiz">
+          <i data-lucide="sparkles"></i>
+          题目集
+          <span class="cv-tab-meta">· 5 道</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="canvas-body">
+
+      <!-- Pane 1：Wiki 镜像（默认显示，AI 当前正在引用） -->
+      <div class="cv-pane active" data-pane="wiki">
+        <article class="cv-wiki">
+          <h1>二次函数图像与性质</h1>
+          <div class="cv-wiki-meta">
+            来源 <b>12 份资料</b> · 相关词条 <b>5 个</b> · 上次更新 <b>2 小时前</b>
+          </div>
+
+          <h2>1. 抛物线的开口方向</h2>
+          <p>
+            二次函数 <span class="cv-formula">y = ax² + bx + c (a ≠ 0)</span> 的图像是一条抛物线。
+            当 <b>a &gt; 0</b> 时，开口<b>向上</b>；当 <b>a &lt; 0</b> 时，开口<b>向下</b>。
+            <span class="cv-cite">[导入课件.pptx P3]</span>
+          </p>
+
+          <h2>2. 对称轴</h2>
+          <p>
+            抛物线的对称轴是一条平行于 y 轴的直线，方程为：
+            <span class="cv-formula">x = -b / (2a)</span>
+            <span class="cv-cite">[配套习题汇编.pdf P12]</span>
+          </p>
+
+          <h2>3. 顶点坐标</h2>
+          <p>
+            顶点是抛物线的最高点或最低点，坐标为：
+            <span class="cv-formula">( -b/(2a), (4ac-b²)/(4a) )</span>
+            <span class="cv-cite">[教学设计·二次函数.docx P5]</span>
+          </p>
+
+          <h2>4. 增减性</h2>
+          <p>
+            当 <b>a &gt; 0</b> 时，在对称轴左侧 y 随 x 增大而<b>减小</b>，右侧 y 随 x 增大而<b>增大</b>。
+            <b>a &lt; 0</b> 时相反。
+            <span class="cv-cite">[海淀区 2026 一模卷 T6]</span>
+          </p>
+
+          <h2>5. 与坐标轴交点</h2>
+          <p>
+            令 x = 0 得 y 轴交点 <b>(0, c)</b>；
+            令 y = 0 解 <b>ax² + bx + c = 0</b> 得 x 轴交点（个数取决于判别式 Δ）。
+            <span class="cv-cite">[配套习题汇编.pdf P15]</span>
+          </p>
+        </article>
+      </div>
+
+      <!-- Pane 2：题目集作品（AI 生成后切到这里） -->
+      <div class="cv-pane" data-pane="quiz">
+        <div class="cv-quiz-head">
+          <h1>《二次函数》分层练习 · 5 道</h1>
+          <div class="meta">
+            AI 基于 <b>12 份资料</b> 生成 · 难度 <b>A / B / C 三档</b> ·
+            适配 <b>八(3)班</b> 学情 · <b>今天 18:42</b>
+          </div>
+        </div>
+
+        <div class="cv-quiz-group">
+          <div class="cv-quiz-group-label a">A · 基础题</div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">A1</span>
+            <span class="qi-q">已知二次函数 y = 2x² − 4x + 1，求其对称轴和顶点坐标。</span>
+            <div class="qi-a">参考答案：对称轴 <b>x = 1</b>，顶点 <b>(1, −1)</b></div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 改编自《配套习题汇编》P12</div>
+          </div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">A2</span>
+            <span class="qi-q">下列函数的图像开口方向，正确的是（   ）<br>A. y = −3x²+1 向上 &nbsp; B. y = x²−2 向上 &nbsp; C. y = −x²−x 向上 &nbsp; D. y = 2x² 向下</span>
+            <div class="qi-a">参考答案：<b>B</b></div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 改编自《导入课件》P3 例 2</div>
+          </div>
+        </div>
+
+        <div class="cv-quiz-group">
+          <div class="cv-quiz-group-label b">B · 提高题</div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">B1</span>
+            <span class="qi-q">抛物线 y = ax² + bx + c 的顶点为 (2, −3)，且经过点 (0, 5)，求 a、b、c。</span>
+            <div class="qi-a">参考答案：<b>a = 2, b = −8, c = 5</b></div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 改编自《教学设计·二次函数》P7</div>
+          </div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">B2</span>
+            <span class="qi-q">已知 y = x² − 2mx + 3，当 x ≥ 1 时 y 随 x 增大而增大，求 m 的取值范围。</span>
+            <div class="qi-a">参考答案：<b>m ≤ 1</b>（关键：对称轴 x = m 在 1 的左侧）</div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 王老师·公开课板书原题</div>
+          </div>
+        </div>
+
+        <div class="cv-quiz-group">
+          <div class="cv-quiz-group-label c">C · 拔高题</div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">C1</span>
+            <span class="qi-q">设抛物线 y = x² − (k+2)x + 2k 与 x 轴交于 A、B 两点，与 y 轴交于 C 点。若 △ABC 面积为 3，求 k。</span>
+            <div class="qi-a">参考答案：<b>k = 3 或 k = −1</b>（需讨论 k 正负与韦达定理）</div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 海淀区 2026 一模 T22 改编</div>
+          </div>
+        </div>
+
+        <div class="cv-actions">
+          <button class="cv-action primary" onclick="showToast('（演示）已导出为 .docx，已发送到「八(3)班·随堂练习」分组')">
+            <i data-lucide="download"></i>
+            导出为 Word
+          </button>
+          <button class="cv-action" onclick="showToast('（演示）已加入《二次函数》第二课时教案')">
+            <i data-lucide="book-plus"></i>
+            加入教案
+          </button>
+          <button class="cv-action" onclick="showToast('（演示）让 AI 再改改难度')">
+            <i data-lucide="refresh-ccw"></i>
+            重新生成
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- 占位（hidden）：兼容旧 JS 中 ai-textarea 引用 -->
+  <div style="display:none">
+    <textarea id="ai-textarea"></textarea>
+  </div>
+
+</div>
+
+<div class="learned-overlay" id="learned-overlay" onclick="closeLearnedPanel()"></div>
+<aside class="learned-panel" id="learned-panel" aria-hidden="true">
+  <div class="learned-head">
+    <h3 class="learned-title">飞象怎么工作 + 已学到你的 23 条</h3>
+    <button class="learned-close" onclick="closeLearnedPanel()" title="关闭">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+  <div class="learned-tabs-wrap">
+    <div class="canvas-tabs">
+      <button class="cv-tab" data-learned-tab="work" onclick="switchLearnedTab('work')">
+        <i data-lucide="workflow"></i>
+        飞象怎么工作
+      </button>
+      <button class="cv-tab active" data-learned-tab="learned" onclick="switchLearnedTab('learned')">
+        <i data-lucide="sparkles"></i>
+        飞象学到了你的 23 条
+      </button>
+    </div>
+  </div>
+  <div class="learned-body">
+    <section class="learned-pane" data-pane="work">
+      <div class="learned-step"><b>1.</b> 你上传的资料 → AI 整理 → Wiki（每段都可追溯到原文出处）</div>
+      <div class="learned-step"><b>2.</b> 你和飞象对话越多 → AI 越懂你的偏好和习惯</div>
+      <div class="learned-step"><b>3.</b> 你删/改资料 → AI 重新整理 → 永远是最新版本</div>
+    </section>
+    <section class="learned-pane active" data-pane="learned">
+      <div class="learned-groups">
+        <button class="learned-chip active" data-group="personal" onclick="switchLearnedGroup('personal')">个人偏好（17 条）</button>
+        <button class="learned-chip" data-group="team" onclick="switchLearnedGroup('team')">教研组共识（6 条）</button>
+      </div>
+
+      <div class="learned-rule" data-rule-group="personal">
+        <div class="learned-rule-main"><i data-lucide="sparkles"></i><span>含参 + 二次函数 → 中考压轴 · 函数综合</span></div>
+        <div class="learned-rule-meta">
+          <span>5/12 · 在《圆与三角形综合》对话中学到</span>
+          <div class="learned-rule-actions">
+            <button class="mem-btn" onclick="showToast('（演示）编辑这条规则')">改一下</button>
+            <button class="mem-btn" onclick="showToast('（演示）已关闭这条规则')">关掉</button>
+          </div>
+        </div>
+      </div>
+      <div class="learned-rule" data-rule-group="personal">
+        <div class="learned-rule-main"><i data-lucide="sparkles"></i><span>出题难度梯度按 3:5:2 分配 A/B/C</span></div>
+        <div class="learned-rule-meta">
+          <span>5/8 · 你的批注</span>
+          <div class="learned-rule-actions">
+            <button class="mem-btn" onclick="showToast('（演示）编辑这条规则')">改一下</button>
+            <button class="mem-btn" onclick="showToast('（演示）已关闭这条规则')">关掉</button>
+          </div>
+        </div>
+      </div>
+      <div class="learned-rule" data-rule-group="personal">
+        <div class="learned-rule-main"><i data-lucide="sparkles"></i><span>学情分析优先看八(3)班</span></div>
+        <div class="learned-rule-meta">
+          <span>5/5 · 多次对话累积</span>
+          <div class="learned-rule-actions">
+            <button class="mem-btn" onclick="showToast('（演示）编辑这条规则')">改一下</button>
+            <button class="mem-btn" onclick="showToast('（演示）已关闭这条规则')">关掉</button>
+          </div>
+        </div>
+      </div>
+      <div class="learned-rule" data-rule-group="personal">
+        <div class="learned-rule-main"><i data-lucide="sparkles"></i><span>课件喜欢图像法导入而非定义法</span></div>
+        <div class="learned-rule-meta">
+          <span>4/28 · 在《二次函数图像与性质》对话中学到</span>
+          <div class="learned-rule-actions">
+            <button class="mem-btn" onclick="showToast('（演示）编辑这条规则')">改一下</button>
+            <button class="mem-btn" onclick="showToast('（演示）已关闭这条规则')">关掉</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="learned-rule" data-rule-group="team" style="display:none;">
+        <div class="learned-rule-main"><i data-lucide="sparkles"></i><span>错题归因模板使用王老师 v2 版</span></div>
+        <div class="learned-rule-meta">
+          <span>5/3 · 教研组共建</span>
+          <div class="learned-rule-actions">
+            <button class="mem-btn" onclick="showToast('（演示）编辑这条规则')">改一下</button>
+            <button class="mem-btn" onclick="showToast('（演示）已关闭这条规则')">关掉</button>
+          </div>
+        </div>
+      </div>
+      <div class="learned-rule" data-rule-group="team" style="display:none;">
+        <div class="learned-rule-main"><i data-lucide="sparkles"></i><span>中考压轴题统一命名"函数综合"</span></div>
+        <div class="learned-rule-meta">
+          <span>4/20 · 教研组共建</span>
+          <div class="learned-rule-actions">
+            <button class="mem-btn" onclick="showToast('（演示）编辑这条规则')">改一下</button>
+            <button class="mem-btn" onclick="showToast('（演示）已关闭这条规则')">关掉</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</aside>
+
+<div id="toast"></div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('my-wiki');</script>
+<script src="assets/v28-shell.js?v=20260617upload"></script>
+<script src="assets/v28.js?v=20260708uploadcheckbox"></script>
+<script src="assets/shared/v28-modals.js?v=20260617a"></script>
+<script src="assets/page-header.js"></script>
+<script>
+  function switchLearnedTab(tab){
+    document.querySelectorAll('[data-learned-tab]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.learnedTab === tab);
+    });
+    document.querySelectorAll('.learned-pane').forEach(pane => {
+      pane.classList.toggle('active', pane.dataset.pane === tab);
+    });
+  }
+
+  function switchLearnedGroup(group){
+    document.querySelectorAll('.learned-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.group === group);
+    });
+    document.querySelectorAll('[data-rule-group]').forEach(row => {
+      row.style.display = row.dataset.ruleGroup === group ? '' : 'none';
+    });
+  }
+
+  function openLearnedPanel(defaultTab = 'learned'){
+    document.body.dataset.learnedPanel = 'open';
+    const panel = document.getElementById('learned-panel');
+    if(panel) panel.setAttribute('aria-hidden', 'false');
+    switchLearnedTab(defaultTab);
+    if(defaultTab === 'learned') switchLearnedGroup('personal');
+  }
+
+  function closeLearnedPanel(){
+    delete document.body.dataset.learnedPanel;
+    const panel = document.getElementById('learned-panel');
+    if(panel) panel.setAttribute('aria-hidden', 'true');
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if(event.key === 'Escape' && document.body.dataset.learnedPanel === 'open'){
+      closeLearnedPanel();
+    }
+  });
+
+  /* ──────────────────────────────────────────────
+     Demo 演示参数 · 一键展示效果
+     ?demo=chat  → 自动进对话视图（看样例对话）
+     ?demo=panel → 自动打开"飞象怎么工作 + 已学到的 N 条"抽屉
+     ────────────────────────────────────────────── */
+  (function initDemoMode(){
+    const params = new URLSearchParams(window.location.search);
+    const demo = params.get('demo');
+    if(!demo) return;
+
+    const ready = () => {
+      if(demo === 'chat' && typeof openChat === 'function'){
+        openChat('resume');
+      } else if(demo === 'panel'){
+        openLearnedPanel('learned');
+      }
+    };
+
+    if(document.readyState === 'complete'){
+      setTimeout(ready, 200);
+    } else {
+      window.addEventListener('load', () => setTimeout(ready, 200));
+    }
+  })();
+</script>
+
+<template id="review-template">
+{
+  "title": "我的知识库 · 个人资料沉淀",
+  "summary": "我的知识库承载老师个人资料沉淀、下载分享和“飞象学到的规则”，强调个人私有、可复用和可控。",
+  "reviewVersions": [
+    {
+      "id": "v1.0",
+      "label": "v1.0 本次新增",
+      "default": true,
+      "title": "我的知识库 · v1.0 本次新增",
+      "summary": "本次只评审我的知识库文件夹视图、上传弹窗题目入库勾选项，以及文件进入文件页后的添加至校本题库链路。",
+      "sections": [
+        {
+          "id": "personal-kb-v1-folder-upload",
+          "title": "1. 文件夹视图与上传入口",
+          "body": "聚焦我的知识库文件夹视图中的新增上传和文件进入文件页逻辑。",
+          "blocks": [
+            {
+              "title": "本次新增 / 调整",
+              "items": [
+                "【新增】文件夹视图保留 Wiki、知识图谱、文件夹三视图，文件夹只作为资料组织方式，不改变我的知识库归属。",
+                "【新增】上传弹窗增加 checkbox，标题为“允许文件中的题目进入 AI 校本题库”，副标题为“勾选后，AI 会自动分析符合条件的图片、PDF、Word，进入 AI 录题处理。”，默认不勾选。",
+                "【新增】勾选后只对符合条件的图片、PDF、Word 进入 AI 录题处理；未勾选时文件只进入我的知识库，不展示 AI 录题进度提示。",
+                "【新增】勾选且存在符合条件文件时，导入完成提示追加文案“符合条件的题目录入进度，可在「应用广场 - AI 录题」页面查看”。",
+                "【新增】点击文件夹视图中的文件进入文件页，文件页承接后续添加至校本题库。"
+              ]
+            },
+            {
+              "title": "上传弹窗文案",
+              "type": "table",
+              "columns": [
+                "位置",
+                "文案 / 行为"
+              ],
+              "rows": [
+                {
+                  "位置": "弹窗标题",
+                  "文案 / 行为": "上传文件"
+                },
+                {
+                  "位置": "弹窗副标题",
+                  "文案 / 行为": "上传后，AI 会自动整理并生成 Wiki 内容。"
+                },
+                {
+                  "位置": "checkbox 标题",
+                  "文案 / 行为": "允许文件中的题目进入 AI 校本题库"
+                },
+                {
+                  "位置": "checkbox 副标题",
+                  "文案 / 行为": "勾选后，AI 会自动分析符合条件的图片、PDF、Word，进入 AI 录题处理。"
+                },
+                {
+                  "位置": "上传主按钮",
+                  "文案 / 行为": "开始上传"
+                },
+                {
+                  "位置": "导入完成追加提示",
+                  "文案 / 行为": "符合条件的题目录入进度，可在「应用广场 - AI 录题」页面查看。仅勾选且存在符合条件文件时展示。"
+                }
+              ]
+            },
+            {
+              "title": "本次不评审",
+              "items": [
+                "个人 Wiki 详情结构、知识图谱内容、飞象学到的规则和分享个人 Wiki 沿用 v0.9，不作为本次新增评审重点。"
+              ]
+            },
+            {
+              "title": "QA 检查点",
+              "items": [
+                "我的知识库底部问答范围仍显示我的知识库。",
+                "上传弹窗 checkbox 默认不勾选，勾选态清晰可见，标题和副标题文案完整展示。",
+                "未勾选时完成反馈不展示 AI 录题进度提示。",
+                "文件夹中文件点击后进入文件页，且文件页仍能识别来源为我的知识库。"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "personal-wiki-home",
+      "title": "1. 个人 Wiki 首页",
+      "body": "个人 Wiki 首页展示老师上传、整理和生成的个人资料，默认仅本人可见。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "个人 Wiki 首页展示老师上传、整理和生成的个人资料；文件夹视图按文件管理列表展示个人资料，便于老师按目录、文件名和更新时间整理。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "进入页面",
+              "text": "老师从侧栏进入我的知识库。"
+            },
+            {
+              "label": "浏览资料",
+              "text": "按教学主题、教学场景、近期更新或文件夹查看个人资料。"
+            },
+            {
+              "label": "切换文件夹",
+              "text": "点击顶部文件夹视图后，在当前我的知识库范围内查看文件夹路径、文件列表、上传者、更新时间、大小和操作入口。"
+            },
+            {
+              "label": "查看详情",
+              "text": "点击资料进入词条或文件预览。"
+            },
+            {
+              "label": "上传补充",
+              "text": "通过上传入口新增个人资料；上传弹窗内可勾选“允许文件中的题目进入 AI 校本题库”。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "个人知识库默认私有，不自动进入学校知识库。",
+            "我的知识库页的对话态和底部输入框默认范围都是我的知识库，不默认切到学校知识库。",
+            "文件夹视图只改变资料组织方式，不改变资料归属；我的知识库文件夹内的资料仍属于当前老师个人空间。",
+            "上传弹窗中的题目入库勾选项只影响文件内题目是否进入 AI 录题处理，不改变原文件在我的知识库中的归属。",
+            "老师可以选择分享或迁移，但需要明确动作。",
+            "删除个人资料不影响学校资料。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "个人 Wiki 展示资料、文件夹、知识图谱和个人沉淀内容。",
+            "文件夹视图固定展示文件名、上传者、更新时间、大小和操作列；路径栏展示当前文件夹层级。",
+            "AI 录题沉淀支持 PDF、Word 和图片文件；PPT、Excel 等资料仍可作为知识库文件整理，但不承诺自动切题入库。",
+            "页头基础信息固定展示资料数、主题数和上次更新时间。",
+            "资料数指当前老师个人知识库内已上传并可浏览、检索或引用的资料总数。",
+            "主题数指当前老师个人资料已整理成可进入 Wiki 的教学主题数量。",
+            "上次更新时间取个人知识库最近一次资料上传完成、解析完成、主题归类或 Wiki 内容更新的时间。",
+            "资料归属为当前老师个人空间。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "资料为空",
+              "处理方式": "展示一份可体验、可追溯、可一键清空的演示 Wiki 数据；演示资料也同步出现在文件夹视图。"
+            },
+            {
+              "场景": "资料解析中",
+              "处理方式": "显示整理中状态，不当作完整 Wiki。"
+            },
+            {
+              "场景": "资料无权限",
+              "处理方式": "个人页一般不应出现，若出现提示权限异常。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "upload-onboarding.html",
+              "说明": "新增资料上传。"
+            },
+            {
+              "关联对象": "file-preview.html",
+              "说明": "打开个人文件预览。"
+            },
+            {
+              "关联对象": "wiki-entry.html",
+              "说明": "打开个人词条。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "默认进入个人 Wiki 范围。",
+            "个人资料不混入学校知识库。",
+            "文件夹和知识图谱入口可用。",
+            "文件夹视图与学校知识库保持同一套文件管理样式，但范围文案显示我的知识库。",
+            "上传弹窗中的 AI 校本题库 checkbox 默认不勾选，勾选态和未勾选态清晰可见。",
+            "仅当老师勾选 AI 校本题库 checkbox 时，导入完成提示才展示“符合条件的题目录入进度，可在「应用广场 - AI 录题」页面查看”。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "share-btn-personal-home",
+      "title": "2. 分享个人 Wiki",
+      "body": "分享个人 Wiki 让老师主动把个人资料开放给指定同事或学校范围。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：个人 Wiki 所有者。",
+            "用途：把个人资料开放给指定同事或学校范围。",
+            "产出：分享对象、可见范围和分享结果。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "点击分享",
+              "text": "老师点击分享按钮。"
+            },
+            {
+              "label": "选择对象",
+              "text": "选择指定老师、学校内可见或仅链接访问等范围。"
+            },
+            {
+              "label": "确认风险",
+              "text": "分享前提示个人资料将对所选范围可见。"
+            },
+            {
+              "label": "复制链接",
+              "text": "生成永久有效的分享链接，并展示访问范围。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "个人资料默认不分享。",
+            "分享范围不能超过老师对资料的拥有权限。",
+            "知识库分享链接生成后永久有效，不设置过期时间。",
+            "链接访问仍受当前资料状态和访问权限约束。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "分享信息包含分享对象、可见范围、有效状态和当前 Wiki 标识。",
+            "分享结果需要记录发起人和接收范围。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "无可分享资料",
+              "处理方式": "提示暂无内容可分享。"
+            },
+            {
+              "场景": "复制失败",
+              "处理方式": "展示链接并提示手动复制。"
+            },
+            {
+              "场景": "访问者无权限",
+              "处理方式": "展示无权限说明。"
+            },
+            {
+              "场景": "资料删除或权限收回",
+              "处理方式": "展示无权限或内容不可用说明。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "file-preview.html",
+              "说明": "被分享者打开具体文件。"
+            },
+            {
+              "关联对象": "wiki-entry.html",
+              "说明": "被分享者打开词条。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "无分享权限时不展示或禁用分享。",
+            "分享后接收人只能看到被授权范围。",
+            "取消分享后链接不可继续访问。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "learned-panel",
+      "title": "4. 飞象学到的规则",
+      "body": "“飞象学到的规则”展示老师在个人使用中沉淀的偏好，例如题型偏好、讲解风格、常用班级和资料处理习惯。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：希望复用个人偏好的老师。",
+            "用途：查看飞象从个人使用中沉淀的规则。",
+            "展示项：题型偏好、讲解风格、常用班级和资料处理习惯。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "查看规则",
+              "text": "老师在个人知识库页查看飞象已学习到的规则。"
+            },
+            {
+              "label": "编辑规则",
+              "text": "点击编辑可修改或删除不准确规则。"
+            },
+            {
+              "label": "关闭规则",
+              "text": "关闭后后续生成不再默认使用该规则。"
+            },
+            {
+              "label": "生效提示",
+              "text": "修改后提示将影响之后的对话、组题或资源生成。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "规则只属于当前老师，不能自动代表学校规则。",
+            "老师必须可以编辑或关闭不准确规则。",
+            "规则影响后续生成，不追改历史内容。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "规则项展示规则名称、来源行为、适用场景和更新时间。",
+            "规则属于个人使用偏好，不默认进入学校知识库。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "规则为空",
+              "处理方式": "展示暂无学习规则，不影响使用。"
+            },
+            {
+              "场景": "规则不准确",
+              "处理方式": "老师可编辑或关闭。"
+            },
+            {
+              "场景": "保存失败",
+              "处理方式": "保留编辑内容并提示重试。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "chat.html",
+              "说明": "对话生成可引用启用规则。"
+            },
+            {
+              "关联对象": "compose-sheet.html",
+              "说明": "组题偏好可受规则影响。"
+            },
+            {
+              "关联对象": "app-detail.html",
+              "说明": "应用运行时可读取老师偏好。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "规则列表不展示他人个人偏好。",
+            "规则为空时有空状态。",
+            "删除或关闭规则后不再参与后续推荐。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'my-wiki.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+</body>
+</html>

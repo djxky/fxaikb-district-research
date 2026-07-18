@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飞象教育分析引擎 · 对话式研究演示</title>
+  <script src="assets/lucide-local.js"></script>
+  <style>
+    :root{--paper:#f4f6f4;--surface:#fff;--ink:#17212b;--muted:#64717d;--line:#dce3e2;--navy:#092a43;--blue:#146b94;--blue-soft:#ecf6fa;--gold:#a77b26;--gold-soft:#fbf5e7;--green:#247153;--green-soft:#edf7f1;--red:#a54a44;--red-soft:#fbefed}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+    button{font:inherit}a{color:inherit}.page{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:14px 0 22px}.header{display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px}.brand-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;color:#fff;background:var(--gold)}.brand strong{display:block;font-size:14px}.brand small{display:block;color:var(--muted);font-size:9px}.guard{display:flex;gap:18px;color:var(--muted);font-size:10px}.guard span{display:flex;align-items:center;gap:5px}.guard svg{width:13px;color:var(--green)}
+    .hero{padding:13px 0 11px}.eyebrow{color:var(--gold);font-size:9px;font-weight:800;letter-spacing:.13em}.hero h1{margin:3px 0 2px;font-size:29px;line-height:1.2;letter-spacing:-.035em}.hero p{margin:0;color:var(--muted);font-size:12px}
+    .query{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 12px 35px rgba(22,35,44,.05)}.avatar{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;color:#fff;font-weight:800;background:var(--navy)}.query small{display:block;color:var(--muted);font-size:9px}.query strong{font-size:14px}.mock{padding:4px 8px;border-radius:999px;color:var(--gold);background:var(--gold-soft);font-size:9px;font-weight:700}
+    .stepper{display:grid;grid-template-columns:repeat(8,1fr);margin:11px 0 8px;position:relative}.stepper:before{content:"";position:absolute;left:5%;right:5%;top:12px;height:1px;background:#cbd5d7}.step{position:relative;border:0;background:transparent;color:#89939b;cursor:pointer;text-align:center}.step b{position:relative;z-index:1;display:grid;place-items:center;width:25px;height:25px;margin:0 auto 3px;border:1px solid #cad3d5;border-radius:50%;background:var(--paper);font-size:8px}.step span{font-size:9px}.step.done b{border-color:var(--green);color:#fff;background:var(--green)}.step.active{color:var(--navy);font-weight:700}.step.active b{border-color:var(--gold);color:#fff;background:var(--gold);box-shadow:0 0 0 4px rgba(167,123,38,.13)}
+    .stage{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,.8fr);min-height:382px;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 18px 55px rgba(20,35,45,.07)}.main{padding:18px 22px}.stage-head{display:flex;justify-content:space-between;gap:20px}.stage-kicker{color:var(--blue);font-size:9px;font-weight:800;letter-spacing:.08em}.stage h2{margin:3px 0 2px;font-size:21px;letter-spacing:-.03em}.stage-sub{margin:0;color:var(--muted);font-size:11px}.plain{display:flex;gap:10px;margin:12px 0;padding:11px 12px;border-radius:10px;background:var(--blue-soft)}.plain svg{flex:0 0 auto;width:17px;color:var(--blue)}.plain strong{display:block;margin-bottom:1px;font-size:12px}.plain p{margin:0;color:#49606e;font-size:10px}.professional{border:1px solid var(--line);border-radius:10px;overflow:hidden}.professional-title{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:#f7f9f8;font-size:10px;font-weight:750}.professional-title span{color:var(--green);font-size:9px}.evidence-grid{display:grid;grid-template-columns:repeat(3,1fr)}.evidence{min-height:91px;padding:10px;border-right:1px solid var(--line)}.evidence:last-child{border-right:0}.evidence small{display:block;color:var(--muted);font-size:8px}.evidence strong{display:block;margin:3px 0;font-size:12px;line-height:1.35}.evidence p{margin:0;color:var(--muted);font-size:9px}.evidence.warn strong{color:var(--red)}
+    .side{display:flex;flex-direction:column;padding:17px;border-left:1px solid var(--line);background:#fafbf9}.side-label{color:var(--muted);font-size:8px;font-weight:800;letter-spacing:.09em}.ledger{display:grid;gap:6px;margin-top:8px}.ledger-item{padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff}.ledger-item span{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:8px}.ledger-item span b{color:var(--green)}.ledger-item strong{display:block;margin-top:2px;font-size:10px}.rule{margin-top:9px;padding:9px;border-radius:8px;background:var(--gold-soft);color:#725a2e;font-size:9px}.rule strong{display:block;color:#5b451d}.controls{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px}.controls button{display:flex;align-items:center;gap:4px;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);font-size:10px;cursor:pointer}.controls button.primary{border-color:var(--navy);color:#fff;background:var(--navy)}.controls button:disabled{opacity:.35;cursor:default}.controls svg{width:12px}.count{color:var(--muted);font-size:9px}
+    .sourcebar{display:flex;align-items:center;gap:7px;margin-top:8px;color:var(--muted);font-size:9px}.sourcebar a{text-decoration:none;border-bottom:1px solid #aab5b8}.sourcebar svg{width:12px;color:var(--green)}
+    @media(max-width:900px){.guard{display:none}.step span{display:none}.stage{grid-template-columns:1fr}.side{border-left:0;border-top:1px solid var(--line)}.evidence-grid{grid-template-columns:1fr}.evidence{min-height:auto;border-right:0;border-bottom:1px solid var(--line)}.evidence:last-child{border-bottom:0}}@media(max-width:600px){.page{width:calc(100% - 24px)}.hero h1{font-size:26px}.query{grid-template-columns:40px 1fr}.mock{grid-column:2}.main{padding:19px}.stage-head{display:block}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <div class="brand"><div class="brand-mark"><i data-lucide="sparkles"></i></div><div><strong>飞象教育分析引擎</strong><small>对话式研究演示</small></div></div>
+      <div class="guard"><span><i data-lucide="shield-check"></i>最小必要数据</span><span><i data-lucide="git-branch"></i>结论全程可追溯</span><span><i data-lucide="user-check"></i>重要结论由人复核</span></div>
+    </header>
+
+    <section class="hero"><div class="eyebrow">不是展示 AI 想了什么，而是展示结论如何被证据一步步约束</div><h1>一句教育问题，启动一套可审计的专业研究</h1><p>领导看得懂研究进展，局端专家能检查数据、方法、反证与结论边界。</p></section>
+
+    <section class="query">
+      <div class="avatar">局</div><div><small>海岳区教育局 · 基础教育科</small><strong>“全面分析林知遥本学期的学习发展，并解释为什么高阶表现改善、常规成绩却没有同步提升。”</strong></div><div class="mock">脱敏模拟数据</div>
+    </section>
+
+    <nav class="stepper" aria-label="分析步骤"></nav>
+
+    <section class="stage">
+      <div class="main">
+        <div class="stage-head"><div><div class="stage-kicker" id="kicker"></div><h2 id="title"></h2><p class="stage-sub" id="subtitle"></p></div></div>
+        <div class="plain"><i data-lucide="message-circle-more"></i><div><strong id="plainTitle"></strong><p id="plainText"></p></div></div>
+        <div class="professional"><div class="professional-title">本步专业底稿 <span id="gate"></span></div><div class="evidence-grid" id="evidence"></div></div>
+        <div class="sourcebar"><i data-lucide="book-open-check"></i><span>分析框架参考：</span><a href="https://www.moe.gov.cn/srcsite/A06/s3321/202103/t20210317_520238.html" target="_blank">《义务教育质量评价指南》</a><span>·</span><a href="https://www.ets.org/research/policy_research_reports/publications/report/2003/hsgs.html" target="_blank">Evidence-Centered Design</a></div>
+      </div>
+      <aside class="side">
+        <div class="side-label">实时研究账本</div><div class="ledger" id="ledger"></div>
+        <div class="rule" id="rule"></div>
+        <div class="controls"><button id="prev"><i data-lucide="chevron-left"></i>上一步</button><span class="count" id="count"></span><button class="primary" id="next">继续分析<i data-lucide="chevron-right"></i></button></div>
+      </aside>
+    </section>
+  </main>
+  <script>
+    const steps=[
+      {name:'理解问题',k:'01 · 问题编译',t:'先把“全面分析”变成可验证的问题',sub:'先定义研究对象、时间范围、比较口径和使用边界，再开始调数。',pt:'AI 正在确认：这次究竟要回答什么？',p:'研究目标不是给学生贴标签，而是解释“高阶任务表现改善，但常规测评未同步”的可能原因，并形成可验证的支持方案。',g:'研究问题已锁定',e:[['研究对象','林知遥 · 八年级（3）班','2025–2026 学年第二学期，18 周'],['结果指标','年级标准分趋势','避免直接比较不同难度试卷的原始分'],['使用边界','支持教学改进','不用于能力定级、排名或升学决策']],r:'先定义问题，再选择数据。禁止“有什么数据就分析什么”。'},
+      {name:'建立证据',k:'02 · 证据契约',t:'明确“什么数据能够支持什么判断”',sub:'把结论、可观察证据与数据来源一一对应，避免从单一成绩跳到能力判断。',pt:'AI 正在建立证据地图，而不是简单拼表。',p:'“高阶表现改善”必须由开放任务量规、迁移题表现等多源证据共同支持；“成绩未转化”要用可比口径确认。',g:'证据规则已通过',e:[['待验证主张','高阶任务表现改善','至少 2 类独立证据，且跨 6 周以上'],['关键结果','常规成绩未同步','采用年级标准分与知识结构校准'],['禁止推断','心理状态与家庭原因','没有授权的直接数据，不从行为痕迹反推']],r:'证据不足时，AI 必须输出“无法判断”，而不是补齐一个听起来合理的故事。'},
+      {name:'调取数据',k:'03 · 最小必要调数',t:'只调用回答问题所必需的数据',sub:'跨系统对齐学生、时间、课程与知识点，不把敏感数据默认纳入分析。',pt:'已连接 5 个系统；心理数据因本题无必要性而不调用。',p:'本次使用作业、考试、作文、体质健康与学生管理数据。所有展示均为脱敏模拟数据，但字段均可由现有系统采集。',g:'权限与必要性校验通过',e:[['智能作业','186 次 · 2,843 条作答','题目、知识点、正误、订正与重做记录'],['考试与作文','6 次考试 · 14 篇作文','题目得分、量规维度、47 次修改记录'],['管理与体质','92 天考勤 · 1 次体测','仅作背景校验；未发现影响分析的异常']],r:'心理健康数据默认隔离。除非问题必要、权限合法且由专业人员介入，否则不得调用或跨域推断。'},
+      {name:'校验数据',k:'04 · 数据质量门',t:'先判断数据能不能用，再谈分析',sub:'检查身份映射、缺失、重复、口径变化、评分一致性和时间覆盖。',pt:'AI 发现 8 条重复作答、12 条知识点标签缺失，已隔离，不进入主分析。',p:'核心指标覆盖 17/18 周；作文教师评分与复核评分一致性为 0.86。当前数据足以支持趋势判断，但不足以判断“作答节奏”。',g:'质量等级 A− · 可用于诊断',e:[['完整性','核心周覆盖 94.4%','第 11 周缺 1 次周测，不影响方向判断'],['一致性','作文评分一致性 0.86','达到内部演示阈值 0.80；保留分歧样本'],['限制项','仅 2 次数字化考试有时长','不以作答速度解释成绩差异']],r:'数据质量决定结论强度：有缺口就降低置信度或缩小结论范围。'},
+      {name:'形成假设',k:'05 · 多假设竞争',t:'同时提出多个解释，不急着选一个',sub:'让不同解释竞争同一组证据，防止 AI 只寻找支持第一直觉的材料。',pt:'AI 形成 3 个可检验解释，并为每个解释定义支持证据与否证条件。',p:'当前主假设是“基础知识稳定性限制高阶能力向常规成绩转化”；同时保留“试卷难度变化”和“作答节奏”两个替代解释。',g:'3 个假设进入检验',e:[['H1 · 基础稳定性','待验证','同类基础错误是否在 21 天内重复出现'],['H2 · 试卷结构变化','待验证','年级整体与同难度题表现是否同步变化'],['H3 · 作答节奏','证据不足','需要更多数字化考试时长或过程观察']],r:'先列替代解释，再检验证据。不能把相关性直接表述为原因。'},
+      {name:'交叉验证',k:'06 · 跨域关联',t:'让多类数据相互印证，而不是相互堆叠',sub:'分别看趋势、重复错误、任务类型与评分量规，并控制试卷难度和年级变化。',pt:'作业、考试与作文出现一致方向，但不是所有指标都支持同一解释。',p:'开放任务量规从 3.1 升至 3.7/5，迁移题正确率提升 11 个百分点；同期年级标准分仅从 0.08 变为 0.11，变化不显著。',g:'H1 获得主要支持',e:[['支持证据','21 天同类基础错误复现率 31%','错误集中在运算与概念辨析，而非高难题'],['交叉证据','高阶表现连续 8 周改善','作文论证、数学迁移任务方向一致'],['控制比较','年级整体难度波动已校准','H2 解释力较弱，暂不作为主因']],r:'跨域一致只提高可信度，不自动证明因果；结论仍使用“可能限制”而非“导致”。'},
+      {name:'寻找反证',k:'07 · 主动反证',t:'专门寻找能推翻当前判断的证据',sub:'检查反例、评分漂移、缺勤、班级共同变化以及其他可能原因。',pt:'AI 正在攻击自己的结论：如果 H1 是错的，数据里应该出现什么？',p:'未发现缺勤突增、教师评分漂移或班级共同下滑；但作答节奏数据不足，因此不能排除时间管理因素。',g:'主结论保留 · 边界收紧',e:[['已排除','缺勤与班级共同波动','考勤正常；班级标准分趋势稳定'],['未排除','作答节奏因素','只有 2 次有效时长数据，证据不足'],['反例保留','2 个单元基础题稳定但成绩未升','说明 H1 不是唯一解释']],r:'反证不会让报告“变弱”，它决定结论能否用于真实教育决策。'},
+      {name:'生成结论',k:'08 · 结论治理',t:'输出结论、依据、边界与可验证行动',sub:'把研究结果变成学校可执行、可复核、可在下一轮数据中验证的支持方案。',pt:'分析完成。AI 不给学生定性，而是提出一项两周可验证的教学支持。',p:'林知遥的高阶任务表现呈持续改善；基础知识提取稳定性可能限制其在常规测评中的表现转化。该解释可信度为 B+，仍需补充作答节奏证据。',g:'结论可信度 B+ · 建议人工复核',e:[['结论依据','3 类系统 · 6 项关键证据','完整证据链可反查到题目、量规与原始记录'],['行动建议','2 周间隔复习 + 2 次低压力短测','比较同类错误复现率，不增加机械作业量'],['成功标准','复现率 31% → 20% 以下','若未改善，回退 H1，转查节奏与试卷适配']],r:'这是一项可证伪的支持建议，不是永久标签。教师确认后执行，两周后自动复盘。'}
+    ];
+    let current=0;const nav=document.querySelector('.stepper');
+    function render(){nav.innerHTML=steps.map((s,i)=>`<button class="step ${i<current?'done':''} ${i===current?'active':''}" data-i="${i}"><b>${String(i+1).padStart(2,'0')}</b><span>${s.name}</span></button>`).join('');const s=steps[current];kicker.textContent=s.k;title.textContent=s.t;subtitle.textContent=s.sub;plainTitle.textContent=s.pt;plainText.textContent=s.p;gate.textContent=s.g;evidence.innerHTML=s.e.map((x,i)=>`<div class="evidence ${x[0].includes('禁止')||x[0].includes('限制')||x[0].includes('未排除')?'warn':''}"><small>${x[0]}</small><strong>${x[1]}</strong><p>${x[2]}</p></div>`).join('');ledger.innerHTML=`<div class="ledger-item"><span>已接入数据源 <b>${current<2?'待确认':current<3?'5 个':'5 个'}</b></span><strong>${current<2?'按问题动态确定':'作业 · 考试 · 作文 · 管理 · 体质'}</strong></div><div class="ledger-item"><span>可追溯证据 <b>${[0,0,0,52,96,168,184,184][current]} 条</b></span><strong>原始记录 → 指标 → 判断 → 结论</strong></div><div class="ledger-item"><span>当前结论强度 <b>${['未判定','未判定','未判定','A− 数据','待检验','B+','B+','B+'][current]}</b></span><strong>${current<4?'尚未进入结论阶段':current<7?'随反证动态调整':'适合制定支持计划'}</strong></div>`;rule.innerHTML=`<strong>本步治理规则</strong>${s.r}`;count.textContent=`${current+1} / ${steps.length}`;prev.disabled=current===0;next.innerHTML=current===steps.length-1?'查看完整报告 <i data-lucide="file-check-2"></i>':'继续分析 <i data-lucide="chevron-right"></i>';window.lucide&&window.lucide.createIcons();}
+    nav.addEventListener('click',e=>{const b=e.target.closest('.step');if(b){current=+b.dataset.i;render()}});prev.onclick=()=>{if(current>0){current--;render()}};next.onclick=()=>{if(current<steps.length-1){current++;render()}else{alert('报告将保留：研究问题、数据清单、质量记录、假设检验、反证、结论边界与行动复盘标准。')}};render();
+  </script>
+</body>
+</html>

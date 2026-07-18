@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飞象老师校园版 · 产品介绍</title>
+  <style>
+    :root {
+      --bg: #faf9f6;
+      --surface: #ffffff;
+      --ink: #111110;
+      --muted: #696761;
+      --faint: #9d9990;
+      --line: rgba(17, 17, 16, 0.1);
+      --gold: #a87e2c;
+      --gold-soft: #fbf5e6;
+      --green: #4a755b;
+      --green-soft: #eaf3ed;
+      --blue: #53759e;
+      --blue-soft: #edf3f8;
+      --purple: #81628f;
+      --purple-soft: #f4eff5;
+      --rose: #a8626c;
+      --rose-soft: #f8eff0;
+      --shadow: 0 18px 54px rgba(24, 22, 18, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(250, 249, 246, 0.96) 42%, var(--bg)),
+        repeating-linear-gradient(90deg, rgba(168, 126, 44, 0.055) 0 1px, transparent 1px 48px),
+        repeating-linear-gradient(180deg, rgba(83, 117, 158, 0.04) 0 1px, transparent 1px 48px);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    .page { min-height: 100vh; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 14px clamp(20px, 4vw, 56px);
+      border-bottom: 1px solid rgba(17, 17, 16, 0.06);
+      background: rgba(250, 249, 246, 0.82);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      font-weight: 700;
+    }
+
+    .brand-copy {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      line-height: 1.25;
+    }
+
+    .brand-title {
+      display: block;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      flex: none;
+      color: #fff;
+      background: var(--gold);
+      box-shadow: 0 7px 18px rgba(168, 126, 44, 0.22);
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .ai-note {
+      display: block;
+      margin-top: 3px;
+      color: var(--faint);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .nav a:hover { color: var(--ink); }
+
+    .hero {
+      min-height: calc(100vh - 63px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.88fr);
+      gap: clamp(30px, 5vw, 72px);
+      align-items: center;
+      padding: clamp(54px, 7vw, 96px) clamp(20px, 5vw, 72px) 52px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(42px, 6.4vw, 82px);
+      line-height: 1.04;
+      letter-spacing: 0;
+      font-weight: 780;
+    }
+
+    .hero-copy {
+      max-width: 680px;
+      margin: 28px 0 0;
+      color: #45423c;
+      font-size: clamp(17px, 1.75vw, 21px);
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(24, 22, 18, 0.05);
+    }
+
+    .button.primary {
+      border-color: #111110;
+      background: #111110;
+      color: #fff;
+    }
+
+    .system-map {
+      position: relative;
+      min-height: 520px;
+      display: grid;
+      place-items: center;
+    }
+
+    .orbit {
+      position: absolute;
+      inset: 38px;
+      border: 1px solid rgba(17, 17, 16, 0.08);
+      border-radius: 32px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.36)),
+        linear-gradient(135deg, rgba(168, 126, 44, 0.08), rgba(83, 117, 158, 0.08));
+      box-shadow: var(--shadow);
+    }
+
+    .core {
+      position: relative;
+      z-index: 2;
+      width: min(78%, 330px);
+      padding: 28px;
+      border: 1px solid rgba(17, 17, 16, 0.08);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 18px 40px rgba(24, 22, 18, 0.08);
+    }
+
+    .core-title {
+      margin: 0 0 10px;
+      font-size: 24px;
+      line-height: 1.25;
+      font-weight: 780;
+    }
+
+    .core p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .node {
+      position: absolute;
+      z-index: 3;
+      width: 178px;
+      padding: 15px;
+      border: 1px solid rgba(17, 17, 16, 0.08);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 12px 28px rgba(24, 22, 18, 0.08);
+    }
+
+    .node b {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 15px;
+    }
+
+    .node span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .node:nth-child(3) { top: 0; left: 8%; border-top: 4px solid var(--gold); }
+    .node:nth-child(4) { top: 54px; right: 0; border-top: 4px solid var(--green); }
+    .node:nth-child(5) { bottom: 54px; right: 4%; border-top: 4px solid var(--blue); }
+    .node:nth-child(6) { bottom: 0; left: 0; border-top: 4px solid var(--purple); }
+
+    section {
+      padding: 76px clamp(20px, 5vw, 72px);
+      border-top: 1px solid rgba(17, 17, 16, 0.06);
+    }
+
+    .section-inner {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(280px, 0.58fr);
+      gap: 36px;
+      align-items: end;
+      margin-bottom: 32px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.14;
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .story {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .story-item,
+    .module,
+    .principle,
+    .closing-panel {
+      border: 1px solid rgba(17, 17, 16, 0.08);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 12px 28px rgba(24, 22, 18, 0.05);
+    }
+
+    .story-item { padding: 22px; }
+    .story-item .num {
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 780;
+    }
+
+    .story-item h3,
+    .module h3,
+    .principle h3 {
+      margin: 10px 0 8px;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+
+    .story-item p,
+    .module p,
+    .principle p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .modules {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .module {
+      min-height: 286px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .module::after {
+      content: attr(data-mark);
+      position: absolute;
+      right: 18px;
+      bottom: -10px;
+      color: rgba(17, 17, 16, 0.045);
+      font-size: 92px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .module-label {
+      display: inline-flex;
+      width: fit-content;
+      min-height: 28px;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .module:nth-child(1) .module-label { color: var(--gold); background: var(--gold-soft); }
+    .module:nth-child(2) .module-label { color: var(--green); background: var(--green-soft); }
+    .module:nth-child(3) .module-label { color: var(--blue); background: var(--blue-soft); }
+    .module:nth-child(4) .module-label { color: var(--purple); background: var(--purple-soft); }
+
+    .module ul {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+      color: #3f3c37;
+    }
+
+    .module li {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .module li::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      margin-top: 10px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.55;
+      flex: none;
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .principle {
+      padding: 26px;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .principle.large {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(135deg, rgba(251, 245, 230, 0.92), rgba(237, 243, 248, 0.86)),
+        #fff;
+    }
+
+    .loop {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 26px;
+      overflow: hidden;
+      border: 1px solid rgba(17, 17, 16, 0.08);
+      border-radius: 8px;
+      background: rgba(17, 17, 16, 0.08);
+    }
+
+    .loop div {
+      min-height: 96px;
+      padding: 18px 14px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .loop b {
+      display: block;
+      color: var(--ink);
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .closing {
+      padding-bottom: 96px;
+    }
+
+    .closing-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.46fr);
+      gap: 28px;
+      align-items: center;
+      padding: clamp(28px, 5vw, 54px);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.74)),
+        linear-gradient(135deg, rgba(168, 126, 44, 0.12), rgba(168, 98, 108, 0.08));
+    }
+
+    .closing-panel h2 { max-width: 740px; }
+    .closing-panel p {
+      margin: 18px 0 0;
+      max-width: 760px;
+      color: #45423c;
+      font-size: 17px;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-content: center;
+    }
+
+    .tag-cloud span {
+      display: inline-flex;
+      min-height: 34px;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid rgba(17, 17, 16, 0.08);
+      color: var(--muted);
+      font-weight: 650;
+      box-shadow: 0 8px 18px rgba(24, 22, 18, 0.04);
+    }
+
+    @media (max-width: 920px) {
+      .nav { display: none; }
+      .hero,
+      .section-head,
+      .principles,
+      .closing-panel {
+        grid-template-columns: 1fr;
+      }
+      .hero { padding-top: 46px; }
+      .system-map { min-height: 470px; }
+      .story,
+      .modules,
+      .loop {
+        grid-template-columns: 1fr;
+      }
+      .module { min-height: auto; }
+    }
+
+    @media (max-width: 620px) {
+      .topbar { padding-inline: 16px; }
+      .brand-copy { max-width: 240px; }
+      .brand-title,
+      .brand small,
+      .ai-note { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .button { width: 100%; }
+      .system-map {
+        min-height: auto;
+        display: block;
+      }
+      .orbit { display: none; }
+      .core {
+        width: 100%;
+        margin-bottom: 12px;
+      }
+      .node {
+        position: relative;
+        inset: auto !important;
+        width: 100%;
+        margin-top: 10px;
+      }
+      section { padding-block: 58px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="返回飞象老师校园版首页">
+        <span class="logo">飞</span>
+        <span class="brand-copy">
+          <span class="brand-title">飞象老师校园版</span>
+          <small>让学校的 AI 能力进入每位老师的日常工作</small>
+          <span class="ai-note">本页面内容由 AI 总结理解后生成，供大家参考</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="页面导航">
+        <a href="#why">为什么做</a>
+        <a href="#modules">四个模块</a>
+        <a href="#loop">数据飞轮</a>
+        <a href="teacher-login.html">老师登录</a>
+        <a href="index.html">进入演示</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <div class="eyebrow">Feixiang Teacher School Edition</div>
+          <h1 id="hero-title">把飞象老师带进学校，成为每位老师身边的 AI 工作台。</h1>
+          <p class="hero-copy">
+            过去一年，飞象老师在教师群体中形成了真实影响力。很多老师、学校和局端，也正是通过飞象老师认识了飞象。飞象不只是一款工具，而是一家长期深耕教育 AI 的教育科技与教育 Agent 公司。飞象老师校园版，是我们把过往的 AI 教育能力、学校资源沉淀、教师日常工作和学校数字资产连接起来的一次系统升级。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#modules">了解校园版能力</a>
+            <a class="button" href="teacher-login.html">老师登录</a>
+            <a class="button" href="index.html">查看产品原型</a>
+          </div>
+        </div>
+
+        <div class="system-map" aria-label="飞象老师校园版四个核心模块示意图">
+          <div class="orbit"></div>
+          <div class="core">
+            <h2 class="core-title">学校 AI 工作系统</h2>
+            <p>飞象老师校园版是学校 AI 操作系统：以对话为入口，以学校知识库为上下文，以官方应用和校本应用为执行载体，把老师和学校的工作持续沉淀下来。</p>
+          </div>
+          <div class="node"><b>AI 工作台</b><span>对话生成、资料搜索、内容创作的统一入口</span></div>
+          <div class="node"><b>学校知识库</b><span>把网盘、U 盘和资料库整理成可检索的 AI Wiki</span></div>
+          <div class="node"><b>应用广场</b><span>承载飞象已有能力，也支持老师创建校本小应用</span></div>
+          <div class="node"><b>资源广场</b><span>让优质 AI 内容在校内和更大教师网络中流动</span></div>
+        </div>
+      </section>
+
+      <section id="why">
+        <div class="section-inner">
+          <div class="section-head">
+            <h2>从个人版到校园版，不是多几个功能，而是换一个工作方式。</h2>
+            <p>老师过去已经在使用 AI 辅助备课、出题、生成教学动画和互动课件。校园版要解决的，是这些能力如何进入学校的组织场景，并让学校已有资源真正活起来。</p>
+          </div>
+          <div class="story">
+            <article class="story-item">
+              <div class="num">01</div>
+              <h3>老师已经认识 AI</h3>
+              <p>飞象老师个人版让老师先感受到 AI 对备课、出题、生成教学动画和互动课件的帮助，这是校园版的用户基础。</p>
+            </article>
+            <article class="story-item">
+              <div class="num">02</div>
+              <h3>学校沉淀了大量资料</h3>
+              <p>课件、教案、题库、公开课、教研成果散落在网盘、群文件和个人设备中，检索和复用成本很高。</p>
+            </article>
+            <article class="story-item">
+              <div class="num">03</div>
+              <h3>AI 需要学校上下文</h3>
+              <p>当 AI 能理解本地文件、平台生成内容、应用数据、学校资料和真实教学任务，它才会从通用助手变成学校自己的教育 Agent。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="modules">
+        <div class="section-inner">
+          <div class="section-head">
+            <h2>校园版由四个核心模块组成。</h2>
+            <p>四个模块分别对应老师的起点、学校的知识底座、可执行的 AI 能力，以及内容流转与再创作。</p>
+          </div>
+
+          <div class="modules">
+            <article class="module" data-mark="AI">
+              <div>
+                <span class="module-label">01 · 首页工作台</span>
+                <h3>老师打开校园版后的使用起点</h3>
+                <p>AI 工作台用对话承接老师的即时需求。老师可以直接生成教案、题目、教学动画和互动课件，也可以搜索学校资料、引用知识库内容，快速把一个想法推进成可用成果。</p>
+              </div>
+              <ul>
+                <li>用自然语言发起任务，不强迫老师先理解复杂菜单。</li>
+                <li>生成内容、搜索资料、创建应用都可以从同一个入口开始。</li>
+              </ul>
+            </article>
+
+            <article class="module" data-mark="KB">
+              <div>
+                <span class="module-label">02 · 学校知识库</span>
+                <h3>让沉睡的教学资料变成可复用的 AI Wiki</h3>
+                <p>学校和老师过去积累了大量教学资源，但它们常常沉淀在网盘、U 盘和群文件里。校园版希望借助 AI 自动整理、归类、摘要、关联和更新，把资料变成持续生长的校本知识库。</p>
+              </div>
+              <ul>
+                <li>资料不只是存进去，而是被理解成词条、主题、题目和可追溯来源。</li>
+                <li>老师每次使用、补充和修改，都会反过来丰富学校的知识结构。</li>
+              </ul>
+            </article>
+
+            <article class="module" data-mark="APP">
+              <div>
+                <span class="module-label">03 · 应用广场</span>
+                <h3>把飞象积累的 AI 能力变成老师随手可用的应用</h3>
+                <p>AI 组题、AI 录题、教学动画生成、互动课件生成等能力，都可以成为老师日常工作的应用。老师也可以基于飞象老师的生成能力，快速创建自己的校本小工具，解决长尾教学需求。</p>
+              </div>
+              <ul>
+                <li>官方应用解决高频教学任务，校本应用解决学校自己的流程和特色场景。</li>
+                <li>应用不是孤立工具，而是可以引用知识库、沉淀结果、反哺数据。</li>
+              </ul>
+            </article>
+
+            <article class="module" data-mark="RES">
+              <div>
+                <span class="module-label">04 · 资源广场</span>
+                <h3>让老师生产的 AI 内容被发现、复用和再加工</h3>
+                <p>老师可以看到本校老师生产的优质 AI 内容，也可以看到更大范围内 C 端老师生产的内容。资源可以直接使用，也可以二次加工，变成适合自己班级和学校场景的新内容。</p>
+              </div>
+              <ul>
+                <li>优秀资源从个人产物变成学校资产，减少重复劳动。</li>
+                <li>资源使用数据帮助 AI 理解老师真正需要什么。</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="loop">
+        <div class="section-inner">
+          <div class="section-head">
+            <h2>校园版的关键，是让数据和内容形成正循环。</h2>
+            <p>老师在平台生成的内容、在应用中产生的数据、上传或整理的本地文件、二次加工的资源，最终都会成为学校的数字资产，并提供给 AI 作为理解老师和学校的上下文。</p>
+          </div>
+
+          <div class="principles">
+            <article class="principle large">
+              <div>
+                <h3>不是“资料库 + 工具箱”，而是一套持续学习的学校 AI 系统。</h3>
+                <p>参考 LLM Wiki 的思路，校园版希望把学校知识整理成可读、可查、可引用、可追溯、可持续更新的结构。AI 不只回答问题，还帮助学校把散落的经验组织起来。</p>
+              </div>
+              <div class="loop" aria-label="数据飞轮">
+                <div><b>汇聚</b>本地文件、课件、教案、题库和教研资料进入知识库</div>
+                <div><b>理解</b>AI 自动整理主题、词条、来源、关系和可复用内容</div>
+                <div><b>使用</b>老师在工作台、应用和资源中调用并产生新数据</div>
+                <div><b>沉淀</b>内容、数据和反馈成为学校数字资产，继续反哺 AI</div>
+              </div>
+            </article>
+
+            <article class="principle">
+              <h3>校园版真正改变的是老师的日常工作密度。</h3>
+              <p>过去，老师需要先找资料、改格式、拼内容、反复调整。校园版希望让这些工作被 AI 串起来：资料自动被找到，内容基于学校上下文生成，优秀产物可以继续复用，新的需求也能被快速做成应用。</p>
+              <p style="margin-top: 16px;">当老师每一次工作都能留下结构化沉淀，平台中的内容、应用数据和本地文件就会逐步形成学校自己的数字资产。AI 也会越来越懂这所学校、这个学科、这个年级和这位老师。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="closing">
+        <div class="section-inner">
+          <div class="closing-panel">
+            <div>
+              <h2>飞象老师校园版，是学校进入 AI 时代的教师工作入口。</h2>
+              <p>它从老师已经熟悉的飞象老师出发，把对话生成、知识库、应用、资源和学校数字资产连接成一个完整系统。目标不是让老师多学一个平台，而是让老师原本每天都要做的工作，更快、更准、更可沉淀，并持续为 AI 提供更懂学校的上下文。</p>
+            </div>
+            <div class="tag-cloud" aria-label="校园版关键词">
+              <span>AI 工作台</span>
+              <span>学校知识库</span>
+              <span>LLM Wiki</span>
+              <span>应用广场</span>
+              <span>资源广场</span>
+              <span>校本沉淀</span>
+              <span>数字资产</span>
+              <span>教师 Agent</span>
+              <span>数据飞轮</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

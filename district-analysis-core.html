@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飞象教育分析引擎 · 核心分析链</title>
+  <style>
+    :root {
+      --paper: #f7f7f4;
+      --surface: #ffffff;
+      --ink: #17202b;
+      --muted: #657080;
+      --line: #dfe4e8;
+      --blue: #155f94;
+      --blue-soft: #edf6fb;
+      --gold: #9a7123;
+      --gold-soft: #faf4e6;
+      --green: #26724f;
+      --green-soft: #edf7f2;
+      --amber: #a35d19;
+      --amber-soft: #fff5e9;
+      --red: #9a4242;
+      --red-soft: #fff0f0;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font: 14px/1.65 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    .page { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 34px 0 64px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; color: white; border-radius: 10px; background: var(--gold); font-weight: 800; }
+    .brand strong { display: block; font-size: 16px; }
+    .brand span { color: var(--muted); font-size: 11px; }
+    .top-note { color: var(--green); font-size: 12px; }
+
+    .hero { display: block; padding: 44px 0 28px; }
+    .eyebrow { color: var(--gold); font-size: 11px; font-weight: 750; letter-spacing: .12em; }
+    h1 { max-width: 1060px; margin: 12px 0 14px; font-size: clamp(34px, 4vw, 52px); line-height: 1.12; letter-spacing: -.045em; }
+    .hero-copy > p { max-width: 800px; margin: 0; color: var(--muted); font-size: 17px; }
+    .hero-statement { max-width: 900px; margin-top: 24px; padding: 17px 20px; border-left: 4px solid var(--gold); background: var(--gold-soft); }
+    .hero-statement span { color: var(--gold); font-size: 10px; font-weight: 750; letter-spacing: .1em; }
+    .hero-statement strong { display: block; margin-top: 5px; font-size: 16px; line-height: 1.55; }
+
+    .query-card { display: grid; grid-template-columns: 94px minmax(0,1fr) auto; align-items: center; gap: 18px; padding: 19px 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 14px 40px rgba(26,39,53,.05); }
+    .query-card > span { color: var(--blue); font-weight: 750; }
+    .query-card blockquote { margin: 0; font-size: 17px; font-weight: 650; }
+    .query-card small { color: var(--muted); }
+
+    .section { margin-top: 34px; }
+    .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 15px; }
+    .section-head h2 { margin: 0; font-size: 24px; letter-spacing: -.025em; }
+    .section-head p { max-width: 650px; margin: 0; color: var(--muted); text-align: right; }
+
+    .chain { display: grid; gap: 8px; counter-reset: step; }
+    .step { position: relative; display: grid; grid-template-columns: 160px minmax(0, 1.15fr) minmax(300px, 1fr); grid-template-rows: auto auto; align-items: start; column-gap: 24px; min-height: 0; padding: 18px 22px; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); counter-increment: step; }
+    .step::before { content: "0" counter(step); position: absolute; top: 15px; left: 104px; color: #e6eaed; font-size: 26px; font-weight: 800; line-height: 1; }
+    .step-phase { grid-column: 1; grid-row: 1; color: var(--blue); font-size: 9px; font-weight: 750; letter-spacing: .08em; }
+    .step h3 { grid-column: 1; grid-row: 2; margin: 5px 0 0; font-size: 16px; }
+    .step > p { grid-column: 2; grid-row: 1 / span 2; margin: 0; color: var(--muted); font-size: 12px; }
+    .step-output { grid-column: 3; grid-row: 1 / span 2; margin: 0; padding: 10px 12px; border-left: 3px solid var(--blue); background: var(--blue-soft); }
+    .step-output span { color: var(--blue); font-size: 9px; font-weight: 750; letter-spacing: .08em; }
+    .step-output strong { display: block; margin-top: 4px; font-size: 12px; line-height: 1.55; }
+    .step:nth-child(2) .step-output,
+    .step:nth-child(3) .step-output { border-color: var(--gold); background: var(--gold-soft); }
+    .step:nth-child(2) .step-output span,
+    .step:nth-child(3) .step-output span { color: var(--gold); }
+    .step:nth-child(4) .step-output { border-color: var(--green); background: var(--green-soft); }
+    .step:nth-child(4) .step-output span { color: var(--green); }
+    .step:nth-child(6) .step-output { border-color: var(--amber); background: var(--amber-soft); }
+    .step:nth-child(6) .step-output span { color: var(--amber); }
+
+    .contract { display: grid; grid-template-columns: 1.05fr 1.25fr 1.25fr 1fr; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); overflow: hidden; }
+    .contract > div { min-height: 132px; padding: 17px; border-right: 1px solid var(--line); }
+    .contract > div:last-child { border-right: 0; }
+    .contract span { color: var(--muted); font-size: 10px; }
+    .contract strong { display: block; margin-top: 8px; font-size: 14px; }
+    .contract p { margin: 7px 0 0; color: var(--muted); font-size: 11px; }
+    .contract .counter { background: var(--amber-soft); }
+
+    .routes { display: grid; gap: 9px; }
+    .route { display: grid; grid-template-columns: 230px minmax(0,1fr) 170px; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); }
+    .route strong { font-size: 13px; }
+    .route-flow { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+    .route-flow span { flex: 0 0 auto; padding: 4px 7px; color: #44505e; border: 1px solid var(--line); border-radius: 5px; background: #f8fafb; font-size: 10px; }
+    .route-flow i { color: #a4adb7; font-style: normal; }
+    .route > span:last-child { color: var(--muted); font-size: 11px; text-align: right; }
+
+    .claim-ledger { display: grid; grid-template-columns: .8fr 1.2fr 1.2fr .7fr 1fr; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); overflow: hidden; }
+    .claim-ledger > div { padding: 16px; border-right: 1px solid var(--line); }
+    .claim-ledger > div:last-child { border-right: 0; }
+    .claim-ledger span { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .06em; }
+    .claim-ledger strong { display: block; margin-top: 7px; font-size: 12px; line-height: 1.55; }
+    .grade { color: var(--green); font-size: 20px !important; }
+    .boundary { background: var(--red-soft); }
+    .boundary strong { color: var(--red); }
+
+    .principles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .principles div { padding: 15px; border: 1px solid var(--line); border-radius: 10px; background: #fbfcfc; }
+    .principles strong { display: block; font-size: 12px; }
+    .principles span { color: var(--muted); font-size: 11px; }
+
+    .sources { margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    .sources a { margin-right: 18px; color: var(--blue); text-decoration: none; }
+
+    @media (max-width: 1050px) {
+      .step { grid-template-columns: 140px minmax(0, 1fr); }
+      .step > p { grid-column: 2; }
+      .step-output { grid-column: 1 / -1; grid-row: 3; margin-top: 12px; }
+      .route { grid-template-columns: 1fr; }
+      .route > span:last-child { text-align: left; }
+      .route-flow { flex-wrap: wrap; }
+    }
+    @media (max-width: 720px) {
+      .page { width: min(100% - 28px, 1440px); }
+      .top-note { display: none; }
+      .query-card { grid-template-columns: 1fr; }
+      .step { display: block; }
+      .step::before { right: 16px; left: auto; }
+      .step > p { margin-top: 8px; }
+      .step-output { margin-top: 12px; }
+      .principles { grid-template-columns: 1fr; }
+      .contract, .claim-ledger { grid-template-columns: 1fr; }
+      .contract > div, .claim-ledger > div { border-right: 0; border-bottom: 1px solid var(--line); }
+      .section-head { display: block; }
+      .section-head p { margin-top: 5px; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">FX</div><div><strong>飞象教育分析引擎</strong><span>核心分析链校准稿</span></div></div>
+      <div class="top-note">这不是固定报表，而是动态生成的研究过程</div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">UNIVERSAL EDUCATION ANALYSIS</div>
+        <h1>把任意教育问题，编译成一项可执行、可验证、可追溯的研究</h1>
+        <p>平台的核心不是“把多个系统的数据汇总起来”，而是根据问题即时生成研究计划，明确什么数据能够支持什么结论，并主动处理反证、不确定性和使用边界。</p>
+      </div>
+      <aside class="hero-statement">
+        <span>给领导的一句话</span>
+        <strong>AI 不直接回答问题。它先像教育研究专家一样，设计一套能够回答这个问题的证据路径。</strong>
+      </aside>
+    </section>
+
+    <section class="query-card">
+      <span>示例问题</span>
+      <blockquote>“全面分析林知遥本学期的发展情况，并给出学校支持建议。”</blockquote>
+      <small>同一内核也可处理班级、学校、区域及专题问题</small>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>一、通用核心分析链</h2>
+        <p>八个环节是稳定内核；具体分析方法、数据源和分支数量根据问题动态生成。</p>
+      </div>
+      <div class="chain">
+        <article class="step">
+          <span class="step-phase">QUESTION</span><h3>问题编译</h3>
+          <p>识别对象、范围、时间、比较基准、决策用途、约束条件和禁止用途；含糊问题先补齐口径。</p>
+          <div class="step-output"><span>可见产物</span><strong>研究任务书：学生个体｜本学期｜学校支持｜不进入升学评价</strong></div>
+        </article>
+        <article class="step">
+          <span class="step-phase">DESIGN</span><h3>研究设计</h3>
+          <p>拆解可回答的子问题，调用政策、课程标准和专业理论，定义概念、指标与比较方法。</p>
+          <div class="step-output"><span>可见产物</span><strong>研究问题树 + 理论依据 + 指标口径 + 不可推断事项</strong></div>
+        </article>
+        <article class="step">
+          <span class="step-phase">EVIDENCE</span><h3>证据规划</h3>
+          <p>先规定每项结论需要什么可观察表现、数据粒度、最低时间跨度和来源独立性，再寻找数据。</p>
+          <div class="step-output"><span>可见产物</span><strong>主张—证据—数据表：结论成立前必须满足的证据条件</strong></div>
+        </article>
+        <article class="step">
+          <span class="step-phase">DATA</span><h3>数据质量闸门</h3>
+          <p>校验身份、粒度、完整度、重复、缺失、时间重叠、跨系统连接和授权范围，不静默修补。</p>
+          <div class="step-output"><span>可见产物</span><strong>3,612 条原始记录 → 3,428 条可分析 → 184 条降级或排除</strong></div>
+        </article>
+        <article class="step">
+          <span class="step-phase">ANALYSIS</span><h3>动态分析编排</h3>
+          <p>根据问题选择现状、趋势、比较、分层、诊断、关联或干预评估等分析算子，形成动态分析图。</p>
+          <div class="step-output"><span>可见产物</span><strong>全面扫描 → 发现关键变化 → 选择重点问题继续深挖</strong></div>
+        </article>
+        <article class="step">
+          <span class="step-phase">VALIDATION</span><h3>假设与反证</h3>
+          <p>诊断类问题同时保留多个解释，主动检查试题难度、缺勤、熟悉度、教师偏差等替代原因。</p>
+          <div class="step-output"><span>可见产物</span><strong>支持 1 项解释｜部分支持 1 项｜排除 2 项｜1 项仍待验证</strong></div>
+        </article>
+        <article class="step">
+          <span class="step-phase">CLAIM</span><h3>结论治理</h3>
+          <p>区分事实、比较、趋势、关联、解释和建议；标记证据等级、适用范围、不确定性与人工复核门槛。</p>
+          <div class="step-output"><span>可见产物</span><strong>2 项 A 级发现｜1 项 B 级解释｜2 个领域不形成判断</strong></div>
+        </article>
+        <article class="step">
+          <span class="step-phase">ACTION</span><h3>行动输出</h3>
+          <p>根据局长、校长、教研员、教师等不同角色，重组同一套已验证结论，生成建议与复核计划。</p>
+          <div class="step-output"><span>可见产物</span><strong>结论 + 依据 + 责任人 + 观察周期 + 验证指标 + 退出条件</strong></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>二、每项结论如何被证据约束</h2>
+        <p>AI 不能从“有数据”直接跳到“有结论”，中间必须存在明确的证据契约。</p>
+      </div>
+      <div class="contract">
+        <div><span>研究主张</span><strong>高阶任务表现持续改善，但没有稳定转化为常规成绩</strong></div>
+        <div><span>需要的可观察证据</span><strong>多个时间点的高阶任务表现、基础题稳定性、限时与非限时差异</strong><p>趋势至少 8 个有效时间点；跨域主张至少 2 个独立来源。</p></div>
+        <div><span>实际调用数据</span><strong>37 道陌生开放题、624 道基础题、6 次统测、83 条订正记录</strong><p>作业系统、统测平台、作文版本和出勤记录完成时间对齐。</p></div>
+        <div class="counter"><span>替代解释与反证</span><strong>试题难度变化：排除<br />缺勤影响：排除<br />作答节奏：部分成立</strong></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>三、同一内核如何处理不同问题</h2>
+        <p>通用不等于每次都走完整流程；系统根据研究意图选择最小但足够严谨的路径。</p>
+      </div>
+      <div class="routes">
+        <div class="route"><strong>“本学期体育达标率是多少？”</strong><div class="route-flow"><span>问题编译</span><i>→</i><span>口径确认</span><i>→</i><span>数据校验</span><i>→</i><span>现状统计</span><i>→</i><span>结论</span></div><span>事实查询 · 短路径</span></div>
+        <div class="route"><strong>“八年级数学为什么下降？”</strong><div class="route-flow"><span>趋势确认</span><i>→</i><span>结构分解</span><i>→</i><span>竞争假设</span><i>→</i><span>跨源验证</span><i>→</i><span>反证</span></div><span>问题诊断 · 完整路径</span></div>
+        <div class="route"><strong>“全面分析这个学生。”</strong><div class="route-flow"><span>覆盖检查</span><i>→</i><span>并行扫描</span><i>→</i><span>发现重点</span><i>→</i><span>专题深挖</span><i>→</i><span>汇总</span></div><span>综合研究 · 分支路径</span></div>
+        <div class="route"><strong>“新增体育活动是否有效？”</strong><div class="route-flow"><span>干预定义</span><i>→</i><span>可比性检查</span><i>→</i><span>前后与参照</span><i>→</i><span>替代解释</span><i>→</i><span>边界</span></div><span>效果评估 · 因果门槛</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>四、最终不是一个分数，而是一条可审计结论</h2>
+        <p>用户点击任意结论，都应能反查原始来源、计算方法、反证和使用边界。</p>
+      </div>
+      <div class="claim-ledger">
+        <div><span>结论类型</span><strong>研究解释<br />不是已验证因果</strong></div>
+        <div><span>当前结论</span><strong>表现分化主要与限时基础计算稳定性和作答节奏有关，不支持“普遍知识缺失”的解释。</strong></div>
+        <div><span>核心依据</span><strong>3 类独立来源｜18 周纵向数据｜4/5 项替代解释检查完成</strong></div>
+        <div><span>证据等级</span><strong class="grade">B</strong></div>
+        <div class="boundary"><span>适用边界</span><strong>用于制定支持计划；不得写成能力定级或升学评价。</strong></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>五、整套系统必须坚持的四条规则</h2></div>
+      <div class="principles">
+        <div><strong>先定义，再计算</strong><span>教育概念不能被数据库里的现成字段替代。</span></div>
+        <div><strong>先验证，再结论</strong><span>数据未通过质量闸门，不进入结论链。</span></div>
+        <div><strong>主动寻找反证</strong><span>系统不仅积累支持材料，也必须尝试推翻当前解释。</span></div>
+        <div><strong>证据不足就不判断</strong><span>拒绝用漂亮分数掩盖缺失数据和不确定性。</span></div>
+      </div>
+    </section>
+
+    <footer class="sources">
+      理论与政策锚点：
+      <a href="https://www.moe.gov.cn/srcsite/A06/s3321/202103/t20210317_520238.html" target="_blank" rel="noreferrer">《义务教育质量评价指南》</a>
+      <a href="https://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html" target="_blank" rel="noreferrer">《义务教育课程方案和课程标准（2022年版）》</a>
+      <a href="https://www.ets.org/research/policy_research_reports/publications/report/2003/hsgs.html" target="_blank" rel="noreferrer">ETS Evidence-Centered Design</a>
+      <a href="https://www.moe.gov.cn/srcsite/A16/s3342/202601/W020260107510856466340.pdf" target="_blank" rel="noreferrer">《教育数据分类分级指南》</a>
+    </footer>
+  </main>
+</body>
+</html>

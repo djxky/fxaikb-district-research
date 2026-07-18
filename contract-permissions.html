@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飞象老师校园版 · 商品与权限说明</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f7f8fa;
+      color: #1f2937;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    a { color: inherit; }
+    .page {
+      width: min(1080px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      color: #111827;
+      font-size: 24px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 34px;
+      padding: 0 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #fff;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    section {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #fff;
+    }
+    h2 {
+      margin: 0 0 12px;
+      color: #111827;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+    }
+    table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+    }
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: #f9fafb;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: 0; }
+    td:first-child {
+      color: #111827;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      color: #374151;
+    }
+    li + li { margin-top: 6px; }
+    .muted { color: #6b7280; }
+    @media (max-width: 640px) {
+      .page { width: min(100vw - 20px, 1080px); padding-top: 18px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      h1 { font-size: 21px; }
+      section { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <h1>商品与权限说明</h1>
+      <a class="back" href="index.html?review=1">回到首页过稿</a>
+    </div>
+
+    <section>
+      <h2>1. 商品与权限点</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>商品</th>
+              <th>权限点</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>飞象老师校园版</td>
+              <td>飞象老师校园版使用</td>
+              <td>包含 AI 录题、AI 校本题库读、我的知识库查看与上传、学校知识库查看。</td>
+            </tr>
+            <tr>
+              <td>飞象老师校园版</td>
+              <td>AI 校本题库管理</td>
+              <td>管理 AI 校本题库内容。</td>
+            </tr>
+            <tr>
+              <td>飞象老师校园版</td>
+              <td>学校知识库上传</td>
+              <td>上传和维护学校知识库内容。</td>
+            </tr>
+            <tr>
+              <td>飞象老师校园版</td>
+              <td>学校管理</td>
+              <td>管理学校、老师、角色和组织信息。</td>
+            </tr>
+            <tr>
+              <td>飞象作业</td>
+              <td class="muted">保持原权限点</td>
+              <td>独立商品，不并入飞象老师校园版。</td>
+            </tr>
+            <tr>
+              <td>飞象作文</td>
+              <td class="muted">保持原权限点</td>
+              <td>独立商品，不并入飞象老师校园版。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. 角色默认权限</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>角色</th>
+              <th>本次变化</th>
+              <th>默认权限</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>管理员</td>
+              <td>新增</td>
+              <td>飞象老师校园版使用、学校知识库上传、AI 校本题库管理、学校管理。</td>
+            </tr>
+            <tr>
+              <td>教务老师</td>
+              <td>新增</td>
+              <td>飞象老师校园版使用、学校管理。</td>
+            </tr>
+            <tr>
+              <td>学科老师</td>
+              <td>新增</td>
+              <td>飞象老师校园版使用。</td>
+            </tr>
+            <tr>
+              <td>作文批改老师</td>
+              <td>不变</td>
+              <td>保持原飞象作文相关权限。</td>
+            </tr>
+            <tr>
+              <td>双师授课老师</td>
+              <td>不变</td>
+              <td>保持原双师授课相关权限。</td>
+            </tr>
+            <tr>
+              <td>学习机管理员</td>
+              <td>不变</td>
+              <td>保持原学习机管理相关权限。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. 生效规则</h2>
+      <ul>
+        <li>商品决定可分配的权限点范围。</li>
+        <li>角色决定老师默认获得哪些权限点。</li>
+        <li>首页、教师管理和应用入口只展示最终生效后的权限结果。</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

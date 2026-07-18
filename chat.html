@@ -1,0 +1,5046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞象 AI · 对话</title>
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<style>
+  :root {
+    --bg: #faf9f6;
+    --side: #f4f3ef;
+    --surface: #ffffff;
+    --ink: #111110;
+    --muted: #6b6a65;
+    --faint: #a19f99;
+    --line: rgba(0, 0, 0, 0.06);
+    --line-strong: rgba(0, 0, 0, 0.12);
+    --gold: #a87e2c;
+    --gold-soft: #fbf5e6;
+    --green: #4a755b;
+    --green-soft: #eaf3ed;
+    --blue: #53759e;
+    --blue-soft: #edf3f8;
+    --purple: #81628f;
+    --purple-soft: #f4eff5;
+    --rose: #a8626c;
+    --rose-soft: #f8eff0;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+    background: var(--bg); color: var(--ink);
+    font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input, textarea { font: inherit; border: 0; background: none; outline: 0; color: inherit; }
+  button { cursor: pointer; transition: all 0.18s ease; }
+  a { color: inherit; text-decoration: none; }
+
+  .app {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) minmax(0, 1fr);
+    transition: grid-template-columns .26s cubic-bezier(.4,0,.2,1);
+  }
+  .app[data-sidebar="collapsed"] { grid-template-columns: 0 minmax(0,1fr) minmax(0,1fr); }
+  .app[data-canvas="closed"] { grid-template-columns: 240px minmax(0,1fr) 0; }
+  .app[data-sidebar="collapsed"][data-canvas="closed"] { grid-template-columns: 0 minmax(0,1fr) 0; }
+
+  /* ============= 左 sidebar（首页米白风格，可收起） ============= */
+  .sidebar {
+    background: var(--side);
+    border-right: 1px solid var(--line);
+    display: flex; flex-direction: column; padding: 20px 16px;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .app[data-sidebar="collapsed"] .sidebar { padding-left: 0; padding-right: 0; border-right: 0; }
+  
+  .workspace { display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px; padding: 6px; border-radius: 10px; cursor: pointer; transition: all 0.2s; margin-left: -6px; margin-right: -6px; position: relative; text-decoration: none; color: inherit; }
+  .workspace:hover { background: rgba(0,0,0,0.04); }
+  .workspace:hover .school-name { color: var(--gold); }
+  .ws-main { display: flex; align-items: center; gap: 10px; width: 100%; }
+  .school-logo { width: 34px; height: 34px; border-radius: 8px; background: var(--gold); color: #fff; display: grid; place-items: center; font-size: 15px; font-weight: 700; flex-shrink: 0; position: relative; }
+  .school-logo::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a87e2c'%3E%3Cpath d='M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z'/%3E%3C/svg%3E"); background-size: 10px; background-position: center; background-repeat: no-repeat; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+  .school-name { font-size: 14.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  .ws-footer { display: flex; align-items: center; padding-left: 44px; }
+  .power-by { font-size: 11px; font-weight: 600; color: var(--gold); display: inline-flex; align-items: center; gap: 4px; }
+
+  .nav-btn {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--radius-sm);
+    color: var(--ink); font-weight: 500; margin-bottom: 4px;
+    cursor: pointer;
+  }
+  .nav-btn:hover { background: rgba(0,0,0,0.04); }
+  .nav-btn.active { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.04); color: var(--gold); }
+  .nav-btn.primary { background: var(--ink); color: #fff; margin-bottom: 24px; }
+  .nav-btn.primary:hover { background: #000; }
+  .nav-title { font-size: 11px; color: var(--faint); font-weight: 600; padding: 12px 12px 6px; margin-top: 8px; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .nav-count { color: var(--faint); font-size: 12px; background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 6px; }
+  .nav-dot { width: 6px; height: 6px; background: #e65252; border-radius: 50%; }
+
+  .spacer { flex: 1; }
+  .user {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; margin-top: 16px;
+    border-top: 1px solid var(--line);
+    background: transparent; border-left: 0; border-right: 0; border-bottom: 0;
+    cursor: pointer;
+    font-family: inherit;
+    width: calc(100% + 24px); margin-left: -12px;
+    transition: background .15s;
+  }
+  .user:hover { background: rgba(0,0,0,0.04); }
+  .user.open { background: rgba(0,0,0,0.04); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #e3dec9; display: grid; place-items: center; font-weight: 600; }
+  .user-name { font-size: 13px; font-weight: 600; }
+
+  /* ============= 中间对话区 ============= */
+  .center {
+    display: flex; flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    background: var(--bg);
+  }
+
+  /* 顶栏 */
+  .ctop {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(250, 249, 246, .85);
+    backdrop-filter: blur(6px);
+  }
+  .ctop-title {
+    flex: 1; min-width: 0;
+    font-size: 14px; font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ctop-meta {
+    color: var(--muted); font-size: 12px; font-weight: 400;
+    margin-left: 8px;
+  }
+  .ctop-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .app:not([data-result-kind="html"]) .ctop-actions { display: none; }
+  .ctop-btn {
+    height: 30px; padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    font-size: 12.5px; color: var(--ink);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .ctop-btn:hover { background: var(--side); }
+  .ctop-btn [data-icon] { width: 14px; height: 14px; }
+  .ctop-btn.primary {
+    background: var(--ink); color: #fff;
+    border-color: var(--ink);
+  }
+  .ctop-btn.primary:hover { background: #000; }
+  .ctop-btn.publish-only {
+    border-color: transparent;
+    background: transparent;
+    color: var(--ink);
+    padding: 0 8px;
+  }
+  .ctop-btn.publish-only:hover { background: rgba(0,0,0,0.05); }
+  .ctop-btn.icon-only { width: 32px; padding: 0; justify-content: center; }
+
+  /* 消息流 */
+  .messages {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 36px 28px 96px;
+  }
+  .msg-wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+
+  .msg-user {
+    align-self: flex-end;
+    max-width: 80%;
+    padding: 12px 18px;
+    background: var(--gold-soft);
+    color: var(--ink);
+    border-radius: 18px 18px 4px 18px;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  .msg-ai {
+    display: flex; gap: 12px;
+    align-items: flex-start;
+  }
+  .msg-ai-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--ink); color: #fff;
+    display: grid; place-items: center;
+    flex-shrink: 0; font-size: 12px; font-weight: 700;
+    margin-top: 2px;
+  }
+  .msg-ai-content {
+    flex: 1; min-width: 0;
+    padding-top: 4px;
+  }
+  .msg-ai-text {
+    font-size: 14.5px; line-height: 1.7; color: var(--ink);
+  }
+  .msg-ai-text b { font-weight: 700; }
+  .typing-cursor {
+    display: inline-block;
+    width: 6px; height: 14px;
+    margin-left: 2px;
+    background: var(--ink);
+    vertical-align: text-bottom;
+    animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* 引用 chip */
+  .msg-cites {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 12px;
+    align-items: center;
+  }
+  .msg-cites-label {
+    font-size: 11.5px; color: var(--muted); font-weight: 500;
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-right: 4px;
+  }
+  .msg-cite-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    font-size: 11.5px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .msg-cite-chip:hover { border-color: var(--gold); color: var(--gold); }
+  .msg-cite-chip b { color: var(--gold); font-weight: 700; font-size: 11px; margin-right: 1px; }
+  .cite-sup {
+    color: var(--gold);
+    font-size: 0.7em;
+    font-weight: 700;
+    margin: 0 1px;
+    cursor: pointer;
+  }
+  .cite-link {
+    cursor: pointer;
+    border-bottom: 1px dotted var(--gold);
+    transition: color .15s;
+  }
+  .cite-link:hover { color: var(--gold); }
+
+  /* 操作按钮（查看 Canvas / 调整难度等） */
+  .msg-actions {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 14px;
+  }
+  .msg-action {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 7px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 18px;
+    font-size: 12.5px; color: var(--ink);
+    font-weight: 500;
+  }
+  .msg-action:hover { background: var(--side); border-color: var(--ink); }
+  .msg-action.primary {
+    background: var(--ink); color: #fff;
+    border-color: var(--ink);
+  }
+  .msg-action.primary:hover { background: #000; }
+  .msg-action [data-icon] { width: 13px; height: 13px; }
+
+  .result-card {
+    margin-top: 14px;
+    width: min(100%, 620px);
+    min-height: 116px;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    background: var(--surface);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 172px;
+  }
+  .result-card-main {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .result-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--ink);
+  }
+  .result-card-title svg { width: 18px; height: 18px; color: var(--green); flex-shrink: 0; }
+  .result-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .result-card-chip {
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: var(--green-soft);
+    color: var(--green);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+  }
+  .result-card-visual {
+    min-height: 116px;
+    background: linear-gradient(135deg, #f4f8ef 0%, #d9efd0 100%);
+    border-left: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .result-card-visual::before {
+    content: "";
+    position: absolute;
+    left: 22px;
+    top: 28px;
+    width: 128px;
+    height: 76px;
+    border-radius: 8px 8px 0 0;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(74,117,91,.16);
+  }
+  .result-card-visual::after {
+    content: "";
+    position: absolute;
+    left: 42px;
+    top: 54px;
+    width: 88px;
+    height: 38px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, rgba(74,117,91,.18), rgba(168,216,143,.55));
+  }
+
+  .ai-search-panel {
+    margin-top: 14px;
+    width: min(100%, 660px);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,.78);
+    overflow: hidden;
+  }
+  .ai-search-head {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, #ffffff, #fbfaf7);
+  }
+  .ai-search-kicker {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+  .ai-search-kicker svg { width: 14px; height: 14px; }
+  .ai-search-summary {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .ai-result-list {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ai-result-item {
+    width: 100%;
+    text-align: left;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .ai-result-item:hover {
+    background: var(--surface);
+    border-color: var(--line);
+  }
+  .ai-result-item.is-video:hover { background: #fbfaf7; border-color: rgba(168,126,44,.18); }
+  .ai-result-item.is-image:hover { background: #f8fafc; border-color: rgba(83,117,158,.18); }
+  .ai-result-type-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    background: var(--side);
+    margin-top: 1px;
+  }
+  .ai-result-type-icon svg { width: 15px; height: 15px; }
+  .ai-result-type-icon.is-video { background: var(--gold-soft); color: var(--gold); }
+  .ai-result-type-icon.is-image { background: var(--blue-soft); color: var(--blue); }
+  .ai-result-title {
+    font-size: 13.5px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+  .ai-result-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 11.5px;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
+  .ai-result-source {
+    color: var(--green);
+    font-weight: 650;
+  }
+  .ai-result-snippet {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .ai-result-open {
+    align-self: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    background: var(--side);
+  }
+  .ai-result-item:hover .ai-result-open {
+    background: var(--green-soft);
+    color: var(--green);
+  }
+  .ai-search-foot {
+    padding: 9px 16px 12px;
+    font-size: 11.5px;
+    color: var(--faint);
+    border-top: 1px solid var(--line);
+  }
+
+  /* 反馈条 */
+  .msg-fb {
+    display: flex; align-items: center; gap: 4px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--line);
+  }
+  .msg-fb-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 28px; padding: 0 10px;
+    border-radius: 7px;
+    color: var(--muted); font-size: 12px;
+  }
+  .msg-fb-btn:hover { background: var(--side); color: var(--ink); }
+  .msg-fb-btn [data-icon] { width: 13px; height: 13px; }
+  .msg-fb-thumb {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: grid; place-items: center;
+    color: var(--muted);
+  }
+  .msg-fb-thumb:hover { background: var(--side); color: var(--ink); }
+  .msg-fb-thumb.active { background: var(--gold-soft); color: var(--gold); }
+  .msg-fb-thumb [data-icon] { width: 14px; height: 14px; }
+  .msg-fb-sep { width: 1px; height: 14px; background: var(--line-strong); margin: 0 4px; }
+
+  /* 底部 composer */
+  .composer-zone {
+    padding: 12px 28px 22px;
+    background: linear-gradient(to bottom, transparent, var(--bg) 24px);
+    position: relative;
+    z-index: 30;
+    overflow: visible;
+  }
+  .composer-wrap { max-width: 760px; margin: 0 auto; position: relative; z-index: 30; overflow: visible; }
+  .composer-pill {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 26px;
+    padding: 8px 8px 8px 12px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto;
+    grid-template-areas: "plus input actions";
+    align-items: center;
+    gap: 0 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.03);
+    transition: all 0.2s;
+    min-height: 52px;
+  }
+  .composer-pill.has-chips {
+    grid-template-areas: 
+      "input input input"
+      "plus chips actions";
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+    padding: 12px 10px 10px 14px;
+    row-gap: 8px;
+    border-radius: 20px;
+    align-items: end;
+  }
+  .composer-pill.ai-mode .input-wrap { align-items: flex-start; min-height: 48px; }
+  .composer-pill.ai-mode .input-wrap textarea {
+    min-height: 44px;
+    line-height: 22px;
+    font-size: 14px;
+  }
+  .composer-pill:focus-within { border-color: var(--gold); box-shadow: 0 8px 32px rgba(168,126,44,0.08); }
+  
+  #cc-plus-btn { grid-area: plus; }
+  .composer-pill.upload-required #cc-plus-btn { display: none; }
+  .input-wrap { grid-area: input; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 8px; width: 100%; min-height: 34px; }
+  .input-wrap textarea {
+    flex: 1; font-size: 15px; color: var(--ink); min-width: 0;
+    resize: none; line-height: 1.45; padding: 6px 0; max-height: 160px;
+    background: transparent; border: none; outline: none; font-family: inherit;
+    align-self: center;
+  }
+  .input-wrap textarea::placeholder { color: #b8b3ab; }
+  .chip-row {
+    grid-area: chips; display: none; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0;
+  }
+  .composer-pill.has-chips .chip-row { display: flex; }
+  .capability-upload-card {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    width: 96px;
+    height: 74px;
+    border: 1px dashed var(--line-strong);
+    border-radius: 12px;
+    background: rgba(255,255,255,.7);
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .capability-upload-card svg {
+    width: 18px;
+    height: 18px;
+    color: var(--green);
+  }
+  .capability-upload-card:hover {
+    border-color: rgba(69,132,99,.45);
+    background: var(--green-soft);
+    color: var(--ink);
+  }
+  .composer-pill.upload-required .capability-upload-card { display: inline-flex; }
+  .composer-actions { grid-area: actions; display: flex; align-items: center; gap: 6px; }
+
+  /* 已选 chip · 在输入框前面（GPT 风格）*/
+  .pill-mode {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 26px; padding: 0 4px 0 10px;
+    background: var(--gold); color: #fff;
+    border-radius: 13px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+    margin-left: 2px;
+    box-shadow: 0 1px 2px rgba(168,126,44,0.18);
+  }
+  .pill-mode svg.mode-ico { width: 12px; height: 12px; }
+  .pill-mode .mode-x {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: #fff; opacity: .8;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .pill-mode .mode-x:hover { opacity: 1; background: rgba(255,255,255,.18); }
+  .pill-mode .mode-x svg { width: 10px; height: 10px; }
+  
+  .pill-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .pill-icon:hover { background: var(--side); color: var(--ink); }
+  .pill-icon [data-icon] { width: 17px; height: 17px; }
+  .pill-send {
+    background: var(--ink); color: #fff;
+    width: 34px; height: 34px;
+  }
+  .pill-send:hover { background: #000; }
+  .pill-send.idle { background: var(--line-strong); cursor: not-allowed; color: #fff; }
+  .center[data-empty="1"] .pill-send.idle { background: var(--ink); cursor: pointer; }
+  .pill-send.idle:hover { background: var(--line-strong); }
+  .pill-send [data-icon] { width: 15px; height: 15px; }
+  .pill-plus { color: var(--ink); }
+  .pill-plus:hover { background: var(--side); }
+
+  .kb-attached-row {
+    display: contents;
+  }
+  .attachment-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    max-height: 168px;
+    overflow: hidden;
+  }
+  .attachment-row:empty {
+    display: none;
+  }
+  .attachment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: 172px;
+    height: 58px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: rgba(248,248,247,.92);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+    transition: background .15s, border-color .15s;
+  }
+  .attachment-chip:hover {
+    background: #fff;
+    border-color: var(--line);
+  }
+  .attachment-chip svg.ico {
+    width: 22px;
+    height: 22px;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+  .attachment-meta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .attachment-chip .attachment-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .attachment-size {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1;
+  }
+  .attachment-thumb {
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    background:
+      linear-gradient(135deg, rgba(79,140,163,.22), rgba(69,132,99,.22)),
+      linear-gradient(135deg, #f7efe2, #e9f2ee);
+    border: 1px solid rgba(0,0,0,.06);
+  }
+  .attachment-chip .chip-del {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: var(--muted);
+    background: rgba(255,255,255,.86);
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    flex-shrink: 0;
+  }
+  .attachment-chip:hover .chip-del { display: inline-flex; }
+  .attachment-chip .chip-del:hover { background: var(--side); color: var(--ink); }
+  .kb-attached-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 26px; padding: 0 6px 0 10px;
+    border: 1px solid #e8d9b6; border-radius: 6px;
+    background: #fff; color: var(--gold);
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all .15s;
+  }
+  .kb-attached-chip:hover { background: #fdf6e3; border-color: #dec591; }
+  .kb-attached-chip svg.ico { width: 12px; height: 12px; opacity: .85; }
+  .kb-attached-chip .chip-del {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 4px;
+    color: #cda85a; margin-left: 2px;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .kb-attached-chip:hover .chip-del { opacity: 1; }
+  .kb-attached-chip .chip-del:hover { background: rgba(168,126,44,0.15); color: var(--gold); }
+
+  .capability-upload-card.is-uploaded {
+    border-style: solid;
+    border-color: rgba(69,132,99,.28);
+    background: var(--green-soft);
+    color: var(--ink);
+    align-items: flex-start;
+    padding: 9px 10px;
+  }
+  .capability-upload-card.is-uploaded .uploaded-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+  }
+  .capability-upload-card.is-uploaded .uploaded-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+  }
+  .capability-upload-card.is-uploaded .uploaded-label {
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .capability-upload-card .upload-remove {
+    width: 17px;
+    height: 17px;
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .capability-upload-card .upload-remove:hover {
+    background: rgba(69,132,99,.12);
+    color: var(--ink);
+  }
+
+  /* + 弹出菜单 · 类 Claude 紧凑风格 */
+  .plus-pop {
+    position: fixed;
+    background: #fff;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 18px 48px rgba(0,0,0,0.10);
+    z-index: 99999;
+    width: 240px;
+  }
+  .plus-pop .plus-row {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%;
+    padding: 7px 10px; border-radius: 7px;
+    cursor: pointer; border: 0; background: transparent;
+    font-family: inherit; text-align: left;
+    font-size: 13px; color: var(--ink);
+  }
+  .plus-pop .plus-row:hover { background: var(--side); }
+  .plus-pop .plus-row svg.row-ico { width: 15px; height: 15px; color: var(--text-1); flex-shrink: 0; }
+  .plus-pop .plus-row .row-label { flex: 1; }
+  .plus-pop .plus-row .row-meta {
+    font-size: 11.5px; color: var(--muted); font-weight: 500;
+    margin-left: auto; display: flex; align-items: center; gap: 4px;
+  }
+  .plus-pop .plus-row .row-meta svg { width: 11px; height: 11px; }
+  .plus-pop .plus-row.is-active { color: var(--gold); }
+  .plus-pop .plus-row.is-active svg.row-ico { color: var(--gold); }
+  .plus-pop .plus-row.is-active .row-meta { color: var(--gold); font-weight: 600; }
+  .plus-pop .plus-row .row-chevron { width: 12px; height: 12px; color: var(--muted); flex-shrink: 0; }
+  .plus-pop .plus-divider { height: 1px; background: var(--line); margin: 4px 4px; }
+
+  /* 二级菜单 · 知识库多选 */
+  .kb-submenu {
+    position: fixed;
+    width: 280px;
+    background: #fff;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 18px 48px rgba(0,0,0,0.10);
+    z-index: 100000;
+    max-height: 380px;
+    overflow-y: auto;
+  }
+  .kb-submenu-title {
+    font-size: 11.5px; color: var(--muted); font-weight: 600;
+    padding: 6px 10px 4px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .kb-submenu-clear {
+    font-size: 11px; color: var(--muted);
+    cursor: pointer;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .kb-submenu-clear:hover { background: var(--side); color: var(--ink); }
+  .kb-submenu-group-label {
+    font-size: 10.5px; color: var(--muted); font-weight: 500;
+    padding: 6px 10px 2px;
+  }
+  .kb-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.15s;
+  }
+  .kb-item:hover { background: var(--side); }
+  .kb-item .kb-check {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 4px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .kb-item .kb-check svg { width: 11px; height: 11px; color: #fff; opacity: 0; }
+  .kb-item.is-checked .kb-check {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .kb-item.is-checked .kb-check svg { opacity: 1; }
+  .kb-item .kb-name { flex: 1; min-width: 0; color: var(--ink); }
+  .kb-item.is-checked .kb-name { color: var(--gold); font-weight: 600; }
+  .kb-item .kb-count {
+    font-size: 11px; color: var(--muted); font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  /* 已选 chip · 在输入框前面（GPT 风格）*/
+  .pill-mode {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 26px; padding: 0 4px 0 10px;
+    background: var(--gold); color: #fff;
+    border-radius: 13px; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+    margin-left: 2px;
+    box-shadow: 0 1px 2px rgba(168,126,44,0.18);
+  }
+  .pill-mode svg.mode-ico { width: 12px; height: 12px; }
+  .pill-mode .mode-x {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: #fff; opacity: .8;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .pill-mode .mode-x:hover { opacity: 1; background: rgba(255,255,255,.18); }
+  .pill-mode .mode-x svg { width: 10px; height: 10px; }
+
+  /* ============= 新对话空状态（empty）· GPT 风格居中 ============= */
+  /* 非空状态：empty hero / chips 隐藏（用 :not 提高特异性，覆盖 .intent-chips 的 display:flex） */
+  .center:not([data-empty="1"]) .empty-hero,
+  .center:not([data-empty="1"]) .empty-chips { display: none; }
+  .center:not([data-empty="1"]) .composer-pill,
+  .center:not([data-empty="1"]) .composer-pill.has-chips {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "input actions";
+    grid-template-rows: auto;
+    padding: 8px 8px 8px 18px;
+    border-radius: 26px;
+    align-items: center;
+    row-gap: 0;
+  }
+  .center:not([data-empty="1"]) #cc-plus-btn,
+  .center:not([data-empty="1"]) .chip-row {
+    display: none !important;
+  }
+
+  /* 空状态下：右侧 Canvas 不显示，整个 grid 退到两列；侧栏正常 */
+  .app[data-empty="1"] { grid-template-columns: 240px minmax(0,1fr) 0; }
+  .app[data-empty="1"][data-sidebar="collapsed"] { grid-template-columns: 0 minmax(0,1fr) 0; }
+  .app[data-empty="1"] .canvas { display: none; }
+
+  .center[data-empty="1"] .messages { display: none; }
+  .center[data-empty="1"] .composer-zone {
+    margin: auto 0;
+    padding-bottom: 22px;
+    background: transparent;
+  }
+  .center[data-empty="1"] .composer-wrap {
+    display: flex;
+    flex-direction: column;
+  }
+  .center[data-empty="1"] .empty-hero,
+  .center[data-empty="1"] .empty-chips { display: flex; }
+  .center[data-empty="1"] .ctop-title,
+  .center[data-empty="1"] .ctop-actions { display: none; }
+  .empty-hero {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .empty-hero .hero-title {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  .intent-chips {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    margin-top: 14px;
+    max-width: 760px;
+    transition: opacity .25s, transform .25s, height .25s, margin .25s;
+    position: relative;
+    z-index: 60;
+    overflow: visible;
+  }
+  .intent-chips.hidden-chips {
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+    margin-top: -10px;
+  }
+  .intent-chip {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 20px;
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    font-size: 13px; color: var(--muted); font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .intent-chip:hover {
+    background: var(--side);
+    color: var(--ink);
+    border-color: rgba(0,0,0,0.16);
+  }
+  .intent-chip.active {
+    background: #fff;
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 2px 8px rgba(168,126,44,0.10);
+    font-weight: 600;
+  }
+  .intent-chip .chip-beta {
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--green);
+    background: var(--green-soft);
+    border-radius: 999px;
+    padding: 2px 4px;
+    margin-left: -2px;
+    transform: translateY(-1px);
+  }
+  .capability-tip {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 10px);
+    transform: translate(-50%, -4px);
+    width: 230px;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.96);
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 18px 45px rgba(25,25,24,.14);
+    color: var(--ink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .16s ease, transform .16s ease;
+    z-index: 2000;
+    text-align: left;
+  }
+  .capability-tip::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    width: 10px;
+    height: 10px;
+    transform: translateX(-50%) rotate(45deg);
+    background: rgba(255,255,255,.96);
+    border-left: 1px solid var(--line-strong);
+    border-top: 1px solid var(--line-strong);
+  }
+  .intent-chip:hover .capability-tip {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .capability-tip-preview {
+    height: 84px;
+    border-radius: 9px;
+    background:
+      radial-gradient(circle at 75% 18%, rgba(255,255,255,.28), transparent 26%),
+      linear-gradient(135deg, rgba(25,72,88,.96), rgba(69,132,99,.88));
+    display: grid;
+    place-items: center;
+    color: rgba(255,255,255,.92);
+    margin-bottom: 9px;
+    overflow: hidden;
+  }
+  .capability-tip-preview svg {
+    width: 38px;
+    height: 38px;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,.22));
+  }
+  .capability-tip-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .capability-tip-badge {
+    font-size: 10px;
+    line-height: 1;
+    color: #fff;
+    background: #f36b3d;
+    border-radius: 999px;
+    padding: 3px 5px;
+  }
+  .capability-tip-desc {
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--muted);
+    white-space: normal;
+  }
+
+  /* ============= 右 Canvas ============= */
+  .canvas {
+    background: var(--side);
+    border-left: 1px solid var(--line);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .cv-top {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--side);
+  }
+  .cv-title {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .cv-title svg { width: 20px; height: 20px; color: var(--green); flex-shrink: 0; }
+  .cv-title span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cv-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .cv-tabs { display: flex; gap: 8px; margin-bottom: 12px; min-width: 0; }
+  .cv-tab {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: var(--muted);
+    font-weight: 500;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .cv-tab:hover { background: rgba(0,0,0,0.04); color: var(--ink); }
+  .cv-tab.active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    font-weight: 600;
+  }
+  .cv-tab [data-icon] { width: 13px; height: 13px; }
+  .cv-action {
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .cv-action span { white-space: nowrap; }
+  .cv-action:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
+  .cv-action.primary {
+    background: var(--green);
+    color: #fff;
+    padding: 0 14px;
+  }
+  .cv-action.primary:hover { background: #074535; color: #fff; }
+  .cv-action [data-icon] { width: 14px; height: 14px; }
+
+  .cv-save-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 28px; padding: 0 12px;
+    border-radius: 7px;
+    background: var(--ink); color: #fff;
+    font-size: 12.5px; font-weight: 600;
+    cursor: pointer; border: 0;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .cv-save-btn:hover { background: #000; }
+  .cv-save-btn.saved {
+    background: var(--green-soft);
+    color: var(--green);
+  }
+  .cv-save-btn.saved:hover { background: #dfece4; }
+  .cv-save-btn svg { width: 13px; height: 13px; }
+
+  /* 保存到知识库 · popover */
+  .save-pop {
+    position: fixed;
+    width: 520px;
+    background: #fff;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    box-shadow: 0 20px 56px rgba(0,0,0,0.14);
+    z-index: 99999;
+    overflow: hidden;
+  }
+  .save-pop-head {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .save-pop-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .save-pop-sub {
+    font-size: 11.5px; color: var(--muted);
+    margin-top: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .save-pop-sub-chip {
+    background: var(--gold-bg, #fbf5e6); color: var(--gold-deep, #a87e2c);
+    padding: 1px 7px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+  }
+  .save-pop-body { padding: 12px 14px 10px; }
+  .save-pop-field { margin-bottom: 12px; }
+  .save-pop-label {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .save-name-input,
+  .save-folder-search {
+    width: 100%;
+    height: 34px;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    padding: 0 10px;
+    background: #fff;
+    font-size: 12.5px;
+  }
+  .save-name-input:focus,
+  .save-folder-search:focus {
+    border-color: rgba(168,126,44,0.42);
+    box-shadow: 0 0 0 3px rgba(168,126,44,0.10);
+  }
+  .save-tree-panel {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fbfaf8;
+    overflow: hidden;
+  }
+  .save-tree-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    background: #fff;
+  }
+  .save-tree-head svg { width: 14px; height: 14px; color: var(--gold); }
+  .save-tree-title {
+    font-size: 12.5px;
+    font-weight: 650;
+    color: var(--ink);
+  }
+  .save-tree {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 6px;
+  }
+  .save-tree-empty {
+    padding: 28px 12px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .save-folder-row {
+    display: flex; align-items: center; gap: 10px;
+    min-height: 32px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 0; background: transparent;
+    width: 100%; text-align: left;
+    font-family: inherit;
+  }
+  .save-folder-row:hover { background: #fff; }
+  .save-folder-row.active { background: var(--gold-soft); }
+  .save-folder-toggle {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    color: var(--muted);
+  }
+  .save-folder-toggle:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
+  .save-folder-toggle svg { width: 12px; height: 12px; transition: transform 0.16s; }
+  .save-folder-toggle.expanded svg { transform: rotate(90deg); }
+  .save-folder-spacer { width: 18px; flex-shrink: 0; }
+  .save-folder-icon { width: 15px; height: 15px; flex-shrink: 0; color: var(--gold); }
+  .save-folder-body { flex: 1; min-width: 0; }
+  .save-folder-name {
+    font-size: 13px; color: var(--ink); line-height: 1.3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .save-folder-check {
+    width: 14px; height: 14px; opacity: 0;
+    color: var(--gold-deep, #a87e2c);
+    flex-shrink: 0;
+  }
+  .save-folder-row.active .save-folder-check { opacity: 1; }
+  .save-pop-foot {
+    border-top: 1px solid var(--line);
+    padding: 10px 12px;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .save-pop-new {
+    flex: 1; font-size: 12px; color: var(--muted);
+    cursor: pointer; padding: 4px 8px; border-radius: 6px;
+    display: flex; align-items: center; gap: 5px;
+    border: 0; background: transparent;
+  }
+  .save-pop-new:hover { color: var(--ink); background: var(--side); }
+  .save-pop-new svg { width: 12px; height: 12px; }
+  .save-pop-submit {
+    background: var(--ink); color: #fff;
+    padding: 6px 14px; border-radius: 7px;
+    font-size: 12.5px; font-weight: 600;
+    cursor: pointer; border: 0;
+    min-width: 108px;
+  }
+  .save-pop-submit:hover { background: #000; }
+  .save-pop-submit:disabled {
+    background: var(--line-strong); cursor: not-allowed;
+  }
+
+  .cv-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 20px;
+  }
+  .cv-pane { display: none; }
+  .cv-pane.active { display: block; }
+  .cv-empty {
+    height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    color: var(--muted);
+    gap: 10px;
+    min-height: 320px;
+  }
+  .cv-empty-icon {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--surface);
+    display: grid; place-items: center;
+    color: var(--faint);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+  .cv-empty-title { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .cv-empty-desc { font-size: 12.5px; max-width: 240px; line-height: 1.6; }
+
+  .doc-preview {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    min-height: calc(100vh - 116px);
+    padding: 44px 54px;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.04);
+  }
+  .doc-preview h2 {
+    text-align: center;
+    margin: 0 0 24px;
+    font-size: 20px;
+    line-height: 1.35;
+  }
+  .doc-section-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin: 18px 0 12px;
+  }
+  .doc-question {
+    margin: 12px 0 18px;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .doc-source {
+    display: inline-block;
+    background: #fff3d9;
+    color: #9a681c;
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 12px;
+    font-weight: 650;
+    margin-bottom: 6px;
+  }
+  .doc-options {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 6px;
+  }
+  .doc-answer-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: #fbfaf8;
+    margin-bottom: 12px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .html-preview-shell {
+    display: grid;
+    grid-template-columns: 132px 1fr;
+    gap: 20px;
+    height: calc(100vh - 108px);
+    min-height: 560px;
+  }
+  .html-thumbs {
+    overflow-y: auto;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .html-thumb {
+    aspect-ratio: 16 / 10;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 9px;
+    position: relative;
+    cursor: pointer;
+  }
+  .html-thumb.active { border-color: var(--green); box-shadow: 0 0 0 2px rgba(74,117,91,.16); }
+  .html-thumb-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #0f5f93;
+    line-height: 1.25;
+  }
+  .html-thumb-line {
+    height: 5px;
+    background: #d9eef8;
+    border-radius: 999px;
+    margin-top: 7px;
+  }
+  .html-thumb-badge {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background: rgba(17,17,16,.58);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .html-stage {
+    background: #f7faf8;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px;
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .html-slide {
+    width: min(100%, 860px);
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    background: linear-gradient(150deg, #bfeeff, #e8f7ff 58%, #d8f1ff);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 44px rgba(83,117,158,.16);
+    padding: 64px 72px;
+  }
+  .html-slide h2 {
+    margin: 0;
+    text-align: center;
+    font-size: 38px;
+    color: #0f6598;
+    letter-spacing: 0;
+  }
+  .html-slide-sub {
+    margin: 26px auto 0;
+    width: fit-content;
+    padding: 10px 28px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.72);
+    color: #1673ae;
+    font-weight: 650;
+  }
+  .cube-row {
+    display: flex;
+    justify-content: center;
+    gap: 116px;
+    margin-top: 78px;
+  }
+  .cube-card {
+    width: 96px;
+    height: 72px;
+    border: 2px solid rgba(255,255,255,.82);
+    background: rgba(72,181,229,.35);
+    transform: skewY(-10deg);
+    box-shadow: 28px -18px 0 rgba(72,181,229,.22);
+  }
+  .cube-card.rose {
+    background: rgba(231,123,142,.35);
+    box-shadow: 28px -18px 0 rgba(231,123,142,.22);
+  }
+  .play-demo {
+    position: absolute;
+    right: 28px;
+    bottom: 26px;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 10px;
+    background: #cdebcf;
+    color: #0f5132;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .app-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    height: calc(100vh - 108px);
+    min-height: 560px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .app-preview-toolbar {
+    height: 64px;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .app-mode-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .app-mode-tab {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 650;
+  }
+  .app-mode-tab.active {
+    background: #edf2ed;
+    color: var(--ink);
+  }
+  .app-mode-tab svg { width: 15px; height: 15px; }
+  .app-file-name {
+    min-width: 0;
+    color: var(--muted);
+    font-size: 12.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .app-preview .html-stage {
+    flex: 1;
+    min-height: 0;
+    border: 0;
+    border-radius: 0;
+    background: #f5f0e7;
+  }
+  .snake-app-card {
+    width: min(520px, 92%);
+    border: 1px solid #d9cdb7;
+    border-radius: 13px;
+    background: #fffaf1;
+    box-shadow: 0 18px 40px rgba(86, 68, 42, .12);
+    padding: 22px 22px 18px;
+    color: #2f2c26;
+  }
+  .snake-app-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .snake-kicker {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #9a8a70;
+    font-weight: 800;
+  }
+  .snake-app-title {
+    margin-top: 4px;
+    font-size: 28px;
+    line-height: 1;
+    font-weight: 800;
+  }
+  .snake-score {
+    text-align: right;
+    color: #8d806a;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .snake-score b {
+    display: block;
+    color: #2f2c26;
+    font-size: 24px;
+    line-height: 1.05;
+  }
+  .snake-status {
+    margin: 20px 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    font-size: 13px;
+    font-weight: 650;
+  }
+  .snake-mini-btn {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 8px;
+    background: #e7dcc6;
+    border: 1px solid #d2c3a9;
+    color: #5c503d;
+    font-weight: 700;
+  }
+  .snake-grid {
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid #ddd0b7;
+    border-radius: 10px;
+    background: #e9dcc4;
+  }
+  .snake-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    background: #fbf6e9;
+  }
+  .snake-cell.snake { background: #2f7d32; }
+  .snake-cell.word { background: #d64e34; }
+  .snake-controls {
+    margin-top: 18px;
+    display: grid;
+    justify-content: center;
+    gap: 6px;
+    grid-template-columns: repeat(3, 58px);
+  }
+  .snake-controls .up { grid-column: 2; }
+  .snake-controls button {
+    height: 34px;
+    border-radius: 8px;
+    background: #eadfca;
+    border: 1px solid #d4c4a8;
+    color: #564b39;
+    font-weight: 700;
+  }
+  .snake-footnote {
+    margin-top: 18px;
+    color: #8f8067;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  /* ---- Canvas: 课件预览 ---- */
+  .slides-stage {
+    background: linear-gradient(135deg, #edf5ee, #d8eadb);
+    border-radius: 12px;
+    padding: 32px 20px;
+    text-align: center;
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+  }
+  .slides-stage-title {
+    font-size: 24px; font-weight: 700;
+    color: #2a4f37; margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+  .slides-stage-sub {
+    font-size: 12.5px; color: #5a7a64;
+    margin-bottom: 16px;
+  }
+  .slides-stage-deco {
+    display: flex; gap: 16px; justify-content: center;
+    margin-top: 12px;
+  }
+  .slides-stage-deco .leaf {
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,.7);
+    border-radius: 50% 0 50% 50%;
+    transform: rotate(45deg);
+  }
+  .slides-thumbs {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .thumb {
+    aspect-ratio: 16 / 10;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 9px;
+    color: var(--muted);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+  }
+  .thumb:hover { border-color: var(--gold); }
+  .thumb-num {
+    position: absolute; top: 4px; right: 5px;
+    font-size: 8.5px; color: var(--faint);
+  }
+  .thumb-title {
+    font-size: 9.5px; color: var(--ink); font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 3px;
+    padding-right: 14px;
+  }
+  .thumb-body {
+    height: 4px; background: var(--line); border-radius: 2px;
+    margin-bottom: 3px;
+  }
+  .thumb-body.short { width: 60%; }
+  .thumb-body.mid { width: 80%; }
+
+  /* ---- Canvas: 题目集 ---- */
+  .quiz-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .quiz-tab {
+    padding: 5px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .quiz-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .quiz-tab .num { color: var(--faint); margin-left: 3px; }
+  .quiz-tab.active .num { color: rgba(255,255,255,0.6); }
+
+  .quiz-item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .quiz-item-head {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .quiz-num {
+    background: var(--gold-soft); color: var(--gold);
+    padding: 1px 7px; border-radius: 4px;
+    font-size: 11px; font-weight: 700;
+  }
+  .quiz-level {
+    background: var(--green-soft); color: var(--green);
+    padding: 1px 7px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+  }
+  .quiz-level.b { background: var(--blue-soft); color: var(--blue); }
+  .quiz-level.c { background: var(--rose-soft); color: var(--rose); }
+  .quiz-kind {
+    margin-left: auto;
+    font-size: 11px; color: var(--faint);
+  }
+  .quiz-question {
+    font-size: 13px; color: var(--ink); line-height: 1.6;
+  }
+  .quiz-question b { color: var(--gold); }
+
+  /* ---- Canvas: 学情联动 ---- */
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .insight-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+  .insight-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0;
+    font-size: 12px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .insight-row:last-child { border-bottom: 0; }
+  .insight-label { color: var(--muted); }
+  .insight-val { color: var(--ink); font-weight: 600; }
+  .insight-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--line);
+    border-radius: 3px;
+    margin: 0 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .insight-bar-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: var(--green);
+    border-radius: 3px;
+  }
+  .insight-bar-fill.warn { background: var(--gold); }
+  .insight-bar-fill.bad { background: var(--rose); }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    left: 50%; bottom: 24px;
+    transform: translateX(-50%);
+    background: rgba(17, 17, 16, 0.92);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 22px;
+    font-size: 12.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+    z-index: 9999;
+    backdrop-filter: blur(6px);
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* 发布作品弹窗 */
+  .publish-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(32, 37, 34, .44);
+    backdrop-filter: blur(1px);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+  .publish-mask[hidden] { display: none; }
+  .publish-dialog {
+    width: min(560px, 92vw);
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 22px 70px rgba(0,0,0,.2);
+    padding: 26px 28px 24px;
+  }
+  .publish-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .publish-title {
+    font-size: 21px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .publish-close {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+  }
+  .publish-close:hover { background: var(--side); color: var(--ink); }
+  .publish-field { margin-bottom: 16px; }
+  .publish-label {
+    font-size: 13px;
+    font-weight: 750;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .publish-label .required { color: #ef4444; }
+  .publish-textarea {
+    width: 100%;
+    min-height: 82px;
+    resize: none;
+    border: 1px solid #d5ddd4;
+    border-radius: 9px;
+    padding: 14px 16px 24px;
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--ink);
+    background: #fbfcfb;
+  }
+  .publish-count {
+    margin-top: -25px;
+    padding-right: 12px;
+    text-align: right;
+    font-size: 11px;
+    color: var(--faint);
+    pointer-events: none;
+  }
+  .publish-complete-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 2px 0 8px;
+    font-size: 13px;
+    font-weight: 750;
+    color: var(--ink);
+  }
+  .publish-out-range {
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+  .publish-select {
+    height: 48px;
+    border: 1px solid #d5ddd4;
+    border-radius: 9px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #fff;
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 650;
+  }
+  .publish-select span:first-child {
+    min-width: 64px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .publish-select b { flex: 1; min-width: 0; }
+  .publish-select svg { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
+  .publish-note {
+    margin: 8px 0 10px;
+    text-align: center;
+    color: #ef4444;
+    font-size: 16px;
+    font-weight: 650;
+  }
+  .publish-submit {
+    width: 100%;
+    height: 50px;
+    border-radius: 8px;
+    background: var(--green);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+  }
+  .publish-submit:hover { background: #074535; }
+
+  /* 应用部署弹窗 */
+  .deploy-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(32, 37, 34, .34);
+    backdrop-filter: blur(1px);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+  .deploy-mask[hidden] { display: none; }
+  .deploy-dialog {
+    width: min(560px, 92vw);
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 22px 70px rgba(0,0,0,.18);
+    padding: 26px 28px 24px;
+  }
+  .deploy-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .deploy-title-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .deploy-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .deploy-status {
+    height: 24px;
+    padding: 0 9px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--green-soft);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 750;
+  }
+  .deploy-status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .deploy-close {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+  }
+  .deploy-close:hover { background: var(--side); color: var(--ink); }
+  .deploy-field { margin-bottom: 16px; }
+  .deploy-label {
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 750;
+    color: var(--ink);
+  }
+  .deploy-input,
+  .deploy-select,
+  .deploy-url {
+    min-height: 54px;
+    border: 1px solid #e3e1dc;
+    border-radius: 12px;
+    background: #fff;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 650;
+  }
+  .deploy-url {
+    background: #f7f8f5;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .deploy-url span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .deploy-url svg,
+  .deploy-select svg {
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .deploy-visibility {
+    position: relative;
+  }
+  .deploy-visibility-trigger {
+    width: 100%;
+    min-height: 54px;
+    border: 1px solid #e3e1dc;
+    border-radius: 12px;
+    padding: 0 14px 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    cursor: pointer;
+    background: #fff;
+    text-align: left;
+  }
+  .deploy-visibility.open .deploy-visibility-trigger {
+    border-color: var(--green);
+    box-shadow: 0 0 0 2px rgba(0, 99, 75, .08);
+  }
+  .deploy-visibility-trigger > svg {
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: transform .16s ease;
+  }
+  .deploy-visibility.open .deploy-visibility-trigger > svg {
+    transform: rotate(180deg);
+  }
+  .deploy-visibility-current {
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .deploy-visibility-menu {
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    padding: 6px;
+    border: 1px solid #e5e1db;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 16px 38px rgba(0,0,0,.12);
+  }
+  .deploy-visibility-menu[hidden] { display: none; }
+  .deploy-option {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 9px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    text-align: left;
+    color: var(--ink);
+  }
+  .deploy-option:hover,
+  .deploy-option.active {
+    background: #f3f8f3;
+  }
+  .deploy-option-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .deploy-option-desc {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .deploy-submit {
+    width: 100%;
+    height: 52px;
+    border-radius: 10px;
+    background: var(--green);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 850;
+  }
+  .deploy-submit:hover { background: #074535; }
+
+  /* 范围下拉（占位） */
+  .scope-pop {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    padding: 6px;
+    min-width: 220px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+
+  /* 通用 popover · 跟首页保持一致（user-menu / notif-menu 共用） */
+  .pop {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 18px 48px rgba(0,0,0,0.10);
+    z-index: 200;
+    min-width: 240px;
+  }
+  .pop-section-title {
+    font-size: 11px; color: var(--faint); font-weight: 600;
+    padding: 8px 12px 4px;
+  }
+  .pop button {
+    width: 100%; text-align: left;
+    padding: 9px 12px; border-radius: 8px;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 10px;
+    color: var(--ink);
+    background: transparent; border: 0;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .pop button:hover { background: var(--side); }
+  .pop button.active { background: var(--gold-soft); color: var(--gold); font-weight: 600; }
+  .pop button svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--faint); }
+  .pop button.active svg { color: var(--gold); }
+  .pop-submenu { position: relative; }
+  .pop-submenu > button::after {
+    content: '';
+    width: 6px; height: 6px;
+    border-top: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    margin-left: auto;
+    opacity: .55;
+  }
+  .pop-flyout {
+    position: absolute;
+    left: calc(100% - 1px);
+    bottom: -6px;
+    width: 252px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 18px 48px rgba(0,0,0,0.10);
+    opacity: 0;
+    transform: translateX(-4px);
+    pointer-events: none;
+    transition: opacity .12s ease, transform .12s ease;
+  }
+  .pop-submenu:hover .pop-flyout,
+  .pop-submenu:focus-within .pop-flyout {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  .pop-divider { height: 1px; background: var(--line); margin: 4px 8px; }
+  .pop-meta { font-size: 11px; color: var(--faint); font-weight: 400; margin-top: 1px; }
+  .pop-row-body { flex: 1; min-width: 0; }
+  .pop-row-title { font-size: 13px; line-height: 1.3; }
+
+  /* 通知弹层 */
+  .notif-item {
+    padding: 12px;
+    border-radius: 10px;
+    display: flex; gap: 10px;
+    cursor: pointer;
+  }
+  .notif-item:hover { background: var(--side); }
+  .notif-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #e65252;
+    margin-top: 6px; flex-shrink: 0;
+  }
+  .notif-dot.read { background: transparent; }
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .notif-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .notif-time { font-size: 11px; color: var(--faint); margin-top: 4px; }
+  .scope-pop button {
+    width: 100%; text-align: left;
+    padding: 9px 12px;
+    border-radius: 7px;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .scope-pop button:hover { background: var(--side); }
+  .scope-pop button.active { background: var(--gold-soft); color: var(--gold); font-weight: 600; }
+  .scope-pop button [data-icon] { width: 14px; height: 14px; flex-shrink: 0; color: var(--faint); }
+  .scope-pop button.active [data-icon] { color: var(--gold); }
+
+  .fx-shell-app[data-fx-sidebar="collapsed"][data-canvas="open"] {
+    grid-template-columns: 56px minmax(0,1fr) minmax(0,1fr) !important;
+  }
+  .fx-shell-app[data-fx-sidebar="collapsed"][data-canvas="closed"],
+  .fx-shell-app[data-fx-sidebar="collapsed"][data-empty="1"] {
+    grid-template-columns: 56px minmax(0,1fr) 0 !important;
+  }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 220px minmax(0,1fr) minmax(0,1fr); }
+  }
+  @media (max-width: 1080px) {
+    .app { grid-template-columns: 56px minmax(0,1fr) 0; }
+    .sidebar { display: none; }
+    .canvas { display: none; }
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body>
+
+<div class="app" id="app" data-sidebar="open" data-canvas="open">
+
+  <aside id="feixiang-sidebar"></aside>
+
+  <!-- ====== 中间对话区 ====== -->
+  <section class="center" id="ch-center">
+    <header class="ctop">
+      <h1 class="ctop-title" id="ch-title">新对话</h1>
+      <div class="ctop-actions">
+        <button class="ctop-btn publish-only" id="ctop-publish-btn" onclick="openPublishModal()" hidden data-track="/click/feixiangCampusChatPage/publishApp | 点击发布应用 | visibility#STRING">
+          <svg data-icon width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+          <span>发布</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="messages" id="messages">
+      <div class="msg-wrap" id="msg-wrap">
+        <!-- 由 JS 动态插入 -->
+      </div>
+    </div>
+
+    <div class="composer-zone">
+      <div class="composer-wrap">
+        <div class="empty-hero" id="ch-empty-hero">
+          <div class="hero-title">张老师，今天想做什么？</div>
+        </div>
+        <div class="composer-pill" id="cc-composer">
+          <button class="pill-icon pill-plus" id="cc-plus-btn" type="button" title="添加文件或图片" onclick="togglePlusMenu(event)" data-track="/click/feixiangCampusChatPage/openAttachmentMenu | 打开对话页附件菜单 | mode#STRING">
+            <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="input-wrap">
+            <div class="attachment-row" id="cc-attachment-row"></div>
+            <textarea id="cc-input" rows="1" placeholder="继续追问 / 让 AI 调整结果……" onkeydown="onComposerKey(event)" oninput="autosize(this); refreshSend();"></textarea>
+          </div>
+          <div class="chip-row" id="cc-chip-row">
+            <span id="cc-mode" class="pill-mode" style="display:none"></span>
+            <button type="button" class="capability-upload-card" id="cc-capability-upload" onclick="uploadCcCapabilityAttachment(event)" data-track="/click/feixiangCampusChatPage/uploadRequiredAttachment | 上传能力必需附件 | capability#STRING">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/></svg>
+              <span>上传附件</span>
+            </button>
+            <div class="kb-attached-row" id="cc-kb-row"></div>
+          </div>
+          <div class="composer-actions">
+            <button class="pill-icon" title="语音输入" onclick="showToast('（演示）语音转文字')" data-track="/click/feixiangCampusChatPage/voiceInput | 使用对话页语音输入 | mode#STRING">
+              <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+            </button>
+            <button class="pill-icon pill-send idle" id="pill-send" onclick="sendInChat()" title="发送" data-track="/click/feixiangCampusChatPage/sendMessage | 发送对话消息 | mode#STRING,kbScope#STRING,attachmentCount#INT32">
+              <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="intent-chips empty-chips" id="ch-empty-chips">
+          <button class="intent-chip" data-chip="ai" onclick="toggleCcChip('ai')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9l-7 1 5 5-1 7 6-3 6 3-1-7 5-5-7-1z"/></svg> AI 生成
+          </button>
+          <button class="intent-chip" data-chip="search" onclick="toggleCcChip('search')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg> 知识库问答
+          </button>
+          <button class="intent-chip" data-chip="create" onclick="toggleCcChip('create')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> 创建应用
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== 右 Canvas ====== -->
+  <aside class="canvas" id="canvas">
+    <div class="cv-top">
+      <div class="cv-title" id="cv-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <span>成果预览</span>
+      </div>
+      <div class="cv-actions" id="cv-actions">
+        <button class="cv-action" onclick="toggleCanvas()" title="关闭 Canvas">
+          <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="cv-body" id="cv-body">
+      <div class="cv-empty">
+        <div class="cv-empty-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="cv-empty-title">Canvas 待生成</div>
+        <div class="cv-empty-desc">问 AI 出题 / 备课 / 看学情，相关结果会展示在这里</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="toast"></div>
+<div class="publish-mask" id="publish-modal" hidden onclick="if(event.target === this) closePublishModal()">
+  <div class="publish-dialog" role="dialog" aria-modal="true" aria-labelledby="publish-title">
+    <div class="publish-head">
+      <div class="publish-title" id="publish-title">发布作品</div>
+      <button class="publish-close" onclick="closePublishModal()" title="关闭">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="publish-field">
+      <div class="publish-label">标题<span class="required">*</span></div>
+      <textarea class="publish-textarea" maxlength="100" oninput="updatePublishCount(this)">五年级长方体和正方体认识课件</textarea>
+      <div class="publish-count" id="publish-count">14/100</div>
+    </div>
+    <div class="publish-complete-row">
+      <span>完善标签</span>
+      <span class="publish-out-range">不在范围里</span>
+    </div>
+    <div class="publish-field">
+      <div class="publish-select">
+        <span>学科<span class="required">*</span></span>
+        <b>数学</b>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+    <div class="publish-field">
+      <div class="publish-select">
+        <span>年级</span>
+        <b>人教版 / 五年级下册</b>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+    <div class="publish-field">
+      <div class="publish-select">
+        <span>章节</span>
+        <b>3 长方体和正方体</b>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+    <div class="publish-note">校园版用户发布到本校资源，仅校内老师可见</div>
+    <button class="publish-submit" onclick="confirmPublish()">确认发布</button>
+  </div>
+</div>
+<div class="deploy-mask" id="deploy-modal" hidden onclick="if(event.target === this) closeDeployModal()">
+  <div class="deploy-dialog" role="dialog" aria-modal="true" aria-labelledby="deploy-title">
+    <div class="deploy-head">
+      <div class="deploy-title-wrap">
+        <div class="deploy-title" id="deploy-title">开始部署你的应用吧</div>
+        <div class="deploy-status">未部署</div>
+      </div>
+      <button class="deploy-close" onclick="closeDeployModal()" title="关闭">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="deploy-field">
+      <div class="deploy-label">应用名称</div>
+      <div class="deploy-input">单词贪吃蛇应用</div>
+    </div>
+    <div class="deploy-field">
+      <div class="deploy-label">部署版本</div>
+      <div class="deploy-select">
+        <span>V1.1.0（7 分钟前）</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+    <div class="deploy-field">
+      <div class="deploy-label">应用域名</div>
+      <div class="deploy-url">
+        <span>https://www.feixianglaoshi.com/app/word-snake</span>
+        <button onclick="event.stopPropagation();showToast('已复制应用域名')" title="复制域名">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+	    <div class="deploy-field">
+	      <div class="deploy-label">可见性</div>
+	      <div class="deploy-visibility" id="deploy-visibility">
+	        <button class="deploy-visibility-trigger" onclick="toggleDeployVisibilityMenu(event)" aria-haspopup="listbox" aria-expanded="false">
+	          <span class="deploy-visibility-current">
+	            <span class="deploy-option-title" id="deploy-visibility-title">公开部署</span>
+	            <span class="deploy-option-desc" id="deploy-visibility-desc">进入本校应用，校内老师可见。</span>
+	          </span>
+	          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+	        </button>
+	        <div class="deploy-visibility-menu" id="deploy-visibility-menu" role="listbox" hidden>
+	          <button class="deploy-option active" data-visibility="public" onclick="selectDeployVisibility('public')">
+	            <span class="deploy-option-title">公开部署</span>
+	            <span class="deploy-option-desc">进入本校应用，校内老师可见。</span>
+	          </button>
+	          <button class="deploy-option" data-visibility="private" onclick="selectDeployVisibility('private')">
+	            <span class="deploy-option-title">私有部署</span>
+	            <span class="deploy-option-desc">不展示到社区，仅自己可见。</span>
+	          </button>
+	        </div>
+	      </div>
+	    </div>
+    <button class="deploy-submit" onclick="confirmDeployApp()" data-track="/click/feixiangCampusChatPage/publishApp | 点击发布应用 | visibility#STRING">部署应用</button>
+  </div>
+</div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('chat');</script>
+<script>
+/* ==================== 工具函数 ==================== */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+let toastTimer = null;
+function showToast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+function updatePublishCount(el) {
+  const count = $('#publish-count');
+  if (count) count.textContent = `${el.value.length}/100`;
+}
+function openPublishModal() {
+  const modal = $('#publish-modal');
+  if (!modal) return;
+  modal.hidden = false;
+  const title = modal.querySelector('.publish-textarea');
+  if (title) updatePublishCount(title);
+}
+function closePublishModal() {
+  const modal = $('#publish-modal');
+  if (modal) modal.hidden = true;
+}
+function confirmPublish() {
+  closePublishModal();
+  showToast('（演示）已发布到本校资源');
+}
+let deployVisibility = 'public';
+const DEPLOY_VISIBILITY_OPTIONS = {
+  public: { title: '公开部署', desc: '进入本校应用，校内老师可见。' },
+  private: { title: '私有部署', desc: '不展示到社区，仅自己可见。' },
+};
+function openDeployModal() {
+  const modal = $('#deploy-modal');
+  if (!modal) return;
+  modal.hidden = false;
+  selectDeployVisibility(deployVisibility);
+}
+function closeDeployModal() {
+  const modal = $('#deploy-modal');
+  if (modal) modal.hidden = true;
+  closeDeployVisibilityMenu();
+}
+function closeDeployVisibilityMenu() {
+  const wrap = $('#deploy-visibility');
+  const menu = $('#deploy-visibility-menu');
+  const trigger = document.querySelector('.deploy-visibility-trigger');
+  wrap?.classList.remove('open');
+  if (menu) menu.hidden = true;
+  trigger?.setAttribute('aria-expanded', 'false');
+}
+function toggleDeployVisibilityMenu(event) {
+  event.stopPropagation();
+  const wrap = $('#deploy-visibility');
+  const menu = $('#deploy-visibility-menu');
+  const trigger = event.currentTarget;
+  if (!wrap || !menu) return;
+  const willOpen = menu.hidden;
+  wrap.classList.toggle('open', willOpen);
+  menu.hidden = !willOpen;
+  trigger.setAttribute('aria-expanded', String(willOpen));
+}
+function selectDeployVisibility(type) {
+  deployVisibility = type;
+  const current = DEPLOY_VISIBILITY_OPTIONS[type] || DEPLOY_VISIBILITY_OPTIONS.public;
+  const title = $('#deploy-visibility-title');
+  const desc = $('#deploy-visibility-desc');
+  if (title) title.textContent = current.title;
+  if (desc) desc.textContent = current.desc;
+  document.querySelectorAll('.deploy-option').forEach(option => {
+    option.classList.toggle('active', option.dataset.visibility === type);
+  });
+  closeDeployVisibilityMenu();
+}
+function confirmDeployApp() {
+  closeDeployModal();
+  showToast(deployVisibility === 'public' ? '（演示）已公开部署到本校应用' : '（演示）已私有部署，仅自己可见');
+}
+function updateTopActions(script) {
+  const app = $('#app');
+  const publishBtn = $('#ctop-publish-btn');
+  const actions = document.querySelector('.ctop-actions');
+  const shouldShowPublish = script && script.canvasKind === 'html';
+  if (app) app.dataset.resultKind = shouldShowPublish ? 'html' : (script?.canvasKind || 'none');
+  if (publishBtn) publishBtn.hidden = !shouldShowPublish;
+  if (actions) actions.hidden = !shouldShowPublish;
+}
+
+function autosize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+function refreshSend() {
+  const ta = $('#cc-input');
+  const btn = $('#pill-send');
+  btn.classList.toggle('idle', !isEmptyState() && !ta.value.trim());
+}
+function onComposerKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendInChat();
+  }
+}
+
+function toggleCanvas() {
+  const app = $('#app');
+  app.dataset.canvas = app.dataset.canvas === 'closed' ? 'open' : 'closed';
+}
+
+/* ==================== Popover · 用户菜单 / 通知菜单（跟首页对齐） ==================== */
+function closeAllPops() {
+  document.getElementById('ws-pop')?.remove();
+  document.getElementById('scope-pop')?.remove();
+  document.getElementById('notif-pop')?.remove();
+  document.getElementById('user-btn')?.classList.remove('open');
+}
+
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  closeAllPops();
+  const btn = document.getElementById('user-btn');
+  if (btn.classList.contains('open')) { btn.classList.remove('open'); return; }
+  btn.classList.add('open');
+  const rect = btn.getBoundingClientRect();
+  const popWidth = 260;
+  const pop = document.createElement('div');
+  pop.className = 'pop';
+  pop.id = 'ws-pop';
+  pop.style.cssText = `position:fixed;width:${popWidth}px;left:${rect.left}px;bottom:${window.innerHeight - rect.top + 6}px`;
+  pop.innerHTML = `
+    <div style="padding:10px 12px 6px;border-bottom:1px solid var(--line);margin-bottom:4px">
+      <div style="font-size:13.5px;font-weight:700;color:var(--ink)">张老师</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:2px">13800138000</div>
+    </div>
+    <div class="pop-submenu">
+      <button onclick="event.stopPropagation()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+        <div class="pop-row-body"><div class="pop-row-title">切换空间</div></div>
+      </button>
+      <div class="pop-flyout">
+        <div class="pop-section-title">校园版</div>
+        <button class="active" onclick="event.stopPropagation();closeAllPops();showToast('当前 · 北京市实验中学')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <div class="pop-row-body"><div class="pop-row-title">北京市实验中学</div></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--gold)"><path d="M5 13l4 4L19 7"/></svg>
+        </button>
+        <button onclick="event.stopPropagation();closeAllPops();showToast('（演示）切换到 · 人大附中')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <div class="pop-row-body"><div class="pop-row-title">人大附中</div></div>
+        </button>
+        <div class="pop-section-title">个人版</div>
+        <button onclick="event.stopPropagation();closeAllPops();showToast('（演示）切换到 · 飞象个人版')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
+          <div class="pop-row-body"><div class="pop-row-title">张老师 · 飞象个人版</div></div>
+        </button>
+      </div>
+    </div>
+    <div class="pop-divider"></div>
+    <button onclick="event.stopPropagation();closeAllPops();showToast('（演示）账号设置')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <div class="pop-row-body"><div class="pop-row-title">账号设置</div></div>
+    </button>
+    <button onclick="event.stopPropagation();closeAllPops();window.location.href='teacher-login.html?logout=1'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <div class="pop-row-body"><div class="pop-row-title">退出登录</div></div>
+    </button>
+  `;
+  document.body.appendChild(pop);
+  setTimeout(() => document.addEventListener('click', closeAllPops, { once: true }), 50);
+}
+
+function toggleNotifMenu(e) {
+  e.stopPropagation();
+  closeAllPops();
+  if (document.getElementById('notif-pop')) return;
+  const btn = document.getElementById('notif-btn');
+  const rect = btn.getBoundingClientRect();
+  const pop = document.createElement('div');
+  pop.className = 'pop';
+  pop.id = 'notif-pop';
+  pop.style.cssText = `position:fixed;bottom:${window.innerHeight - rect.top + 8}px;left:${rect.right + 8}px;width:320px;padding:8px`;
+  pop.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px 6px">
+      <div style="font-size:13px;font-weight:700">通知 · 3 条未读</div>
+      <button style="font-size:11.5px;color:var(--muted);padding:2px 6px;background:transparent;border:0;cursor:pointer;width:auto" onclick="event.stopPropagation();closeAllPops();showToast('（演示）全部已读')">全部已读</button>
+    </div>
+    <div class="notif-item" onclick="closeAllPops();window.location.href='ai-record-jobs.html'">
+      <span class="notif-dot"></span>
+      <div class="notif-body">
+        <div class="notif-title">高一(3)班期中模拟卷 · 已扫描完成</div>
+        <div class="notif-desc">38 份扫描已上传，AI 已完成客观题预批，等待你审核</div>
+        <div class="notif-time">5 分钟前</div>
+      </div>
+    </div>
+    <div class="notif-item" onclick="closeAllPops();window.location.href='school-wiki.html'">
+      <span class="notif-dot"></span>
+      <div class="notif-body">
+        <div class="notif-title">王老师分享了「《荷塘月色》画面捕捉法」</div>
+        <div class="notif-desc">已加入「高一语文·共建库」，可在备课对话中引用</div>
+        <div class="notif-time">2 小时前</div>
+      </div>
+    </div>
+    <div class="notif-item" onclick="closeAllPops();showToast('（演示）3 条请假审批待处理')">
+      <span class="notif-dot"></span>
+      <div class="notif-body">
+        <div class="notif-title">3 条请假审批待处理</div>
+        <div class="notif-desc">高一(5)班 · 张同学 / 李同学 / 王同学 · 病假</div>
+        <div class="notif-time">今天 09:12</div>
+      </div>
+    </div>
+    <div class="notif-item" style="opacity:.7" onclick="closeAllPops();showToast('（演示）查看历史通知')">
+      <span class="notif-dot read"></span>
+      <div class="notif-body">
+        <div class="notif-title">教务处发布了《五月教研计划》</div>
+        <div class="notif-time">昨天 16:30</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(pop);
+  setTimeout(() => document.addEventListener('click', closeAllPops, { once: true }), 50);
+}
+
+/* ==================== 知识库 · 多选（类 Claude Add to project）· 飞象只有"我的 + 学校"两个 ==================== */
+/* 命名 KB_REF_FOLDERS 是因为下方另有 KB_FOLDERS 用于"保存到知识库" popover（结构不同） */
+const KB_REF_FOLDERS = [
+  { id: 'mine',   name: '我的知识库',   count: 18 },
+  { id: 'school', name: '学校知识库',   count: 348 },
+];
+const CC_ATTACHMENT_LIMIT = 10;
+let selectedKbIds = ['school'];
+let ccAttachedItems = [];
+let ccCapabilityUploads = {};
+
+function getCcUploadRequirement() {
+  if (ccMode !== 'ai') return null;
+  if (ccAiCapability === 'interactive') return { id: 'interactive', label: '上传教案文件', fileName: '初英U1互动课件教案.docx', toast: '已添加教案文件' };
+  if (ccAiCapability === 'data') return { id: 'data', label: '上传HTML文件', fileName: '课堂练习数据回收.html', toast: '已添加 HTML 文件' };
+  return null;
+}
+
+function ccAttachmentIcon(type) {
+  if (type === 'image') return '<span class="attachment-thumb"></span>';
+  return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+}
+
+function applyCcAttachmentState() {
+  const row = document.getElementById('cc-attachment-row');
+  if (!row) return;
+  row.innerHTML = ccAttachedItems.map(item => `
+    <div class="attachment-chip" title="${item.name}">
+      ${ccAttachmentIcon(item.type)}
+      <span class="attachment-meta">
+        <span class="attachment-name">${item.name}</span>
+        <span class="attachment-size">${item.size}</span>
+      </span>
+      <span class="chip-del" title="移除" onclick="event.stopPropagation(); removeCcAttachment('${item.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </span>
+    </div>
+  `).join('');
+  refreshComposerLayout();
+}
+
+function addCcAttachment(type) {
+  if (ccAttachedItems.length >= CC_ATTACHMENT_LIMIT) {
+    closePlusPop();
+    showToast(`最多上传 ${CC_ATTACHMENT_LIMIT} 个附件`);
+    return;
+  }
+  const item = type === 'image'
+    ? { id: `image-${Date.now()}`, type: 'image', name: '课堂板书.png', size: '433.92KB' }
+    : { id: `file-${Date.now()}`, type: 'file', name: '教学资料.docx', size: '167KB' };
+  ccAttachedItems.push(item);
+  applyCcAttachmentState();
+  closePlusPop();
+  showToast(type === 'image' ? '已添加图片' : '已添加文件');
+}
+
+function removeCcAttachment(id) {
+  ccAttachedItems = ccAttachedItems.filter(item => item.id !== id);
+  applyCcAttachmentState();
+}
+
+function renderCcCapabilityUploadCard(uploadCard, uploadReq) {
+  if (!uploadCard) return;
+  const uploaded = uploadReq ? ccCapabilityUploads[uploadReq.id] : null;
+  uploadCard.classList.toggle('is-uploaded', !!uploaded);
+  uploadCard.innerHTML = uploaded ? `
+    <span class="uploaded-label">已上传</span>
+    <span class="uploaded-line">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      <span class="uploaded-name">${uploaded.name}</span>
+      <span class="upload-remove" title="移除" onclick="event.stopPropagation(); removeCcCapabilityUpload('${uploadReq.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </span>
+    </span>
+  ` : `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/></svg>
+    <span>${uploadReq ? uploadReq.label : '上传附件'}</span>
+  `;
+}
+
+function applyKbState() {
+  const row = document.getElementById('cc-kb-row');
+  if (!row) return;
+  const list = KB_REF_FOLDERS.filter(f => selectedKbIds.includes(f.id));
+  if (list.length === 0) {
+    row.innerHTML = '';
+    refreshComposerLayout();
+    return;
+  }
+  row.innerHTML = list.map(f => `
+    <div class="kb-attached-chip" title="已添加知识库">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span>${f.name}</span>
+      <span class="chip-del" title="移除" onclick="event.stopPropagation(); removeKb('${f.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </span>
+    </div>
+  `).join('');
+  refreshComposerLayout();
+}
+
+function refreshComposerLayout() {
+  const composer = document.getElementById('cc-composer');
+  if (!composer) return;
+  const mode = document.getElementById('cc-mode');
+  const kbRow = document.getElementById('cc-kb-row');
+  const attachmentRow = document.getElementById('cc-attachment-row');
+  const uploadCard = document.getElementById('cc-capability-upload');
+  const uploadReq = getCcUploadRequirement();
+  renderCcCapabilityUploadCard(uploadCard, uploadReq);
+  const hasMode = mode && mode.style.display !== 'none' && mode.innerHTML.trim() !== '';
+  const hasKb = kbRow && kbRow.children.length > 0;
+  const hasAttachments = attachmentRow && attachmentRow.children.length > 0;
+  composer.classList.toggle('has-chips', !!(hasMode || hasKb || hasAttachments || uploadReq));
+  composer.classList.toggle('ai-mode', ccMode === 'ai');
+  composer.classList.toggle('upload-required', !!uploadReq);
+}
+
+function removeKb(id) {
+  const idx = selectedKbIds.indexOf(id);
+  if (idx >= 0) selectedKbIds.splice(idx, 1);
+  if (ccMode === 'search' && selectedKbIds.length === 0) selectedKbIds = ['school'];
+  applyKbState();
+  if (ccMode === 'search') renderCcIntentChips();
+  const sub = document.getElementById('kb-submenu');
+  if (sub) renderKbSubmenu(sub);
+  const main = document.getElementById('plus-pop');
+  if (main) renderPlusMenu(main);
+}
+
+function uploadCcCapabilityAttachment(e) {
+  e.stopPropagation();
+  const uploadReq = getCcUploadRequirement();
+  if (!uploadReq) return;
+  ccCapabilityUploads[uploadReq.id] = { type: 'file', name: uploadReq.fileName };
+  refreshComposerLayout();
+  showToast(uploadReq.toast);
+}
+
+function removeCcCapabilityUpload(id) {
+  delete ccCapabilityUploads[id];
+  refreshComposerLayout();
+}
+
+function togglePlusMenu(e, opts) {
+  e.stopPropagation();
+  const wasOpen = !!document.getElementById('plus-pop');
+  closePlusPop();
+  if (wasOpen) return;
+  const btn = document.getElementById('cc-plus-btn');
+  const rect = btn.getBoundingClientRect();
+  const opensDown = isEmptyState();
+  const pop = document.createElement('div');
+  pop.className = 'plus-pop';
+  pop.id = 'plus-pop';
+  pop.style.cssText = opensDown
+    ? `position:fixed;left:${rect.left}px;top:${rect.bottom + 8}px`
+    : `position:fixed;left:${rect.left}px;bottom:${window.innerHeight - rect.top + 8}px`;
+  pop.addEventListener('click', ev => ev.stopPropagation());
+  renderPlusMenu(pop);
+  document.body.appendChild(pop);
+  setTimeout(() => document.addEventListener('click', closePlusPopHandler, { capture: true }), 50);
+}
+function closePlusPop() {
+  document.getElementById('plus-pop')?.remove();
+  document.getElementById('kb-submenu')?.remove();
+}
+function closePlusPopHandler(e) {
+  if (e.target.closest('#plus-pop')) return;
+  if (e.target.closest('#kb-submenu')) return;
+  if (e.target.closest('#cc-plus-btn')) return;
+  document.removeEventListener('click', closePlusPopHandler, { capture: true });
+  closePlusPop();
+}
+
+function renderPlusMenu(pop) {
+  pop.innerHTML = `
+    <button class="plus-row" onclick="event.stopPropagation();addCcAttachment('file')" data-track="/click/feixiangCampusChatPage/addAttachment | 添加对话页附件 | attachmentType#STRING,mode#STRING">
+      <svg class="row-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      <span class="row-label">添加文件</span>
+    </button>
+    <button class="plus-row" onclick="event.stopPropagation();addCcAttachment('image')" data-track="/click/feixiangCampusChatPage/addAttachment | 添加对话页附件 | attachmentType#STRING,mode#STRING">
+      <svg class="row-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+      <span class="row-label">添加图片</span>
+    </button>
+  `;
+}
+
+function openKbSubmenu(e) {
+  e.stopPropagation();
+  const main = document.getElementById('plus-pop');
+  if (!main) return;
+  document.getElementById('kb-submenu')?.remove();
+  const rect = main.getBoundingClientRect();
+  const sub = document.createElement('div');
+  sub.id = 'kb-submenu';
+  sub.className = 'kb-submenu';
+  const subWidth = 280;
+  let leftPos = rect.right + 8;
+  if (leftPos + subWidth > window.innerWidth - 16) leftPos = rect.left - subWidth - 8;
+  const subMaxH = 380;
+  let topPos = isEmptyState() ? rect.top : rect.bottom - subMaxH;
+  if (topPos < 16) topPos = 16;
+  if (topPos + subMaxH > window.innerHeight - 16) topPos = window.innerHeight - subMaxH - 16;
+  sub.style.left = leftPos + 'px';
+  sub.style.top = topPos + 'px';
+  sub.addEventListener('click', ev => ev.stopPropagation());
+  renderKbSubmenu(sub);
+  document.body.appendChild(sub);
+}
+
+function renderKbSubmenu(sub) {
+  sub.innerHTML = `
+    <div class="kb-submenu-title">
+      <span>选择要添加的知识库 · 可多选</span>
+      ${selectedKbIds.length ? `<span class="kb-submenu-clear" onclick="event.stopPropagation();clearAllKb()">清空</span>` : ''}
+    </div>
+    ${KB_REF_FOLDERS.map(f => {
+      const checked = selectedKbIds.includes(f.id);
+      return `
+        <div class="kb-item ${checked ? 'is-checked' : ''}" onclick="event.stopPropagation();toggleKbItem('${f.id}')">
+          <div class="kb-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+          <span class="kb-name">${f.name}</span>
+          <span class="kb-count">${f.count} 份</span>
+        </div>
+      `;
+    }).join('')}
+  `;
+}
+
+function toggleKbItem(id) {
+  const idx = selectedKbIds.indexOf(id);
+  if (idx >= 0) selectedKbIds.splice(idx, 1);
+  else selectedKbIds.push(id);
+  applyKbState();
+  if (ccMode === 'search') renderCcIntentChips();
+  const sub = document.getElementById('kb-submenu');
+  if (sub) renderKbSubmenu(sub);
+  const main = document.getElementById('plus-pop');
+  if (main) renderPlusMenu(main);
+}
+
+function clearAllKb() {
+  selectedKbIds = ccMode === 'search' ? ['school'] : [];
+  applyKbState();
+  if (ccMode === 'search') renderCcIntentChips();
+  const sub = document.getElementById('kb-submenu');
+  if (sub) renderKbSubmenu(sub);
+  const main = document.getElementById('plus-pop');
+  if (main) renderPlusMenu(main);
+  showToast('已清空知识库引用');
+}
+
+/* ==================== composer mode chip（前置 GPT 风格） ==================== */
+const CC_CHIP_META = {
+  ai:     { label: 'AI 生成', placeholder: '', svg: '<path d="M12 2L9 9l-7 1 5 5-1 7 6-3 6 3-1-7 5-5-7-1z"/>' },
+  search: { label: '知识库问答', placeholder: '输入问题或资料关键词', svg: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>' },
+  create: { label: '创建应用', placeholder: '描述你想要的应用，比如：单词贪吃蛇课堂练习', svg: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>' },
+};
+const CC_AI_PLACEHOLDER_EXAMPLES = [
+  '互动课件｜帮我生成初英人教七下U1 Grammar Focus的互动课件，通过精简而高效的语言活动，帮助学生掌握并巩固与动物相关的词汇、句型及原因状语从句引导词because的用法。',
+  '教学游戏｜以《西游记》取经之路为故事线，生成六年级课内古诗词闯关游戏，让学生在游戏化体验中变“被动背诵”为“主动探究”。',
+  '教学动画｜设计初中数学勾股定理互动教学活动，引导学生主动探究，培养几何直观、逻辑推理能力。',
+  'AI 组题｜帮我生成一份北京朝阳区七年级上册数学期末考试模拟题',
+];
+const CC_AI_CAPABILITIES = [
+  { id: 'qbank', label: 'AI 组题', desc: '根据知识点、题型和难度快速生成练习、测验或试卷。', placeholder: CC_AI_PLACEHOLDER_EXAMPLES[3], svg: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>' },
+  { id: 'animation', label: '教学动画', badge: '新功能', desc: '生成用于课堂讲解的专业级互动教学动画。', placeholder: CC_AI_PLACEHOLDER_EXAMPLES[2], svg: '<path d="M12 3v4"/><path d="M12 17v4"/><path d="M3 12h4"/><path d="M17 12h4"/><path d="m5.6 5.6 2.8 2.8"/><path d="m15.6 15.6 2.8 2.8"/><path d="m18.4 5.6-2.8 2.8"/><path d="m8.4 15.6-2.8 2.8"/><circle cx="12" cy="12" r="3"/>' },
+  { id: 'game', label: '教学游戏', badge: '新功能', desc: '把知识点设计成可在课堂中使用的小游戏。', placeholder: '教学游戏｜以《西游记》取经之路为故事线，生成六年级课内古诗词闯关游戏，让学生在游戏化体验中变“被动背诵”为“主动探究”。', svg: '<line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="3"/>' },
+  { id: 'interactive', label: '互动课件', badge: '新功能', desc: '上传教案文件后，生成可操作、可演示的课堂互动课件。', placeholder: CC_AI_PLACEHOLDER_EXAMPLES[0], svg: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/>' },
+  { id: 'data', label: '数据回收', badge: '新功能', desc: '上传 HTML 文件后，为课件增加答题、统计和课堂数据回收。', placeholder: '数据回收｜我想在课件的练习环节，增加数据回收功能，了解每道题的正确率及高频错题的情况。', svg: '<path d="M3 3v18h18"/><path d="M7 15v2"/><path d="M12 9v8"/><path d="M17 12v5"/>' },
+];
+const CC_DEFAULT_PLACEHOLDER = '继续对话…';
+const CC_EMPTY_PLACEHOLDER = '问点什么……';
+let ccAiPlaceholderIndex = 0;
+let ccAiPlaceholderTimer = null;
+
+function getCcPlaceholder() {
+  const cap = ccAiCapability ? CC_AI_CAPABILITIES.find(item => item.id === ccAiCapability) : null;
+  if (ccMode === 'ai' && cap) return cap.placeholder;
+  if (ccMode === 'ai') return CC_AI_PLACEHOLDER_EXAMPLES[ccAiPlaceholderIndex % CC_AI_PLACEHOLDER_EXAMPLES.length];
+  if (ccMode && CC_CHIP_META[ccMode]) return CC_CHIP_META[ccMode].placeholder;
+  const center = document.getElementById('ch-center');
+  if (center && center.dataset.empty === '1') return CC_EMPTY_PLACEHOLDER;
+  return CC_DEFAULT_PLACEHOLDER;
+}
+
+function syncCcPlaceholder() {
+  const ipt = $('#cc-input');
+  if (ipt) ipt.placeholder = getCcPlaceholder();
+}
+function startCcAiPlaceholderCarousel() {
+  syncCcPlaceholder();
+  if (ccAiPlaceholderTimer) return;
+  ccAiPlaceholderTimer = setInterval(() => {
+    if (ccMode !== 'ai') {
+      stopCcAiPlaceholderCarousel();
+      return;
+    }
+    ccAiPlaceholderIndex = (ccAiPlaceholderIndex + 1) % CC_AI_PLACEHOLDER_EXAMPLES.length;
+    syncCcPlaceholder();
+  }, 3600);
+}
+function stopCcAiPlaceholderCarousel() {
+  if (!ccAiPlaceholderTimer) return;
+  clearInterval(ccAiPlaceholderTimer);
+  ccAiPlaceholderTimer = null;
+}
+
+let ccMode = null;
+let ccAiCapability = null;
+function setCcMode(kind) {
+  ccMode = kind;
+  ccAiCapability = null;
+  if (ccMode === 'search' && selectedKbIds.length === 0) selectedKbIds = ['school'];
+  renderCcIntentChips();
+  refreshCcModeChip();
+  syncCcPlaceholder();
+  applyKbState();
+}
+function refreshCcModeChip() {
+  const el = $('#cc-mode');
+  if (el) {
+    if (ccMode && CC_CHIP_META[ccMode]) {
+      const m = CC_CHIP_META[ccMode];
+      const aiCap = ccMode === 'ai' && ccAiCapability
+        ? CC_AI_CAPABILITIES.find(cap => cap.id === ccAiCapability)
+        : null;
+      const label = aiCap ? `${m.label} · ${aiCap.label}` : m.label;
+      el.innerHTML = `
+        <svg class="mode-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${m.svg}</svg>
+        ${label}
+        <span class="mode-x" onclick="event.stopPropagation();clearCcMode()" title="取消">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </span>
+      `;
+      el.style.display = 'inline-flex';
+    } else {
+      el.style.display = 'none';
+      el.innerHTML = '';
+    }
+  }
+  if (ccMode === 'ai') startCcAiPlaceholderCarousel();
+  else stopCcAiPlaceholderCarousel();
+  refreshComposerLayout();
+}
+function clearCcMode() { setCcMode(null); }
+function selectCcAiCapability(id) {
+  ccMode = 'ai';
+  ccAiCapability = id;
+  ccAiPlaceholderIndex = 0;
+  renderCcIntentChips();
+  refreshCcModeChip();
+  syncCcPlaceholder();
+  applyKbState();
+  $('#cc-input')?.focus();
+}
+function renderCcMainIntentChips() {
+  const panel = $('#ch-empty-chips');
+  if (!panel) return;
+  panel.innerHTML = `
+    <button class="intent-chip ${ccMode === 'ai' ? 'active' : ''}" data-chip="ai" onclick="toggleCcChip('ai')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${CC_CHIP_META.ai.svg}</svg> AI 生成
+    </button>
+    <button class="intent-chip ${ccMode === 'search' ? 'active' : ''}" data-chip="search" onclick="toggleCcChip('search')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${CC_CHIP_META.search.svg}</svg> 知识库问答
+    </button>
+    <button class="intent-chip ${ccMode === 'create' ? 'active' : ''}" data-chip="create" onclick="toggleCcChip('create')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${CC_CHIP_META.create.svg}</svg> 创建应用
+    </button>
+  `;
+}
+function renderCcAiCapabilityChips() {
+  const panel = $('#ch-empty-chips');
+  if (!panel) return;
+  panel.innerHTML = CC_AI_CAPABILITIES.map(cap => `
+    <button class="intent-chip ai-capability-chip ${ccAiCapability === cap.id ? 'active' : ''}" data-capability="${cap.id}" onclick="selectCcAiCapability('${cap.id}')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${cap.svg}</svg>
+      ${cap.label}
+      ${cap.beta ? '<span class="chip-beta">BETA</span>' : ''}
+      <span class="capability-tip">
+        <span class="capability-tip-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${cap.svg}</svg></span>
+        <span class="capability-tip-title">${cap.label}${cap.badge ? `<span class="capability-tip-badge">${cap.badge}</span>` : ''}</span>
+        <span class="capability-tip-desc">${cap.desc}</span>
+      </span>
+    </button>
+  `).join('');
+}
+function renderCcKbScopeChips() {
+  const panel = $('#ch-empty-chips');
+  if (!panel) return;
+  panel.innerHTML = `
+    ${KB_REF_FOLDERS.map(f => `
+      <button class="intent-chip ${selectedKbIds.includes(f.id) ? 'active' : ''}" onclick="selectCcKbScope('${f.id}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        ${f.name}
+      </button>
+    `).join('')}
+  `;
+}
+function selectCcKbScope(id) {
+  if (ccMode !== 'search') ccMode = 'search';
+  selectedKbIds = [id];
+  applyKbState();
+  renderCcIntentChips();
+  $('#cc-input')?.focus();
+}
+function renderCcIntentChips() {
+  const panel = $('#ch-empty-chips');
+  if (!panel) return;
+  panel.classList.toggle('hidden-chips', !!ccMode && ccMode !== 'ai' && ccMode !== 'search');
+  if (ccMode === 'ai') renderCcAiCapabilityChips();
+  else if (ccMode === 'search') renderCcKbScopeChips();
+  else renderCcMainIntentChips();
+}
+
+/* ==================== 新对话空状态 ==================== */
+function setEmpty(isEmpty) {
+  const center = document.getElementById('ch-center');
+  const app = document.getElementById('app');
+  if (!center) return;
+  if (!isEmpty) {
+    ccMode = null;
+    ccAiCapability = null;
+    stopCcAiPlaceholderCarousel();
+    closePlusPop();
+  }
+  const v = isEmpty ? '1' : '0';
+  center.dataset.empty = v;
+  if (app) app.dataset.empty = v;
+  refreshCcModeChip();
+  syncCcPlaceholder();
+  refreshEmptyChips();
+  refreshSend();
+}
+function isEmptyState() {
+  const center = document.getElementById('ch-center');
+  return center && center.dataset.empty === '1';
+}
+function refreshEmptyChips() {
+  renderCcIntentChips();
+}
+function toggleCcChip(kind) {
+  setCcMode(ccMode === kind ? null : kind);
+  const ipt = $('#cc-input');
+  if (ipt) ipt.focus();
+}
+
+/* ==================== Canvas tab 切换 ==================== */
+let canvasTabs = []; // { id, label, icon, render }
+let activeCv = null;
+let currentCanvasMeta = null;
+const savedCanvasTabs = new Set();
+const ICONS = {
+  file: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+  code: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>',
+  edit: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  download: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>',
+  expand: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>',
+  share: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 8 4"/><path d="m16.5 6.5-8 4"/></svg>',
+  close: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+};
+function refreshSaveButtonState() {
+  const btn = document.getElementById('cv-save-btn');
+  if (!btn) return;
+  const saved = !!activeCv && savedCanvasTabs.has(activeCv);
+  btn.classList.toggle('saved', saved);
+  btn.title = saved ? '已保存到我的知识库，点击可修改保存位置' : '把这份成果存进我的知识库，下次复用';
+  btn.innerHTML = saved ? `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+    <span>已保存</span>
+  ` : `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    <span>保存</span>
+  `;
+}
+function setCanvasOpen(open) {
+  const app = $('#app');
+  if (!app) return;
+  app.dataset.canvas = open ? 'open' : 'closed';
+}
+function renderCvTop() {
+  const title = $('#cv-title');
+  const actions = $('#cv-actions');
+  const meta = currentCanvasMeta || { title: '成果预览', type: 'empty' };
+  if (title) {
+    const icon = meta.kind === 'html' || meta.kind === 'app' ? ICONS.code : ICONS.file;
+    const displayTitle = meta.kind === 'app' ? '文件预览' : (meta.title || '成果预览');
+    title.innerHTML = `${icon}<span>${displayTitle}</span>`;
+  }
+  if (!actions) return;
+  if (!meta.kind || meta.kind === 'empty') {
+    actions.innerHTML = `
+      <button class="cv-action" onclick="toggleCanvas()" title="关闭 Canvas">${ICONS.close}</button>
+    `;
+    return;
+  }
+  const edit = `<button class="cv-action" onclick="showToast('（演示）打开编辑器')" title="编辑">${ICONS.edit}<span>编辑</span></button>`;
+  const qbankEdit = `<button class="cv-action" onclick="window.location.href='compose-sheet.html?source=ai&from=chat'" title="编辑">${ICONS.edit}<span>编辑</span></button>`;
+  const download = `<button class="cv-action" onclick="showToast('（演示）下载到本地')" title="下载">${ICONS.download}<span>下载</span></button>`;
+  const fullscreen = `<button class="cv-action" onclick="showToast('（演示）全屏浏览')" title="全屏浏览">${ICONS.expand}<span>全屏浏览</span></button>`;
+  const link = `<button class="cv-action" onclick="showToast('（演示）打开原文链接')" title="打开原文">${ICONS.expand}<span>打开原文</span></button>`;
+  const share = `<button class="cv-action" onclick="showToast('已复制应用分享链接')" title="分享">${ICONS.share}<span>分享</span></button>`;
+  const deploy = `<button class="cv-action primary" onclick="openDeployModal()" title="部署"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg><span>部署</span></button>`;
+  const save = `<button class="cv-save-btn" id="cv-save-btn" onclick="toggleSavePop(event)" title="把这份成果存进我的知识库，下次复用">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    <span>保存</span>
+  </button>`;
+  const close = `<button class="cv-action" onclick="toggleCanvas()" title="关闭 Canvas">${ICONS.close}</button>`;
+  if (meta.kind === 'reference') actions.innerHTML = `${link}${download}${close}`;
+  else if (meta.kind === 'document' && meta.documentMode === 'qbank') actions.innerHTML = `${save}${qbankEdit}${download}${close}`;
+  else if (meta.kind === 'document') actions.innerHTML = `${save}${edit}${download}${close}`;
+  else if (meta.kind === 'app') actions.innerHTML = `${share}${deploy}${close}`;
+  else actions.innerHTML = `${edit}${fullscreen}${download}${close}`;
+  refreshSaveButtonState();
+}
+function renderCvTabs() {
+  const wrap = $('#cv-tabs');
+  if (!wrap) return;
+  wrap.innerHTML = canvasTabs.map(t => `
+    <button class="cv-tab ${t.id === activeCv ? 'active' : ''}" onclick="switchCv('${t.id}')">
+      ${t.icon || ''}
+      <span>${t.label}</span>
+    </button>
+  `).join('');
+}
+function renderActiveCvBody() {
+  const tab = canvasTabs.find(t => t.id === activeCv);
+  if (!tab) return;
+  const tabsMarkup = canvasTabs.length > 1 ? '<div class="cv-tabs" id="cv-tabs"></div>' : '';
+  $('#cv-body').innerHTML = tabsMarkup + `<div class="cv-rendered">${tab.render()}</div>`;
+  renderCvTabs();
+}
+function switchCv(id) {
+  activeCv = id;
+  const tab = canvasTabs.find(t => t.id === id);
+  if (!tab) return;
+  if (currentCanvasMeta && tab.title) currentCanvasMeta.title = tab.title;
+  renderActiveCvBody();
+  renderCvTop();
+  refreshSaveButtonState();
+}
+function openCanvasForScript(script) {
+  if (!script.canvas || !script.canvas.length) {
+    canvasTabs = [];
+    activeCv = null;
+    currentCanvasMeta = { title: '成果预览', kind: 'empty' };
+    renderCvTop();
+    setCanvasOpen(false);
+    return;
+  }
+  currentCanvasMeta = {
+    title: script.canvasTitle || script.title || '成果预览',
+    kind: script.canvasKind || 'document',
+    documentMode: script.documentMode || null,
+  };
+  canvasTabs = script.canvas.map(id => ({ id, ...CV_RENDERERS[id] })).filter(t => t.render);
+  activeCv = script.defaultCv || canvasTabs[0]?.id;
+  setCanvasOpen(true);
+  renderActiveCvBody();
+  renderCvTop();
+}
+
+/* ==================== 保存到知识库 · popover ==================== */
+const KB_FOLDERS = [
+  {
+    id: 'root', name: '我的知识库', count: 18, children: [
+      {
+        id: 'gaoyi-yuwen', name: '高一语文', count: 9, children: [
+          {
+            id: 'bixiu-shang', name: '必修上', count: 5, children: [
+              { id: 'sanwen', name: '散文专题', count: 12 },
+              { id: 'gushiwen', name: '古诗文', count: 8 },
+            ]
+          },
+          { id: 'xiandaiwen', name: '现代文阅读', count: 8 },
+          { id: 'beike', name: '备课资料', count: 18 },
+        ]
+      },
+      { id: 'kejian', name: '课件库', count: 6 },
+      { id: 'tiku', name: '题集库', count: 32 },
+      { id: 'fansi', name: '教学反思', count: 5 },
+    ]
+  },
+];
+
+const TAB_LABELS = {
+  slides:  { name: '《荷塘月色》画面捕捉法 · 课件', type: '课件' },
+  quiz:    { name: '《荷塘月色》课堂随堂题 · 5 题', type: '题集' },
+  insight: { name: '本节预设难点分析 · 学情参考',  type: '学情报告' },
+};
+
+let selectedFolder = 'root';
+let saveFolderSearch = '';
+let expandedSaveFolders = new Set(['root', 'gaoyi-yuwen', 'bixiu-shang']);
+function closeSavePop() {
+  document.getElementById('save-pop')?.remove();
+  selectedFolder = 'root';
+  saveFolderSearch = '';
+}
+function flattenSaveFolders(nodes, path = []) {
+  return nodes.flatMap(node => {
+    const currentPath = [...path, node.name];
+    return [
+      { ...node, path: currentPath },
+      ...flattenSaveFolders(node.children || [], currentPath)
+    ];
+  });
+}
+function getSaveFolder(id) {
+  return flattenSaveFolders(KB_FOLDERS).find(f => f.id === id);
+}
+function shouldShowFolder(node, query) {
+  if (!query) return true;
+  return node.name.toLowerCase().includes(query) || (node.children || []).some(child => shouldShowFolder(child, query));
+}
+function renderSaveFolderTree(nodes, level = 0, forceVisible = false) {
+  const query = saveFolderSearch.trim().toLowerCase();
+  const visibleNodes = forceVisible ? nodes : nodes.filter(node => shouldShowFolder(node, query));
+  if (!visibleNodes.length && level === 0) {
+    return '<div class="save-tree-empty">没有找到匹配的文件夹</div>';
+  }
+  return visibleNodes.map(node => {
+    const children = node.children || [];
+    const hasChildren = children.length > 0;
+    const nodeMatches = !!query && node.name.toLowerCase().includes(query);
+    const expanded = hasChildren && (expandedSaveFolders.has(node.id) || !!query);
+    const active = selectedFolder === node.id;
+    return `
+      <button class="save-folder-row ${active ? 'active' : ''}" data-folder="${node.id}" onclick="pickSaveFolder('${node.id}', event)" style="padding-left:${10 + level * 18}px">
+        ${hasChildren ? `
+          <span class="save-folder-toggle ${expanded ? 'expanded' : ''}" onclick="toggleSaveFolderExpand('${node.id}', event)" title="${expanded ? '收起' : '展开'}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </span>
+        ` : '<span class="save-folder-spacer"></span>'}
+        <svg class="save-folder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <div class="save-folder-body">
+          <div class="save-folder-name">${node.name}</div>
+        </div>
+        <svg class="save-folder-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+      </button>
+      ${expanded ? renderSaveFolderTree(children, level + 1, forceVisible || nodeMatches) : ''}
+    `;
+  }).join('');
+}
+function refreshSaveTree() {
+  const tree = document.getElementById('save-tree');
+  if (tree) tree.innerHTML = renderSaveFolderTree(KB_FOLDERS);
+  const submit = document.getElementById('save-submit');
+  if (submit) submit.disabled = !selectedFolder;
+}
+function toggleSavePop(e) {
+  e.stopPropagation();
+  if (document.getElementById('save-pop')) { closeSavePop(); return; }
+  if (!activeCv) { showToast('Canvas 还没有内容可保存'); return; }
+
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const meta = TAB_LABELS[activeCv] || { name: '当前生成内容', type: '内容' };
+
+  const pop = document.createElement('div');
+  pop.className = 'save-pop';
+  pop.id = 'save-pop';
+  const popWidth = 520;
+  const left = Math.min(rect.right - popWidth, window.innerWidth - popWidth - 16);
+  pop.style.left = Math.max(16, left) + 'px';
+  pop.style.top = (rect.bottom + 8) + 'px';
+  pop.innerHTML = `
+    <div class="save-pop-head">
+      <div class="save-pop-title">保存到我的知识库</div>
+      <div class="save-pop-sub">
+        <span class="save-pop-sub-chip">${meta.type}</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${meta.name}</span>
+      </div>
+    </div>
+    <div class="save-pop-body">
+      <div class="save-pop-field">
+        <div class="save-pop-label">内容名称</div>
+        <input class="save-name-input" id="save-name-input" value="${meta.name}" onclick="event.stopPropagation()">
+      </div>
+      <div class="save-pop-field">
+        <div class="save-pop-label">保存位置</div>
+        <input class="save-folder-search" id="save-folder-search" placeholder="搜索文件夹" oninput="filterSaveFolders(this.value)" onclick="event.stopPropagation()">
+      </div>
+      <div class="save-tree-panel">
+        <div class="save-tree-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span class="save-tree-title">我的知识库</span>
+        </div>
+        <div class="save-tree" id="save-tree">${renderSaveFolderTree(KB_FOLDERS)}</div>
+      </div>
+    </div>
+    <div class="save-pop-foot">
+      <button class="save-pop-new" onclick="event.stopPropagation();showToast('（演示）新建文件夹')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        新建文件夹
+      </button>
+      <button class="save-pop-submit" id="save-submit" onclick="doSave()">保存到所选位置</button>
+    </div>
+  `;
+  document.body.appendChild(pop);
+
+  setTimeout(() => {
+    document.addEventListener('click', closeSavePopHandler, { capture: true });
+  }, 50);
+}
+
+function closeSavePopHandler(e) {
+  if (e.target.closest('#save-pop')) return;
+  if (e.target.closest('#cv-save-btn')) return;
+  document.removeEventListener('click', closeSavePopHandler, { capture: true });
+  closeSavePop();
+}
+
+function pickSaveFolder(id, e) {
+  e.stopPropagation();
+  selectedFolder = id;
+  document.querySelectorAll('#save-pop .save-folder-row').forEach(el => {
+    el.classList.toggle('active', el.dataset.folder === id);
+  });
+  document.getElementById('save-submit').disabled = false;
+}
+function toggleSaveFolderExpand(id, e) {
+  e.stopPropagation();
+  if (expandedSaveFolders.has(id)) expandedSaveFolders.delete(id);
+  else expandedSaveFolders.add(id);
+  refreshSaveTree();
+}
+function filterSaveFolders(value) {
+  saveFolderSearch = value || '';
+  refreshSaveTree();
+}
+
+function doSave() {
+  const folder = getSaveFolder(selectedFolder);
+  const meta = TAB_LABELS[activeCv] || { type: '内容' };
+  const name = document.getElementById('save-name-input')?.value?.trim() || meta.type;
+  if (activeCv) savedCanvasTabs.add(activeCv);
+  closeSavePop();
+  refreshSaveButtonState();
+  document.removeEventListener('click', closeSavePopHandler, { capture: true });
+  showToast(`已保存「${name}」到「${folder?.path?.join(' › ') || '我的知识库'}」`);
+}
+
+/* ==================== 消息渲染 ==================== */
+let aiTextEl = null;
+let streamingTimer = null;
+function appendUserMsg(text) {
+  const el = document.createElement('div');
+  el.className = 'msg-user';
+  el.textContent = text;
+  $('#msg-wrap').appendChild(el);
+  scrollToBottom();
+}
+function appendAiMsg() {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-ai';
+  wrap.innerHTML = `
+    <div class="msg-ai-avatar">飞</div>
+    <div class="msg-ai-content">
+      <div class="msg-ai-text"></div>
+    </div>
+  `;
+  $('#msg-wrap').appendChild(wrap);
+  aiTextEl = wrap.querySelector('.msg-ai-text');
+  scrollToBottom();
+  return wrap;
+}
+function scrollToBottom() {
+  const m = $('#messages');
+  m.scrollTop = m.scrollHeight;
+}
+function typeText(el, html, done) {
+  el.innerHTML = '<span class="typing-cursor"></span>';
+  let i = 0;
+  const len = html.length;
+  const step = () => {
+    i += 3;
+    const chunk = html.slice(0, i);
+    el.innerHTML = chunk + '<span class="typing-cursor"></span>';
+    scrollToBottom();
+    if (i >= len) {
+      el.innerHTML = html;
+      done && done();
+      return;
+    }
+    streamingTimer = setTimeout(step, 18);
+  };
+  step();
+}
+function appendResultCard(content, result) {
+  if (!result) return;
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.innerHTML = `
+    <div class="result-card-main">
+      <div class="result-card-title">
+        ${result.type && result.type.includes('HTML') || result.type && result.type.includes('应用') ? ICONS.code : ICONS.file}
+        <span>${result.title}</span>
+      </div>
+      <div class="result-card-meta">
+        <span class="result-card-chip">${result.type}</span>
+        <span>${result.action}</span>
+      </div>
+    </div>
+    <div class="result-card-visual"></div>
+  `;
+  content.appendChild(card);
+}
+
+/* ==================== 演示脚本（按 q / intent 派发） ==================== */
+const SCRIPTS = {
+  qbank: {
+    title: 'AI 组题 · 七年级数学期末模拟题',
+    body: '已完成一套 <b>北京朝阳区七年级上册数学期末考试模拟题</b>，并同步生成答案解析和命题说明。右侧是题单 Canvas，可以直接编辑、下载，或保存到知识库。点击编辑进入统一题单编辑器；按钮状态由校园版、高扫作业、墨水屏作业三类权限决定，预览只能查看高扫作业或墨水屏作业效果，未开通能力保持可见但置灰。',
+    cites: [
+      { n: 1, label: '七上数学期末复习讲义 · 数与式' },
+      { n: 2, label: '朝阳区近三年期末题型分布' },
+      { n: 3, label: '人教版七上教材 · 重点章节' },
+    ],
+    result: { title: '北京朝阳区七年级上册数学期末考试模拟题.docx', type: '文档成果', action: '保存 / 编辑 / 下载' },
+    actions: [],
+    canvasKind: 'document',
+    documentMode: 'qbank',
+    canvasTitle: '北京朝阳区七年级上册数学期末考试模拟题.docx',
+    canvas: ['paper', 'answer', 'brief'],
+    defaultCv: 'paper',
+  },
+  htmlCourseware: {
+    title: '互动课件 · 长方体和正方体的认识',
+    body: '已生成一个 <b>HTML 互动课件</b>：包含封面、结构观察、棱顶点拖拽、高宽认知、课堂练习和小结。右侧是网页型 Canvas，可以编辑、全屏浏览和下载。',
+    cites: [
+      { n: 1, label: '人教版五年级下册数学 · 长方体和正方体' },
+      { n: 2, label: '五年级空间观念课堂活动库' },
+    ],
+    result: { title: '长方体和正方体的认识.html', type: 'HTML 互动内容', action: '编辑 / 全屏浏览 / 下载' },
+    actions: [
+      { label: '全屏浏览', primary: true, icon: 'slides', onClick: "showToast('（演示）全屏打开互动课件')" },
+      { label: '改成更适合导入课', icon: 'refresh', onClick: "showToast('（演示）AI 正在调整导入节奏…')" },
+    ],
+    canvasKind: 'html',
+    canvasTitle: '长方体和正方体的认识.html',
+    canvas: ['courseware'],
+    defaultCv: 'courseware',
+  },
+  appCreate: {
+    title: '创建应用 · 单词贪吃蛇应用',
+    body: '我已经按你的描述生成了一个 <b>单词贪吃蛇应用</b>：学生通过方向键控制角色吃到正确单词，系统记录得分并支持课堂数据回收。右侧是应用预览，可切换版本、代码和预览，并支持分享或部署。',
+    cites: [],
+    result: { title: '单词贪吃蛇应用', type: '应用型成果 · 未部署', action: '版本 / 代码 / 预览 · 分享 / 部署' },
+    actions: [
+      { label: '查看应用', primary: true, icon: 'slides', onClick: "showToast('（演示）打开应用预览')" },
+      { label: '调整单词范围', icon: 'refresh', onClick: "showToast('（演示）AI 正在改成五年级上册词表…')" },
+    ],
+    canvasKind: 'app',
+    canvasTitle: '单词贪吃蛇应用',
+    canvas: ['app'],
+    defaultCv: 'app',
+  },
+  kbSearch: {
+    title: '知识库问答 · 长方体课堂资料',
+    body: '我已基于 <b>学校知识库</b> 完成资料检索，找到 8 个相关结果，包含文件、视频和图片。',
+    searchResults: true,
+    cites: [],
+    actions: [],
+    canvas: [],
+    defaultCv: null,
+  },
+  kbAnswer: {
+    title: '知识库问答 · 长方体课堂导入',
+    body: '基于你可访问的 <b>学校知识库</b> 资料，这节课可以从学生熟悉的纸盒、魔方或粉笔盒导入：先让学生观察物体的面、棱、顶点，再用“数一数、摸一摸、标一标”的方式建立长方体和正方体的空间表象。讲解时建议把长方体的长、宽、高和正方体的棱长放在同一张对比表里，最后用一个棱长总和或展开图判断的小练习巩固。',
+    cites: [
+      { n: 1, label: '五年级数学备课组 · 立体图形单元设计', refIndex: 1 },
+      { n: 2, label: '长方体和正方体的认识 · 互动课件', refIndex: 2 },
+      { n: 3, label: '期末易错题 · 棱长总和与表面积', refIndex: 4 },
+    ],
+    actions: [],
+    canvas: [],
+    defaultCv: null,
+  },
+  default: {
+    title: '新对话',
+    body: '收到。这个问题我可以先用纯对话回答；如果要生成文件、互动课件、教学动画或应用，我会在右侧打开 Canvas。为了演示，你可以直接点下面几种场景切换。',
+    cites: [],
+    actions: [
+      { label: '演示 AI 组题', primary: true, icon: 'quiz', onClick: "sendQuick('帮我生成一份北京朝阳区七年级上册数学期末考试模拟题')" },
+      { label: '演示互动课件', icon: 'slides', onClick: "sendQuick('生成五年级长方体和正方体认识互动课件')" },
+      { label: '演示资料检索', icon: 'chart', onClick: "sendQuick('在知识库问答里查找长方体和正方体课堂资料')" },
+      { label: '演示知识库问答', icon: 'chart', onClick: "sendQuick('基于知识库回答：长方体和正方体这一课怎么导入？')" },
+      { label: '演示创建应用', icon: 'refresh', onClick: "sendQuick('创建一个单词贪吃蛇课堂练习应用')" },
+    ],
+    canvas: [],
+    defaultCv: null,
+  },
+};
+
+function pickScript(text) {
+  if (/搜索|查找|找.*资料|资料搜索/.test(text)) return 'kbSearch';
+  if (/知识库问答|基于知识库|根据.*知识库|知识库.*回答/.test(text)) return 'kbAnswer';
+  if (/创建应用|小工具|审批|应用/.test(text)) return 'appCreate';
+  if (/互动课件|教学动画|教学游戏|长方体|正方体|html/i.test(text)) return 'htmlCourseware';
+  if (/AI 组题|组题|试卷|模拟题|答案解析|期末/.test(text)) return 'qbank';
+  return 'default';
+}
+
+const KB_SEARCH_RESULTS = [
+  {
+    title: '长方体和正方体知识梳理.docx',
+    source: '学校知识库',
+    type: '文件',
+    location: '学校知识库 / 数学组 / 五年级 / 图形与几何',
+    snippet: '长方体和正方体是小学阶段建立空间观念的核心内容，重点理解面、棱、顶点以及长宽高之间的关系。',
+  },
+  {
+    title: '五年级数学备课组 · 立体图形单元设计',
+    source: '学校知识库',
+    type: '文件',
+    location: '学校知识库 / 数学组 / 五年级 / 立体图形单元',
+    snippet: '通过观察长方体的面、棱、顶点，建立空间观念，并用实物纸盒完成结构标注活动。',
+  },
+  {
+    title: '长方体和正方体的认识 · 互动课件',
+    source: '学校知识库',
+    type: '文件',
+    location: '学校知识库 / 资源市场 / 小学数学 / 五年级下册',
+    snippet: '课件包含长方体、正方体特征对比，支持拖拽旋转观察面、棱、顶点之间的关系。',
+  },
+  {
+    title: '课堂活动：用纸盒认识长方体.mp4',
+    source: '我的知识库',
+    type: '视频',
+    location: '我的知识库 / 课堂活动 / 空间观念',
+    snippet: '学生通过摸、数、标记纸盒上的面和棱，先形成直观经验，再抽象出长方体特征。',
+  },
+  {
+    title: '期末易错题 · 棱长总和与表面积',
+    source: '学校知识库',
+    type: '文件',
+    location: '学校知识库 / 数学组 / 五年级 / 期末复习',
+    snippet: '围绕棱长总和、表面积单位换算和展开图判断整理了 12 道高频错题。',
+  },
+  {
+    title: '正方体展开图判断示意图.png',
+    source: '我的知识库',
+    type: '图片',
+    location: '我的知识库 / 图片素材 / 图形与几何',
+    snippet: '用 11 种正方体展开图分类讲解，帮助学生从“看图猜”转向“相对面判断”。',
+  },
+  {
+    title: '空间观念单元导图.jpg',
+    source: '学校知识库',
+    type: '图片',
+    location: '学校知识库 / 教研素材 / 数学核心素养',
+    snippet: '空间观念强调学生对图形位置、形状、大小及其相互关系的理解，是图形与几何学习的重要基础。',
+  },
+  {
+    title: '五下空间观念单元检测讲评',
+    source: '学校知识库',
+    type: '文件',
+    location: '学校知识库 / 数学组 / 单元检测 / 讲评资料',
+    snippet: '讲评重点集中在长宽高对应关系、单位换算、展开图与表面积综合题。',
+  },
+];
+
+function appendSearchResults(content) {
+  const panel = document.createElement('div');
+  panel.className = 'ai-search-panel';
+  const fileIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/></svg>';
+  const videoIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>';
+  const imageIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8" cy="10" r="1.5"/><path d="m21 15-5-5L5 19"/></svg>';
+  const typeIconMap = { '视频': videoIcon, '图片': imageIcon, '文件': fileIcon };
+  const typeClassMap = { '视频': 'is-video', '图片': 'is-image', '文件': 'is-file' };
+  panel.innerHTML = `
+    <div class="ai-search-head">
+      <div class="ai-search-kicker">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        AI 搜索完成
+      </div>
+      <div class="ai-search-summary">
+        找到 <b>8 个</b>和“长方体和正方体”相关的结果：<b>5 个文件</b>、<b>1 个视频</b>、<b>2 张图片</b>。下面优先展示可直接打开查看的内容。
+      </div>
+    </div>
+    <div class="ai-result-list">
+      ${KB_SEARCH_RESULTS.map((item, idx) => {
+        const typeClass = typeClassMap[item.type] || 'is-file';
+        const typeIcon = typeIconMap[item.type] || fileIcon;
+        return `
+        <button class="ai-result-item ${typeClass}" onclick="openKnowledgeResult(${idx})">
+          <span class="ai-result-type-icon ${typeClass}">${typeIcon}</span>
+          <div>
+            <div class="ai-result-title">${item.title}</div>
+            <div class="ai-result-snippet">${item.type} · ${item.location}</div>
+          </div>
+          <span class="ai-result-open">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+          </span>
+        </button>
+      `;
+      }).join('')}
+    </div>
+    <div class="ai-search-foot">点击任意结果，在右侧打开资料预览。</div>
+  `;
+  content.appendChild(panel);
+}
+
+const ICON_MAP = {
+  slides: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+  quiz: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+  chart: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-5"/></svg>',
+  refresh: '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
+};
+
+/* ==================== Canvas 渲染（荷塘月色版） ==================== */
+const HETANG_SLIDES = [
+  { n: 1, title: '导入 · 月色下的中国散文', body: 'short' },
+  { n: 2, title: '走近朱自清 · 生平与创作', body: 'mid' },
+  { n: 3, title: '初读全文 · 整体感知', body: 'mid' },
+  { n: 4, title: '通感修辞 · 听觉转视觉', body: 'short' },
+  { n: 5, title: '月色描写 · 三个层次', body: 'mid' },
+  { n: 6, title: '荷塘四景 · 静、动、远、近', body: 'mid' },
+  { n: 7, title: '"颇不宁静" · 情感线索', body: 'short' },
+  { n: 8, title: '名句精读 · 6 处比喻', body: 'mid' },
+  { n: 9, title: '课堂活动 · 画面捕捉法', body: 'mid' },
+  { n: 10, title: '随堂练 · 句子赏析', body: 'short' },
+  { n: 11, title: '拓展 · 古典与现代之桥', body: 'mid' },
+  { n: 12, title: '课后小结与作业', body: 'short' },
+];
+function renderSlides() {
+  const thumbs = HETANG_SLIDES.map(s => `
+    <div class="thumb" onclick="showToast('（演示）打开第 ${s.n} 页编辑')">
+      <div class="thumb-num">${s.n}</div>
+      <div class="thumb-title">${s.title}</div>
+      <div class="thumb-body ${s.body}"></div>
+      <div class="thumb-body short"></div>
+      <div class="thumb-body mid"></div>
+    </div>
+  `).join('');
+  return `
+    <div class="slides-stage">
+      <div class="slides-stage-title">荷塘月色</div>
+      <div class="slides-stage-sub">高一语文 · 第二课时 · 共 12 页</div>
+      <div class="slides-stage-deco">
+        <div class="leaf" style="background:rgba(255,255,255,.7)"></div>
+        <div class="leaf" style="background:rgba(255,255,255,.5)"></div>
+        <div class="leaf" style="background:rgba(255,255,255,.7)"></div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#6b6a65;margin:6px 2px 8px;display:flex;justify-content:space-between">
+      <span>课件页（12 张）</span>
+      <span style="color:#a87e2c;cursor:pointer" onclick="showToast('（演示）AI 重写整份课件')">让 AI 改写 →</span>
+    </div>
+    <div class="slides-thumbs">${thumbs}</div>
+  `;
+}
+
+const HETANG_QUIZ = [
+  { n: 1, level: 'A', kind: '基础·选择', q: '《荷塘月色》中"<b>月光如流水一般，静静地泻在这一片叶子和花上</b>"使用的修辞手法是？\n A. 拟人  B. 比喻  C. 夸张  D. 借代' },
+  { n: 2, level: 'A', kind: '基础·填空', q: '《荷塘月色》写于 ____ 年，作者朱自清是 ____ 时期著名的散文家。文中作者"心里颇不宁静"的情感贯穿全文，是文章的 ____。' },
+  { n: 3, level: 'B', kind: '理解·赏析', q: '请赏析"<b>塘中的月色并不均匀；但光与影有着和谐的旋律，如梵婀玲上奏着的名曲</b>"一句的妙处，从修辞、感官、画面感三个角度回答。（200 字以内）' },
+  { n: 4, level: 'B', kind: '理解·分析', q: '文章中作者从"宁静"到"颇不宁静"再到"什么都没有"的情感变化体现了什么？结合时代背景说明朱自清此时的精神状态。' },
+  { n: 5, level: 'C', kind: '拓展·创作', q: '请仿照《荷塘月色》中"通感"的修辞手法（如"清香——歌声"），写一段 150 字左右的小景物描写，要求至少使用 2 处通感。' },
+];
+function renderQuiz() {
+  const items = HETANG_QUIZ.map(q => `
+    <div class="quiz-item">
+      <div class="quiz-item-head">
+        <span class="quiz-num">第 ${q.n} 题</span>
+        <span class="quiz-level ${q.level === 'B' ? 'b' : q.level === 'C' ? 'c' : ''}">${q.level} 档</span>
+        <span class="quiz-kind">${q.kind}</span>
+      </div>
+      <div class="quiz-question">${q.q.replace(/\n/g, '<br>')}</div>
+    </div>
+  `).join('');
+  return `
+    <div class="quiz-head">
+      <button class="quiz-tab active">全部 <span class="num">5</span></button>
+      <button class="quiz-tab">A 档 <span class="num">2</span></button>
+      <button class="quiz-tab">B 档 <span class="num">2</span></button>
+      <button class="quiz-tab">C 档 <span class="num">1</span></button>
+    </div>
+    <div style="font-size:12px;color:#6b6a65;margin:0 2px 10px;display:flex;justify-content:space-between">
+      <span>5 道题 · 已按高一(5)班平均水平校准</span>
+      <span style="color:#a87e2c;cursor:pointer" onclick="showToast('（演示）一键发布到高一(5)班')">发布到班级 →</span>
+    </div>
+    ${items}
+  `;
+}
+
+function renderInsight() {
+  return `
+    <div class="insight-card">
+      <div class="insight-title">高一(5)班 · 近 3 次散文阅读得分</div>
+      <div class="insight-row">
+        <span class="insight-label">《故都的秋》</span>
+        <div class="insight-bar"><div class="insight-bar-fill" style="width:78%"></div></div>
+        <span class="insight-val">78 分</span>
+      </div>
+      <div class="insight-row">
+        <span class="insight-label">《我与地坛》</span>
+        <div class="insight-bar"><div class="insight-bar-fill warn" style="width:64%"></div></div>
+        <span class="insight-val">64 分</span>
+      </div>
+      <div class="insight-row">
+        <span class="insight-label">《荷塘月色》预测</span>
+        <div class="insight-bar"><div class="insight-bar-fill bad" style="width:58%"></div></div>
+        <span class="insight-val">58 分*</span>
+      </div>
+      <div style="font-size:11px;color:#a19f99;margin-top:8px">* 根据通感、修辞这两个知识点的历史得分预测</div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-title">薄弱知识点（按错误率）</div>
+      <div class="insight-row">
+        <span class="insight-label">通感修辞 · 辨识与赏析</span>
+        <div class="insight-bar"><div class="insight-bar-fill bad" style="width:72%"></div></div>
+        <span class="insight-val" style="color:#a8626c">72% 错</span>
+      </div>
+      <div class="insight-row">
+        <span class="insight-label">情感线索 · 抓"文眼"</span>
+        <div class="insight-bar"><div class="insight-bar-fill warn" style="width:55%"></div></div>
+        <span class="insight-val" style="color:#a87e2c">55% 错</span>
+      </div>
+      <div class="insight-row">
+        <span class="insight-label">作者背景 · 知人论世</span>
+        <div class="insight-bar"><div class="insight-bar-fill" style="width:32%"></div></div>
+        <span class="insight-val" style="color:#4a755b">32% 错</span>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-title">AI 建议</div>
+      <div style="font-size:12.5px;color:#3a3633;line-height:1.7">
+        ① 第 3 题（通感赏析）建议<b>课堂集体讲解</b>，全班错误率预计 70%+。<br>
+        ② 第 5 题（通感仿写）作为<b>课后挑战题</b>，仅 A 档前 30% 学生掌握。<br>
+        ③ 建议<b>课件第 4 页（通感修辞）</b>预留 8 分钟，配套互动小游戏。
+      </div>
+    </div>
+  `;
+}
+
+function renderPaper() {
+  return `
+    <div class="doc-preview">
+      <h2>北京朝阳区七年级上册数学期末考试模拟题</h2>
+      <div class="doc-section-title">一、选择题（共8题，每题3分，共24分）</div>
+      <div class="doc-question">
+        <span class="doc-source">学习探究诊断｜七年级上册 · 数学</span><br>
+        1.（3分）-7 的绝对值是（　）。<br>
+        <div class="doc-options"><span>A. -7</span><span>B. 7</span><span>C. 1/7</span><span>D. -1/7</span></div>
+      </div>
+      <div class="doc-question">
+        <span class="doc-source">全品学练考｜科学记数法</span><br>
+        2.（3分）384000 用科学记数法表示为（　）。<br>
+        <div class="doc-options"><span>A. 3.84×10⁴</span><span>B. 3.84×10⁵</span><span>C. 3.84×10⁶</span><span>D. 38.4×10⁵</span></div>
+      </div>
+      <div class="doc-question">
+        <span class="doc-source">同步解析与测评｜整式运算</span><br>
+        3.（3分）如果单项式 -1/2 xᵃy² 与 1/3 yᵇx³ 是同类项，那么 a、b 的值分别为（　）。<br>
+        <div class="doc-options"><span>A. 2，2</span><span>B. -3，2</span><span>C. 2，3</span><span>D. 3，2</span></div>
+      </div>
+      <div class="doc-section-title">二、填空题（共6题，每题3分）</div>
+      <div class="doc-question">9. 若 x = -2，则代数式 3x² - 2x + 1 的值为 ______。</div>
+      <div class="doc-question">10. 已知线段 AB = 8cm，点 C 是 AB 的中点，则 AC = ______ cm。</div>
+    </div>
+  `;
+}
+function renderAnswer() {
+  return `
+    <div class="doc-preview">
+      <h2>答案解析</h2>
+      <div class="doc-answer-card"><b>第 1 题：</b>答案 B。负数的绝对值等于它的相反数，所以 -7 的绝对值是 7。</div>
+      <div class="doc-answer-card"><b>第 2 题：</b>答案 B。384000 = 3.84 × 10⁵，注意小数点向左移动 5 位。</div>
+      <div class="doc-answer-card"><b>第 3 题：</b>答案 D。同类项要求相同字母的指数相同，所以 a=3，b=2。</div>
+      <div class="doc-answer-card"><b>易错提醒：</b>科学记数法、同类项判定、线段中点和有理数运算是七上期末的高频失分点，建议讲评时先让学生标注“指数 / 符号 / 单位”。</div>
+    </div>
+  `;
+}
+function renderBrief() {
+  return `
+    <div class="doc-preview">
+      <h2>命题说明书</h2>
+      <div class="doc-answer-card"><b>题型结构：</b>选择题 8 道、填空题 6 道、解答题 5 道，覆盖有理数、整式、方程、几何初步、数据统计。</div>
+      <div class="doc-answer-card"><b>难度分布：</b>基础题 60%，综合题 30%，拓展题 10%。第 15、19 题用于区分学生的建模与推理能力。</div>
+      <div class="doc-answer-card"><b>知识库依据：</b>综合参考教材章节、区级期末题型、学校近两次单元检测错题。</div>
+    </div>
+  `;
+}
+const HTML_THUMBS = ['封面', '结构观察', '棱和顶点', '长宽高', '对比练习', '课堂小结', '作业布置', '拓展挑战', '互动测验', '数据反馈'];
+function renderHtmlCourseware() {
+  const thumbs = HTML_THUMBS.map((name, idx) => `
+    <div class="html-thumb ${idx === 0 ? 'active' : ''}" onclick="showToast('（演示）切换到第 ${idx + 1} 页：${name}')">
+      <div class="html-thumb-title">${name}</div>
+      <div class="html-thumb-line" style="width:${idx % 3 === 0 ? 70 : idx % 3 === 1 ? 92 : 54}%"></div>
+      <div class="html-thumb-line" style="width:${idx % 2 === 0 ? 48 : 76}%"></div>
+      <div class="html-thumb-badge">${idx + 1}</div>
+    </div>
+  `).join('');
+  return `
+    <div class="html-preview-shell">
+      <div class="html-thumbs">${thumbs}</div>
+      <div class="html-stage">
+        <div class="html-slide">
+          <h2>长方体和正方体的认识</h2>
+          <div class="html-slide-sub">小学数学五年级下册 · 互动探究课件</div>
+          <div class="cube-row">
+            <div class="cube-card"></div>
+            <div class="cube-card rose"></div>
+          </div>
+          <button class="play-demo" onclick="showToast('（演示）开始课堂互动')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            演示
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function renderAppPreview() {
+  const snakeCells = Array.from({ length: 154 }, (_, idx) => {
+    const snake = [112, 113, 114, 115, 126].includes(idx);
+    const word = idx === 130;
+    return `<span class="snake-cell ${snake ? 'snake' : ''} ${word ? 'word' : ''}"></span>`;
+  }).join('');
+  return `
+    <div class="html-preview-shell app-preview">
+      <div class="app-preview-toolbar">
+        <div class="app-mode-tabs">
+          <button class="app-mode-tab" onclick="showToast('（演示）查看版本记录')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+            版本
+          </button>
+          <button class="app-mode-tab" onclick="showToast('（演示）查看生成代码')">
+            ${ICONS.code}
+            代码
+          </button>
+          <button class="app-mode-tab active" onclick="showToast('当前正在预览应用')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            预览
+          </button>
+        </div>
+        <div class="app-file-name">/workspace/projects/word-snake/index.html</div>
+      </div>
+      <div class="html-stage">
+        <div class="snake-app-card">
+          <div class="snake-app-head">
+            <div>
+              <div class="snake-kicker">Vocabulary Arcade</div>
+              <div class="snake-app-title">Word Snake</div>
+            </div>
+            <div class="snake-score">Score<b>2</b></div>
+          </div>
+          <div class="snake-status">
+            <span>Game over. Press Restart to play again.</span>
+            <button class="snake-mini-btn" onclick="showToast('（演示）暂停游戏')">Pause</button>
+          </div>
+          <div class="snake-grid">${snakeCells}</div>
+          <div class="snake-controls">
+            <button class="up" onclick="showToast('（演示）向上移动')">Up</button>
+            <button onclick="showToast('（演示）向左移动')">Left</button>
+            <button onclick="showToast('（演示）向下移动')">Down</button>
+            <button onclick="showToast('（演示）向右移动')">Right</button>
+          </div>
+          <div class="snake-footnote">Arrow keys or WASD to steer. 吃到正确单词后记录得分，课后可回收班级练习数据。</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+let activeKnowledgeResult = null;
+function renderKnowledgePreview() {
+  const item = activeKnowledgeResult || KB_SEARCH_RESULTS[0];
+  const isVideo = item.type === '视频';
+  const isImage = item.type === '图片';
+  return `
+    <div class="doc-preview">
+      <h2>${item.title}</h2>
+      <div class="doc-answer-card"><b>来源：</b>${item.source}　<b>类型：</b>${item.type}　<b>位置：</b>${item.location}</div>
+      <div class="doc-section-title">内容片段</div>
+      <div class="doc-answer-card">${item.snippet}</div>
+      <div class="doc-section-title">${isVideo ? '视频预览' : isImage ? '图片预览' : '原文预览'}</div>
+      ${isVideo ? `
+        <div class="doc-answer-card">视频封面：用纸盒认识长方体 · 课堂活动实录</div>
+        <div class="doc-question">时长：06:18　格式：MP4　可用于课堂导入或课后回看。</div>
+      ` : isImage ? `
+        <div class="doc-answer-card">图片预览：图形与几何素材，可用于课件插图或板书辅助。</div>
+        <div class="doc-question">格式：JPG/PNG　建议用途：课堂展示、练习讲评、知识梳理。</div>
+      ` : `
+        <div class="doc-question">
+          本节课建议从学生熟悉的纸盒、粉笔盒、魔方等实物入手，让学生先观察物体的面、棱、顶点，再用数学语言描述长方体和正方体的共同点与不同点。
+        </div>
+        <div class="doc-question">
+          课堂活动可以分为三步：第一步数一数面、棱、顶点；第二步标出长、宽、高；第三步比较长方体和正方体的特征，形成结构化记录。
+        </div>
+        <div class="doc-question">
+          易错提醒：学生容易把“棱长总和”和“表面积”混淆，讲解时应让学生先指出每条棱对应的长、宽、高，再列式计算。
+        </div>
+      `}
+    </div>
+  `;
+}
+function openKnowledgeResult(index) {
+  activeKnowledgeResult = KB_SEARCH_RESULTS[index] || KB_SEARCH_RESULTS[0];
+  currentCanvasMeta = {
+    title: activeKnowledgeResult.title,
+    kind: 'reference',
+  };
+  canvasTabs = [{ id: 'knowledgePreview', label: '资料预览', title: activeKnowledgeResult.title, icon: ICONS.file, render: renderKnowledgePreview }];
+  activeCv = 'knowledgePreview';
+  setCanvasOpen(true);
+  renderActiveCvBody();
+  renderCvTop();
+}
+
+const CV_RENDERERS = {
+  paper: { label: '试卷', title: '北京朝阳区七年级上册数学期末考试模拟题.docx', icon: ICON_MAP.quiz, render: renderPaper },
+  answer: { label: '答案解析', title: '答案解析.docx', icon: ICON_MAP.slides, render: renderAnswer },
+  brief: { label: '命题说明', title: '命题说明书.pdf', icon: ICON_MAP.chart, render: renderBrief },
+  courseware: { label: '互动课件', title: '长方体和正方体的认识.html', icon: ICON_MAP.slides, render: renderHtmlCourseware },
+  app: { label: '应用预览', title: '单词贪吃蛇应用', icon: ICON_MAP.slides, render: renderAppPreview },
+  knowledgePreview: { label: '资料预览', title: '资料预览', icon: ICONS.file, render: renderKnowledgePreview },
+};
+
+/* ==================== 主流程 ==================== */
+function runChatDemo(userText) {
+  clearTimeout(streamingTimer);
+  if (isEmptyState()) setEmpty(false);
+  const scriptKey = pickScript(userText);
+  const script = SCRIPTS[scriptKey];
+  
+  $('#ch-title').textContent = script.title;
+  updateTopActions(script);
+  openCanvasForScript(script);
+  appendUserMsg(userText);
+  appendAiMsg();
+  
+  typeText(aiTextEl, script.body, () => {
+    const content = aiTextEl.parentElement;
+
+    if (script.searchResults) {
+      appendSearchResults(content);
+      scrollToBottom();
+      return;
+    }
+    
+    if (script.cites.length) {
+      const cites = document.createElement('div');
+      cites.className = 'msg-cites';
+      cites.innerHTML = '<span class="msg-cites-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> 引用</span>'
+        + script.cites.map(c => {
+          const action = typeof c.refIndex === 'number' ? `openKnowledgeResult(${c.refIndex})` : `showToast('原文：${c.label}')`;
+          return `<span class="msg-cite-chip" onclick="${action}"><b>[${c.n}]</b> ${c.label}</span>`;
+        }).join('');
+      content.appendChild(cites);
+    }
+
+    if (script.result) appendResultCard(content, script.result);
+
+    if (script.canvasKind !== 'document' && script.actions.length) {
+      const actions = document.createElement('div');
+      actions.className = 'msg-actions';
+      actions.innerHTML = script.actions.map(a => `
+        <button class="msg-action ${a.primary ? 'primary' : ''}" onclick="${a.onClick}">
+          ${ICON_MAP[a.icon] || ''}
+          <span>${a.label}</span>
+        </button>
+      `).join('');
+      content.appendChild(actions);
+    }
+
+    const fb = document.createElement('div');
+    fb.className = 'msg-fb';
+    fb.innerHTML = `
+      <button class="msg-fb-btn" onclick="regenerateLast()">
+        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        <span>重新生成</span>
+      </button>
+      <span class="msg-fb-sep"></span>
+      <button class="msg-fb-thumb" onclick="thumb(this,'up')" title="有用">
+        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+      </button>
+      <button class="msg-fb-thumb" onclick="thumb(this,'down')" title="不太对">
+        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+      </button>
+    `;
+    content.appendChild(fb);
+
+    scrollToBottom();
+  });
+}
+
+let lastUserText = '';
+function sendInChat() {
+  const ta = $('#cc-input');
+  let text = ta.value.trim();
+  if (!text) { showToast('请输入内容'); return; }
+  if (isEmptyState() && ccMode && CC_CHIP_META[ccMode]) {
+    const aiCap = ccMode === 'ai' && ccAiCapability
+      ? CC_AI_CAPABILITIES.find(cap => cap.id === ccAiCapability)
+      : null;
+    text = '[' + CC_CHIP_META[ccMode].label + (aiCap ? ' · ' + aiCap.label : '') + '] ' + text;
+    clearCcMode();
+  }
+  ta.value = '';
+  autosize(ta);
+  refreshSend();
+  lastUserText = text;
+  runChatDemo(text);
+}
+function sendQuick(text) {
+  lastUserText = text;
+  runChatDemo(text);
+}
+function regenerateLast() {
+  if (!lastUserText) return;
+  showToast('AI 重新生成中…');
+  // 删掉最后一条 AI 消息，重新跑
+  const wrap = $('#msg-wrap');
+  const last = wrap.querySelector('.msg-ai:last-child');
+  if (last) last.remove();
+  appendAiMsg();
+  setTimeout(() => {
+    runRegenerate(lastUserText);
+  }, 200);
+}
+function runRegenerate(text) {
+  // 跳过 appendUserMsg 直接重跑 AI 部分
+  const scriptKey = pickScript(text);
+  const script = SCRIPTS[scriptKey];
+  typeText(aiTextEl, script.body, () => {
+    // 简化：重新生成不重复挂引用/操作（演示足够）
+    const fb = document.createElement('div');
+    fb.className = 'msg-fb';
+    fb.innerHTML = `<span style="font-size:11px;color:#a19f99">（已重新生成）</span>`;
+    aiTextEl.parentElement.appendChild(fb);
+  });
+}
+function thumb(btn, dir) {
+  $$('.msg-fb-thumb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  showToast(dir === 'up' ? '感谢反馈 · 已记录"有用"' : '感谢反馈 · 我会改进');
+}
+
+/* ==================== 启动 ==================== */
+function getParam(k) {
+  const m = window.location.search.match(new RegExp('[?&]' + k + '=([^&]*)'));
+  return m ? decodeURIComponent(m[1]) : '';
+}
+function init() {
+  syncChatGreet();
+  const q = getParam('q');
+  const resume = getParam('resume');
+  const intent = getParam('intent');
+  const capability = getParam('capability');
+  const kb = getParam('kb');
+  const folders = getParam('folders');
+  // 知识库初始状态：URL 透传 folders 时按透传选；否则默认学校知识库。
+  if (kb === '1' && folders) {
+    const ids = folders.split(',').filter(id => KB_REF_FOLDERS.find(f => f.id === id));
+    selectedKbIds = ids.length ? ids : ['school'];
+  } else {
+    selectedKbIds = ['school'];
+  }
+  if (intent) setCcMode(intent);
+  if (intent === 'ai' && capability && CC_AI_CAPABILITIES.find(cap => cap.id === capability)) {
+    selectCcAiCapability(capability);
+  }
+  applyKbState();
+
+  if (q) {
+    setTimeout(() => runChatDemo(q), 200);
+  } else if (resume === '1') {
+    setTimeout(() => runChatDemo('帮我备《荷塘月色》第二课时 · 12 页课件 + 5 道分层练习'), 200);
+  } else {
+    // 新对话空状态：GPT 风格居中输入框，等老师自由输入
+    setEmpty(true);
+    $('#cc-input').focus();
+  }
+}
+function syncChatGreet() {
+  const el = document.querySelector('.empty-hero .hero-title');
+  if (el) el.textContent = '张老师，今天想做什么？';
+}
+init();
+</script>
+
+<template id="review-template">
+{
+  "title": "新对话 · 多场景 AI 工作台",
+  "summary": "对话页不是单一聊天页，而是按任务类型切换交互：闲聊只保留对话流；知识库问答可处理资料检索型问题和引用型回答：检索型展示 AI 整理后的资料结果列表，引用型展示回答正文和引用来源；AI 组题生成题单 Canvas；教学动画/互动课件等 HTML 内容生成网页预览 Canvas；创建应用生成应用预览 Canvas。不同场景的右侧区域、操作按钮和保存逻辑必须不同。",
+  "sections": [
+    {
+      "id": "chat-scenarios",
+      "title": "1. 场景分流",
+      "body": "对话页根据老师输入和所选模式进入不同工作流，而不是所有消息都打开 Canvas。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对话页承接首页或新对话空状态的首轮输入。首轮发送后，系统先判断本轮属于闲聊/普通问答、资料检索型问答、引用型知识库问答、AI 组题、AI 生成 HTML 内容、创建应用中的哪一类。",
+            "不同类型决定页面布局：闲聊、资料检索型问答和引用型知识库问答默认不打开生成型 Canvas；AI 组题、HTML 内容、创建应用会打开右侧成果区，左右保持接近 1:1。",
+            "进入对话详情后，底部输入框只用于继续对话、追问或要求调整当前结果，不再展示 AI 生成、知识库问答、创建应用等功能切换入口。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "识别任务类型",
+              "text": "触发：老师发送首轮消息或从首页携带 intent/capability 进入；动作：根据显式模式、二级能力和文本意图判断工作流；反馈：页面标题、消息文案、右侧 Canvas 开关和操作栏同步切换。"
+            },
+            {
+              "label": "无成果对象",
+              "text": "触发：普通问答、闲聊、解释概念、教学建议；动作：只展示左侧/中间对话流；反馈：右侧 Canvas 关闭，输入框继续可追问。"
+            },
+            {
+              "label": "检索对象",
+              "text": "触发：知识库问答中的资料检索型问题；动作：AI 完成检索并返回结果列表；反馈：不打开生成型 Canvas，点击某条结果后右侧打开资料预览。"
+            },
+            {
+              "label": "引用问答",
+              "text": "触发：知识库问答；动作：AI 基于可访问知识库资料回答问题；反馈：对话流展示回答正文和引用来源，点击引用后右侧打开资料预览。"
+            },
+            {
+              "label": "成果对象",
+              "text": "触发：组题、生成课件/动画/互动页、创建应用；动作：对话流展示任务过程和结果卡；反馈：右侧打开对应 Canvas，并展示该成果类型的操作按钮。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "右侧 Canvas 只承载可查看、可编辑、可下载或可保存的具体对象，不因为普通 AI 回复而打开。",
+            "任务类型以老师显式选择优先；没有显式选择时才由文本意图推断。",
+            "切换场景不删除已有消息和已有成果；新成果在右侧替换当前活动 Canvas，历史成果仍应能从消息或结果卡找回。",
+            "右侧 Canvas 必须可关闭；关闭后对话区铺开，成果状态保留，后续点击结果卡或查看按钮可重新打开。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "输入上下文包含首轮消息、入口 intent、知识库范围、能力选项、附件状态和是否需要打开 Canvas。",
+            "场景分流结果至少区分普通问答、资料检索、知识库问答、AI 组题、HTML/互动内容生成和创建应用。",
+            "从首页带入的知识库范围、能力选项和附件信息在进入对话页后继续生效。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "入口 intent 缺失",
+              "处理方式": "按普通问答进入，并保留老师输入内容。"
+            },
+            {
+              "场景": "选择知识库问答但无可用范围",
+              "处理方式": "提示选择我的知识库或学校知识库，不直接发起检索。"
+            },
+            {
+              "场景": "附件上传中点击发送",
+              "处理方式": "等待上传完成或提示上传失败后再发送。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "index.html",
+              "说明": "首页输入框、模式选项 和知识库范围进入对话页。"
+            },
+            {
+              "关联对象": "my-wiki.html / school-wiki.html",
+              "说明": "知识库问答读取对应知识库范围。"
+            },
+            {
+              "关联对象": "compose-sheet.html / app-square.html",
+              "说明": "组题、创建应用等结果可继续进入业务页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "输入普通问题后不应出现右侧 Canvas。",
+            "输入明确搜索意图后应展示 AI 搜索完成和结果列表，默认不打开成果 Canvas。",
+            "输入基于知识库的问答后应展示回答正文和引用来源，默认不打开成果 Canvas。",
+            "输入 AI 组题后应打开文档/题单 Canvas。",
+            "输入互动课件、教学动画或创建应用后应打开 HTML/应用预览 Canvas。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plain-chat",
+      "title": "2. 闲聊 / 普通问答",
+      "body": "闲聊和普通问答是纯对话场景，没有可沉淀成果时不展示右侧 Canvas。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "适用于老师问教学建议、概念解释、课堂话术、普通追问或轻量闲聊。",
+            "页面重点是消息可读性、继续追问和反馈，不应制造文件预览或成果区。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "发送普通问题",
+              "text": "触发：老师不选择任何模式直接发送；动作：消息进入对话流，AI 以普通文本回复；反馈：右侧 Canvas 保持关闭。"
+            },
+            {
+              "label": "继续追问",
+              "text": "触发：老师继续输入；动作：沿用当前会话上下文；反馈：消息追加到对话流底部。"
+            },
+            {
+              "label": "转为生成任务",
+              "text": "触发：老师追问“整理成课件/生成题目/做成应用”；动作：从普通对话切换到对应生成场景；反馈：右侧 Canvas 打开并展示成果。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "普通回复下只展示重新生成、点赞/点踩等轻量反馈，不展示下载、保存到知识库、全屏浏览等成果操作。",
+            "如果 AI 识别到老师需要成果，应先在回复中说明将生成什么，再打开对应 Canvas。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "普通问答只需要消息文本、老师身份和当前会话记录。",
+            "不会写入知识库检索范围，也不会默认打开右侧 Canvas。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "用户表达含糊，不确定是否要生成成果",
+              "处理方式": "先用对话追问或给出轻量建议，不自动打开 Canvas。"
+            },
+            {
+              "场景": "空输入发送",
+              "处理方式": "toast 提示“请输入内容”，不创建空消息。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "chat-history.html",
+              "说明": "普通问答完成后进入历史对话列表。"
+            },
+            {
+              "关联对象": "index.html",
+              "说明": "首页直接输入无特定 intent 时进入普通问答。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "无 intent 输入应进入普通问答。",
+            "普通问答不应展示知识库引用。",
+            "普通问答不应自动打开 Canvas。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kb-search-flow",
+      "title": "3. 资料检索型问答",
+      "body": "资料检索型问答不是生成成果，而是 AI 在知识库问答范围内帮老师完成一次资料检索，并整理可打开的结果。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "适用于老师要找文件、视频、图片等知识库资料。第一版不引入 Wiki 分类，只按文件/视频/图片做轻量区分。",
+            "顶部允许有 AI 加工信息，例如知识库范围、结果数量和结果构成；列表卡片只展示资料原始信息：标题、类型、位置路径。",
+            "点击结果后右侧打开资料预览，操作以打开原文、下载、关闭为主，不出现编辑或保存到知识库。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "发起搜索",
+              "text": "触发：老师在知识库问答中输入查找资料、搜索资料等检索型问题；动作：按当前范围检索可访问资料；反馈：AI 回复“检索完成”，并展示结果数量和类型构成。"
+            },
+            {
+              "label": "查看结果列表",
+              "text": "触发：检索完成；动作：展示紧凑结果列表；反馈：每条结果显示标题、文件/视频/图片类型、知识库位置路径和打开箭头。"
+            },
+            {
+              "label": "打开资料",
+              "text": "触发：点击任意结果；动作：右侧打开资料预览 Canvas；反馈：工具栏展示打开原文、下载、关闭。"
+            },
+            {
+              "label": "转为生成",
+              "text": "触发：老师基于检索结果继续说“整理成题单/生成课件/做成应用”；动作：把当前检索结果作为参考上下文；反馈：引导新建或切换到对应生成型流程。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "检索结果列表不展示 AI 分类、命中次数或 AI 摘要片段，避免混淆资料原始信息和 AI 加工信息。",
+            "知识库范围受权限限制；知识库问答默认基于学校知识库，老师也可以切换到我的知识库。",
+            "检索结果默认不自动保存、不自动生成、不自动加入知识库，只提供打开查看。",
+            "资料预览 Canvas 不是生成型 Canvas，不展示编辑、保存到知识库或全屏浏览。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "检索结果需要包含资源记录、标题、类型、来源知识库、位置路径、可预览地址和权限状态。",
+            "顶部 AI 汇总可以基于检索返回的总数和类型聚合生成，但不得改写单条结果的原始标题和路径。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "未检索到匹配资料",
+              "处理方式": "提示未找到相关资料，并允许老师改问法。"
+            },
+            {
+              "场景": "资料无访问权限",
+              "处理方式": "过滤不可访问资料，只展示可引用来源。"
+            },
+            {
+              "场景": "检索超时",
+              "处理方式": "保留问题并提示稍后重试。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "my-wiki.html / school-wiki.html",
+              "说明": "提供可检索资料来源。"
+            },
+            {
+              "关联对象": "file-preview.html",
+              "说明": "引用文件可进入原文预览。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "检索完成后列表应能区分文件、视频、图片三类。",
+            "列表卡片不应出现命中次数、课堂导入/概念讲解等 AI 分类。",
+            "点击结果后右侧预览可关闭，关闭后回到检索结果列表。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kb-answer-flow",
+      "title": "4. 知识库问答",
+      "body": "知识库问答是基于知识库文件回答老师的问题，交互接近普通对话，但必须展示引用依据。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "适用于老师基于知识库资料提问，例如课堂导入、知识点解释、资料内容总结或易错点分析。",
+            "页面以对话回答为主，不展示搜索结果列表，不默认打开右侧 Canvas。",
+            "AI 回复下方展示 2-4 个引用来源标签，说明回答基于哪些可访问资料。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "发起问答",
+              "text": "触发：老师选择知识库问答或输入“基于知识库回答/根据资料解释”等问题；动作：AI 检索可访问资料并生成回答；反馈：对话流展示回答正文。"
+            },
+            {
+              "label": "展示引用",
+              "text": "触发：回答生成完成；动作：在回答下方展示引用来源标签；反馈：每个引用显示编号和资料标题。"
+            },
+            {
+              "label": "打开引用",
+              "text": "触发：点击引用选项；动作：右侧打开资料预览 Canvas；反馈：老师可查看原文片段、打开原文或下载。"
+            },
+            {
+              "label": "转为生成",
+              "text": "触发：老师继续说“整理成课件/生成试卷/做成应用”；动作：把当前回答和引用来源作为上下文；反馈：切换到对应生成型 Canvas。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "知识库问答和闲聊都以对话流为主，但知识库问答必须保留引用来源。",
+            "引用来源不是搜索结果列表，不展示大量卡片，也不展示命中次数。",
+            "未点击引用时不默认打开右侧 Canvas；点击引用后打开的是资料预览，不是生成型 Canvas。",
+            "回答只能基于老师有权限访问的知识库资料。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "问答上下文包含知识库范围、问题正文、命中文件、命中 Wiki、引用片段和来源链接。",
+            "范围文案使用我的知识库或学校知识库，不使用全部知识库兜底。",
+            "学校知识库问答固定在当前学校知识库范围内。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "未选择知识库范围",
+              "处理方式": "展示范围选择，不发起回答。"
+            },
+            {
+              "场景": "当前范围无资料",
+              "处理方式": "提示该知识库暂无可回答资料。"
+            },
+            {
+              "场景": "回答缺少引用",
+              "处理方式": "提示依据不足，不输出确定结论。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "my-wiki.html",
+              "说明": "我的知识库范围来源。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "学校知识库范围来源。"
+            },
+            {
+              "关联对象": "file-preview.html / wiki-entry.html",
+              "说明": "回答引用可跳转到文件或 Wiki。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "知识库问答应显示回答正文和引用来源标签。",
+            "知识库问答默认不打开右侧 Canvas。",
+            "点击引用后右侧资料预览可关闭，关闭后回到问答对话。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "file-generation-flow",
+      "title": "5. AI 组题 / 文档生成",
+      "body": "AI 组题生成的是可交付文件，右侧 Canvas 应按文档预览器处理。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "适用于 AI 组题、试卷、答案解析、命题说明、讲义、教案、学案等文档成果。",
+            "对话区展示生成说明、引用来源和可继续调整的操作；右侧展示文件预览，可在多个文件标签页 间切换。",
+            "AI 组题文档成果的主操作是保存、编辑和下载；保存按钮用于打开保存到我的知识库弹窗，编辑按钮进入统一的题单编辑器，右侧不再拆成作业设置和编辑题目两个入口。",
+            "AI 组题消息下方不展示查看试卷、查看答案解析、调高难度等额外快捷按钮，避免和右侧文件标签页、输入框追问重复。",
+            "AI 组题对话页需要保留左侧导航，方便老师在组题结果、知识库、应用和资源之间切换。",
+            "AI 组题可以引用老师选择的知识库资料作为生成参考，但第一版不等于自动打通知识库题库。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "生成文件",
+              "text": "触发：老师选择 AI 组题或明确要求生成试卷/讲义/教案；动作：AI 生成一个或多个文档成果；反馈：右侧打开题单 Canvas，顶部显示成果名称。"
+            },
+            {
+              "label": "多文件切换",
+              "text": "触发：同一任务生成试卷、答案解析、说明书等多个文件；动作：右侧显示文件标签页；反馈：点击标签页 切换预览。"
+            },
+            {
+              "label": "编辑",
+              "text": "触发：点击编辑；动作：进入统一的题单编辑器；反馈：按钮状态由校园版、高扫作业、墨水屏作业三类权限共同决定；只有校园版时仅保存、下载、字号、行间距、题间距和题单分析可用，预览需有高扫作业或墨水屏作业权限，高扫作业解锁全部能力，墨水屏作业解锁主流程、卷参设置和题单分析。"
+            },
+            {
+              "label": "下载",
+              "text": "触发：点击下载；动作：下载当前文件；反馈：toast 或浏览器下载反馈。"
+            },
+            {
+              "label": "保存",
+              "text": "触发：点击保存；动作：打开保存到我的知识库的文件夹选择弹层；反馈：选择位置并确认后显示已保存状态。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "文档成果可以保存到知识库，因为它是可复用资料。",
+            "保存到知识库只保存当前成果文件，不保存整段对话。",
+            "AI 组题结果页只保留一个编辑入口；权限差异进入题单编辑器后再通过功能可用态表达。",
+            "当老师在 AI 组题时附加知识库，系统应把知识库作为参考上下文和引用来源，不自动把知识库文件中的题目加入正式题库。",
+            "从知识库资料自动识别题目属于 AI 录题/题库入库链路；第一版优先支持结构清晰的 Word、PDF，PPT、图片或混排资料不承诺稳定切题。",
+            "若组题过程需要使用知识库中已入库题目，应明确走题库选题或 AI 录题校对后的正式题目，不从未校对资料中直接抽题。",
+            "AI 组题对话标题是否继续固定显示为“AI 组题”需要复核；未确认前不要把标题口径写死到所有组题会话。",
+            "下载当前激活文件；多文件场景不默认打包，除非明确提供“全部下载”。",
+            "题单 Canvas 可关闭；关闭不删除已生成文件。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "组题上下文包含题型、年级学科、知识点、题量、难度、生成文件类型和题单 Canvas 状态。",
+            "多文件结果需保留文件标签页、当前选中文件和保存/下载/编辑入口。",
+            "题单编辑继续交给 compose-sheet.html。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "生成失败",
+              "处理方式": "保留老师需求并提示重新生成。"
+            },
+            {
+              "场景": "题量或条件缺失",
+              "处理方式": "追问补齐条件，不直接生成空题单。"
+            },
+            {
+              "场景": "保存到知识库失败",
+              "处理方式": "保留生成结果并允许重新保存。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "ai-qbank.html",
+              "说明": "题目来源和题目篮。"
+            },
+            {
+              "关联对象": "compose-sheet.html",
+              "说明": "生成题单进入统一编辑器。"
+            },
+            {
+              "关联对象": "my-wiki.html",
+              "说明": "题单可保存到我的知识库。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "AI 组题后右侧操作应为保存、编辑、下载、关闭。",
+            "AI 组题生成题单成果，标题右上角不展示发布按钮。",
+            "AI 组题页左侧导航应可见。",
+            "对话标题规则需要复核，不能在产品稿中默认写死所有会话标题为 AI 组题。",
+            "AI 组题消息下方不应出现查看试卷、查看答案解析、调高难度等按钮。",
+            "不应出现全屏浏览作为文档成果主操作。",
+            "附加知识库后，结果中应能看到引用来源，但不会出现“已自动入库题目”的暗示。",
+            "保存后按钮状态应变化，且可再次打开修改保存位置。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "html-generation-flow",
+      "title": "6. AI 生成 HTML / 互动内容",
+      "body": "教学动画、互动课件、教学游戏等大概率生成 HTML 或可运行页面，右侧 Canvas 应按网页预览器处理。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "适用于教学动画、互动课件、教学游戏、可交互页面等 HTML 型成果。",
+            "右侧展示网页/课件预览，可包含缩略页、主画布、演示按钮或播放入口。",
+            "HTML 型成果的主操作是编辑、全屏浏览、下载；保存到知识库不是第一优先级，第一版可不展示。",
+            "AI 生成资源后的页面顶栏只保留发布按钮，不展示收藏、分享、导出或折叠 Canvas 按钮。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "生成互动内容",
+              "text": "触发：老师选择教学动画、教学游戏、互动课件，或文本明确要求生成 HTML；动作：AI 生成可运行页面；反馈：右侧打开 HTML 预览 Canvas。"
+            },
+            {
+              "label": "预览页面",
+              "text": "触发：Canvas 打开；动作：展示主预览和必要缩略页；反馈：老师可看到实际页面效果。"
+            },
+            {
+              "label": "全屏浏览",
+              "text": "触发：点击全屏浏览；动作：以全屏或新窗口方式查看当前 HTML 成果；反馈：适合课堂演示。"
+            },
+            {
+              "label": "编辑",
+              "text": "触发：点击编辑；动作：进入 HTML/互动内容编辑器；反馈：老师可以调整文案、结构、交互或样式。"
+            },
+            {
+              "label": "下载",
+              "text": "触发：点击下载；动作：下载 HTML 包或单个 HTML 文件；反馈：toast 或下载反馈。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "HTML 型成果默认不展示保存到知识库，避免和文档成果混淆；后续如要沉淀，可设计为保存素材或保存到我的作品。",
+            "全屏浏览只查看当前成果，不进入编辑态。",
+            "下载应明确下载的是 HTML 文件还是资源包。",
+            "发布按钮打开发布作品弹窗，弹窗需要提示“校园版用户发布到本校资源，仅校内老师可见”。",
+            "HTML Canvas 关闭后，结果卡仍可重新打开。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "HTML/互动内容结果包含成果标题、预览页、缩略页、发布状态、全屏入口和下载入口。",
+            "课堂演示类成果保留预览、全屏、发布到本校资源等操作状态。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "预览渲染失败",
+              "处理方式": "提示预览失败，保留重新生成和下载入口。"
+            },
+            {
+              "场景": "发布到本校资源失败",
+              "处理方式": "保留本地成果并提示稍后重试。"
+            },
+            {
+              "场景": "内容不适合课堂展示",
+              "处理方式": "允许老师继续让 AI 调整。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "resource-square.html",
+              "说明": "公开发布后的互动内容进入本校资源。"
+            },
+            {
+              "关联对象": "resource-detail.html",
+              "说明": "资源详情承接预览和下载。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "教学动画/互动课件生成后右侧操作应为编辑、全屏浏览、下载、关闭。",
+            "生成资源后的标题右侧仅有发布按钮，不能出现收藏、分享、导出或折叠按钮。",
+            "点击发布后弹窗应展示校园版可见范围说明。",
+            "不应出现保存到知识库作为最强主操作。",
+            "右侧预览应能看出这是可运行页面，而不是普通文档。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "app-generation-flow",
+      "title": "7. 创建应用",
+      "body": "创建应用生成的是可运行应用或小工具，右侧 Canvas 应按应用发布工作台处理，而不是简单复用 HTML 下载工具栏。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "适用于老师描述“创建一个单词游戏、课堂投票、数据收集、小工具”等应用需求。",
+            "创建应用的需求澄清、生成、预览、版本、代码、分享和部署流程整体与飞象老师个人版保持一致。",
+            "对话区负责澄清需求、展示生成过程和支持继续改；右侧展示应用预览。",
+            "应用 Canvas 的核心操作是版本、代码、预览、分享和部署；不展示保存到知识库，也不把下载作为第一优先级。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "描述应用",
+              "text": "触发：老师选择创建应用或输入应用需求；动作：AI 生成应用原型；反馈：右侧打开应用预览 Canvas。"
+            },
+            {
+              "label": "预览应用",
+              "text": "触发：Canvas 打开；动作：默认进入预览态，展示可运行应用的关键页面或状态；反馈：老师能直接判断应用是否可用。"
+            },
+            {
+              "label": "切换查看",
+              "text": "触发：点击版本、代码或预览；动作：在同一 Canvas 内切换应用版本记录、生成代码和运行预览；反馈：不离开当前对话。"
+            },
+            {
+              "label": "继续修改",
+              "text": "触发：老师追问“增加信息/改流程/换样式”；动作：AI 更新应用；反馈：右侧预览同步变化。"
+            },
+            {
+              "label": "分享/部署",
+              "text": "触发：点击分享或部署；动作：分享复制当前应用链接，部署打开弹窗选择版本、域名和可见性；反馈：确认部署后提示部署结果。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "创建应用可以携带知识库作为参考资料，但不会自动复制知识库内容进应用。",
+            "应用成果不等同于知识库文件，第一版不展示保存到知识库。",
+            "部署是应用型成果的主操作；如果已经部署，再次点击部署表示发布最新修改。",
+            "校园版点击部署后的可见性与个人版不同：公开部署发布到本校应用，校内老师可见；私有部署不进入本校应用或社区，仅创建者自己可见。",
+            "分享默认分享当前已部署链接；未部署时应提示先部署或分享预览链接。",
+            "点击部署应打开部署弹窗，允许老师选择部署版本、查看应用域名，并设置可见性。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "创建应用上下文包含应用名称、描述、可见范围、部署状态、预览地址和版本记录。",
+            "公开部署写入本校应用；私有部署仅自己可见。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "应用生成失败",
+              "处理方式": "保留需求并允许重新生成。"
+            },
+            {
+              "场景": "部署失败",
+              "处理方式": "保留预览状态，不写入应用广场。"
+            },
+            {
+              "场景": "可见范围未选择",
+              "处理方式": "要求老师选择公开到本校或仅自己可见。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "app-square.html",
+              "说明": "公开部署后的应用进入本校应用。"
+            },
+            {
+              "关联对象": "app-detail.html",
+              "说明": "应用详情承接介绍、预览和分享。"
+            },
+            {
+              "关联对象": "my-apps.html",
+              "说明": "私有或自创应用可在我的作品查看。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "创建应用后右侧应显示应用预览，而不是文件预览。",
+            "应用 Canvas 顶部应展示分享、部署、关闭；预览区内应有版本、代码、预览切换。",
+            "除部署可见性外，创建应用流程应与飞象老师个人版一致；部署弹窗的可见性下拉菜单应包含公开部署和私有部署：公开部署进入本校应用，校内老师可见；私有部署不进入本校应用或社区，仅自己可见。",
+            "继续追问修改应用时，不应新开无关题单 Canvas。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "canvas-operations",
+      "title": "8. Canvas 操作规则",
+      "body": "Canvas 操作栏必须跟随成果类型变化。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "Canvas 是成果或资料的右侧查看区，不是所有对话都出现。",
+            "文件、资料预览、HTML、应用四类 Canvas 的操作栏不同。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开 Canvas",
+              "text": "生成题单、课件、HTML 或应用后，右侧打开对应 Canvas。"
+            },
+            {
+              "label": "切换文件或页面",
+              "text": "多文件结果使用标签页 或缩略页切换，主预览随选择更新。"
+            },
+            {
+              "label": "执行操作",
+              "text": "老师可编辑、下载、全屏、保存、发布或部署，具体按钮按成果类型展示。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "关闭 Canvas 只收起右侧，不删除结果、不清空对话。",
+            "重新打开 Canvas 时应回到最近一次激活成果。",
+            "操作栏文案必须避免混淆：文件按钮文案用保存并在弹窗说明保存到知识库，HTML 用全屏浏览，应用用部署，资料预览用打开原文。",
+            "所有对话详情页的输入框只能继续对话，不能在输入框内切换功能；新建任务或切换能力应回到首页/新对话空状态完成。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "Canvas 状态包含成果类型、当前文件、预览内容、缩略页、操作按钮、保存状态和发布/部署状态。",
+            "不同成果类型只展示对应操作，不把题单操作、网页操作和应用部署混在一起。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "成果还在生成中",
+              "处理方式": "Canvas 展示生成中状态，禁用下载/保存等不可用操作。"
+            },
+            {
+              "场景": "资料预览无权限",
+              "处理方式": "显示权限提示，保留搜索结果列表。"
+            },
+            {
+              "场景": "下载失败",
+              "处理方式": "toast 提示失败，可重试，不影响预览。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "compose-sheet.html",
+              "说明": "题单编辑。"
+            },
+            {
+              "关联对象": "resource-detail.html",
+              "说明": "互动内容发布后的资源预览。"
+            },
+            {
+              "关联对象": "app-detail.html",
+              "说明": "应用部署后的详情承接。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "生成成果后 Canvas 应自动打开。",
+            "多文件切换不丢失当前成果状态。",
+            "不同成果类型只展示对应操作。",
+            "保存、发布、部署失败时不应清空生成内容。"
+          ]
+        },
+        {
+          "title": "操作矩阵",
+          "type": "table",
+          "columns": [
+            "场景",
+            "右侧内容",
+            "操作"
+          ],
+          "rows": [
+            {
+              "场景": "闲聊/普通问答",
+              "右侧内容": "无 Canvas",
+              "操作": "无成果操作，仅对话反馈"
+            },
+            {
+              "场景": "资料检索结果",
+              "右侧内容": "资料预览",
+              "操作": "打开原文、下载、关闭"
+            },
+            {
+              "场景": "知识库问答引用",
+              "右侧内容": "资料预览",
+              "操作": "点击引用后打开原文、下载、关闭"
+            },
+            {
+              "场景": "AI 组题/文档生成",
+              "右侧内容": "文档/文件预览",
+              "操作": "保存、编辑、下载、关闭"
+            },
+            {
+              "场景": "教学动画/互动课件/教学游戏",
+              "右侧内容": "HTML 预览",
+              "操作": "编辑、全屏浏览、下载、关闭"
+            },
+            {
+              "场景": "创建应用",
+              "右侧内容": "应用预览",
+              "操作": "版本、代码、预览、分享、部署、关闭"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'chat.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+</body>
+</html>

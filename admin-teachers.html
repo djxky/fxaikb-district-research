@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>飞象老师校园版 · 学校管理</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/v28.css?v=20260521d" />
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/page-header.css" />
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input, select { font: inherit; }
+
+  .admin-app {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    height: 100vh;
+  }
+  .main {
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .page-header[data-page-header="admin-teachers"] { position: sticky; }
+  .page-header[data-page-header="admin-teachers"] .ph-action.is-primary {
+    background: #111110;
+    border-color: #111110;
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .page-header[data-page-header="admin-teachers"] .ph-action.is-primary [data-lucide] {
+    color: #fff;
+  }
+  .page-header[data-page-header="admin-teachers"] .ph-action.is-primary:hover {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+  }
+
+  .admin-page {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 40px 72px;
+  }
+  .panel {
+    background: rgba(255,255,255,.86);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow-1);
+  }
+
+  .invite-panel {
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+  .panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .panel-title [data-lucide] {
+    width: 17px;
+    height: 17px;
+    color: var(--gold);
+  }
+  .panel-sub {
+    margin-top: 4px;
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+  .head-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn {
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid #d8d3c9;
+    background: #fff;
+    color: var(--text-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 550;
+    cursor: pointer;
+    transition: all .15s ease;
+    white-space: nowrap;
+  }
+  .btn [data-lucide] { width: 14px; height: 14px; }
+  .btn:hover {
+    border-color: rgba(168,126,44,.42);
+    color: var(--gold-deep);
+    background: var(--gold-bg);
+  }
+  .btn.primary {
+    border-color: var(--text);
+    background: var(--text);
+    color: #fff;
+  }
+  .btn.primary:hover {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+  }
+  .btn.danger:hover {
+    background: #fff1ee;
+    border-color: #f0b6a8;
+    color: #c83c28;
+  }
+  .btn.ghost {
+    background: transparent;
+    border-color: transparent;
+  }
+  .btn.icon {
+    width: 34px;
+    padding: 0;
+  }
+
+  .invite-simple {
+    display: grid;
+    gap: 14px;
+  }
+  .invite-history {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .history-head,
+  .history-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) .72fr .72fr .55fr .48fr .55fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+  }
+  .history-head {
+    color: var(--text-3);
+    font-size: 11.5px;
+    font-weight: 650;
+    background: rgba(250,249,246,.72);
+    border-bottom: 1px solid var(--border);
+  }
+  .history-row {
+    color: var(--text-2);
+    font-size: 12.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .history-row:last-child { border-bottom: 0; }
+  .history-link {
+    display: inline;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  .history-link:hover {
+    color: var(--gold-deep);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .history-status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #eef6f0;
+    border: 1px solid #d3e5d5;
+    color: #2a7f42;
+    font-size: 11px;
+    font-weight: 650;
+  }
+  .history-status.expired {
+    background: #f4f3ef;
+    border-color: #e2ded5;
+    color: var(--text-3);
+  }
+  .history-status.discarded {
+    background: #fff1ee;
+    border-color: #f0c7bd;
+    color: #b44b38;
+  }
+  .history-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  .history-action {
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-3);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .history-action:hover { background: var(--surface-2); color: var(--text); }
+  .history-action.danger:hover { background: #fff1ee; color: #c83c28; }
+  .history-action:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+  }
+  .history-action:disabled:hover {
+    background: transparent;
+    color: var(--text-3);
+  }
+  .history-action [data-lucide] { width: 14px; height: 14px; }
+
+  .content-grid {
+    display: block;
+  }
+  .teachers-panel { overflow: hidden; }
+  .teacher-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .teacher-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-right: 4px;
+  }
+  .teacher-count {
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+  .search {
+    margin-left: auto;
+    width: 220px;
+    height: 32px;
+    border: 1px solid #d8d3c9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    background: #fff;
+    color: var(--text-3);
+  }
+  .search [data-lucide] { width: 13px; height: 13px; }
+  .search input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 12.5px;
+  }
+  .teacher-table { width: 100%; border-collapse: collapse; }
+  .teacher-table th,
+  .teacher-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
+  }
+  .teacher-table th {
+    color: var(--text-3);
+    font-size: 11.5px;
+    font-weight: 650;
+    background: rgba(250,249,246,.72);
+  }
+  .teacher-table tr:last-child td { border-bottom: 0; }
+  .teacher-table tr:hover td { background: #fcfaf5; }
+  .teacher-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .teacher-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .a1 { background: #4a755b; }
+  .a2 { background: #53759e; }
+  .a3 { background: #81628f; }
+  .a4 { background: #a8626c; }
+  .teacher-name {
+    font-size: 13.5px;
+    font-weight: 650;
+    color: var(--text);
+  }
+  .teacher-phone {
+    margin-top: 1px;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  .role-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 7px;
+    background: var(--gold-bg);
+    color: var(--gold-deep);
+    border: 1px solid rgba(192,142,79,.24);
+    font-size: 11.5px;
+    font-weight: 650;
+  }
+  .role-tag.lead {
+    background: #edf3f8;
+    color: #3f638d;
+    border-color: #d5e1ec;
+  }
+  .role-tag.principal {
+    background: #f4eff5;
+    color: #745082;
+    border-color: #e5d7e9;
+  }
+  .role-tag.admin {
+    background: #eef6f0;
+    color: #2f6f45;
+    border-color: #d3e5d5;
+  }
+  .role-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .role-checks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .role-check {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    border: 1px solid #d8d3c9;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .role-check input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: var(--gold);
+  }
+  .date-text {
+    color: var(--text-3);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .subject-text {
+    color: var(--text-2);
+    font-size: 12.5px;
+  }
+  .row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  .more-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    border: 0;
+    color: var(--text-3);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    background: transparent;
+  }
+  .more-btn:hover { color: var(--text); background: var(--surface-2); }
+  .more-btn.edit:hover { color: var(--gold-deep); background: var(--gold-bg); }
+  .more-btn.danger:hover { color: #c83c28; background: #fff1ee; }
+  .more-btn [data-lucide] { width: 15px; height: 15px; }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    background: rgba(17,17,16,.92);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 22px;
+    font-size: 12.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+    z-index: 9999;
+    backdrop-filter: blur(6px);
+  }
+
+  .modal-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(17,17,16,.28);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-mask.open { display: flex; }
+  .modal {
+    width: min(840px, 100%);
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--border-2);
+    box-shadow: 0 24px 64px rgba(0,0,0,.18);
+    overflow: hidden;
+  }
+  .modal.compact {
+    width: min(420px, 100%);
+  }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-title {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .modal-head-main {
+    display: grid;
+    gap: 6px;
+  }
+  .modal-head .modal-desc {
+    margin: 0;
+    max-width: 560px;
+  }
+  .modal-body { padding: 18px 20px; }
+  .modal-desc {
+    color: var(--text-3);
+    font-size: 12.5px;
+  }
+  .history-note {
+    color: var(--text-3);
+    font-size: 12px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .modal-tools {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .modal-tool-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .history-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0 8px;
+  }
+  .history-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .modal-field {
+    display: grid;
+    gap: 7px;
+  }
+  .modal-field label {
+    color: var(--text-2);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .modal-field input,
+  .modal-field select {
+    height: 36px;
+    border: 1px solid #d8d3c9;
+    border-radius: 8px;
+    padding: 0 10px;
+    background: #fff;
+    color: var(--text);
+    min-width: 160px;
+  }
+  .modal-field input:disabled {
+    background: var(--surface-2);
+    color: var(--text-3);
+    cursor: not-allowed;
+  }
+  .modal-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 18px 18px;
+  }
+
+  @media (max-width: 1040px) {
+  }
+  @media (max-width: 760px) {
+    .admin-app { grid-template-columns: 1fr; }
+    #feixiang-sidebar { display: none; }
+    .admin-page { padding: 18px 16px 56px; }
+    .page-header { padding-left: 16px; padding-right: 16px; }
+    .panel-head,
+    .teacher-toolbar { align-items: stretch; flex-direction: column; }
+    .head-actions,
+    .search { width: 100%; margin-left: 0; }
+    .head-actions .btn { flex: 1; }
+    .history-head { display: none; }
+    .history-row {
+      grid-template-columns: 1fr auto;
+      gap: 6px 12px;
+    }
+    .history-row span:nth-child(2),
+    .history-row span:nth-child(3),
+    .history-row span:nth-child(4),
+    .history-row span:nth-child(5),
+    .history-row span:nth-child(6) { display: none; }
+    .teacher-table th:nth-child(2),
+    .teacher-table td:nth-child(2),
+    .teacher-table th:nth-child(4),
+    .teacher-table td:nth-child(4) { display: none; }
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body>
+<div class="admin-app">
+  <aside id="feixiang-sidebar"></aside>
+
+  <main class="main" id="main">
+    <header class="page-header" data-page-header="admin-teachers">
+      <div class="ph-left">
+        <i data-lucide="shield-check" class="ph-icon"></i>
+        <div class="ph-title">学校管理</div>
+        <div class="ph-subtitle">北京市实验中学 · 管理员后台</div>
+      </div>
+      <div class="ph-spacer"></div>
+      <div class="ph-right">
+        <button class="ph-action" onclick="showToast('已导出老师名单')">
+          <i data-lucide="download"></i>
+          导出
+        </button>
+        <button class="ph-action is-primary" onclick="openInviteModal()" data-track="/click/feixiangCampusAdminTeachersPage/inviteTeacher | 邀请老师 | 无">
+          <i data-lucide="link"></i>
+          邀请老师
+        </button>
+      </div>
+    </header>
+
+    <section class="admin-page">
+      <div class="content-grid">
+        <section class="panel teachers-panel">
+          <div class="teacher-toolbar">
+            <div class="teacher-title">老师列表</div>
+            <div class="teacher-count"><span id="teacherCount">42</span> 位</div>
+            <div class="search">
+              <i data-lucide="search"></i>
+              <input id="teacherSearch" type="text" placeholder="搜索老师、手机号、学科" oninput="filterTeachers()" />
+            </div>
+          </div>
+
+          <table class="teacher-table">
+            <thead>
+              <tr>
+                <th>老师</th>
+                <th>角色</th>
+                <th>学科</th>
+                <th>加入时间</th>
+                <th style="text-align:right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="teacherRows">
+              <tr data-search="张明 13800138012 语文">
+                <td>
+                  <div class="teacher-cell">
+                    <div class="teacher-avatar a1">张</div>
+                    <div><div class="teacher-name">张明</div><div class="teacher-phone">138 0013 8012</div></div>
+                  </div>
+                </td>
+                <td><div class="role-list"><span class="role-tag">学科老师</span></div></td>
+                <td><span class="subject-text">语文</span></td>
+                <td><span class="date-text">2026-06-01 10:24</span></td>
+                <td><div class="row-actions"><button class="more-btn edit" title="编辑老师" onclick="openEditTeacherModal(this)"><i data-lucide="pencil"></i></button><button class="more-btn danger" title="移除老师" onclick="removeTeacher(this)" data-track="/click/feixiangCampusAdminTeachersPage/removeTeacher | 移除老师 | 无"><i data-lucide="user-minus"></i></button></div></td>
+              </tr>
+              <tr data-search="王洁 13900139045 数学">
+                <td>
+                  <div class="teacher-cell">
+                    <div class="teacher-avatar a2">王</div>
+                    <div><div class="teacher-name">王洁</div><div class="teacher-phone">139 0013 9045</div></div>
+                  </div>
+                </td>
+                <td><div class="role-list"><span class="role-tag">学科老师</span></div></td>
+                <td><span class="subject-text">数学</span></td>
+                <td><span class="date-text">2026-05-31 16:42</span></td>
+                <td><div class="row-actions"><button class="more-btn edit" title="编辑老师" onclick="openEditTeacherModal(this)"><i data-lucide="pencil"></i></button><button class="more-btn danger" title="移除老师" onclick="removeTeacher(this)" data-track="/click/feixiangCampusAdminTeachersPage/removeTeacher | 移除老师 | 无"><i data-lucide="user-minus"></i></button></div></td>
+              </tr>
+              <tr data-search="李蕾 13600136088 英语">
+                <td>
+                  <div class="teacher-cell">
+                    <div class="teacher-avatar a3">李</div>
+                    <div><div class="teacher-name">李蕾</div><div class="teacher-phone">136 0013 6088</div></div>
+                  </div>
+                </td>
+                <td><div class="role-list"><span class="role-tag">学科老师</span></div></td>
+                <td><span class="subject-text">英语</span></td>
+                <td><span class="date-text">2026-05-30 09:13</span></td>
+                <td><div class="row-actions"><button class="more-btn edit" title="编辑老师" onclick="openEditTeacherModal(this)"><i data-lucide="pencil"></i></button><button class="more-btn danger" title="移除老师" onclick="removeTeacher(this)" data-track="/click/feixiangCampusAdminTeachersPage/removeTeacher | 移除老师 | 无"><i data-lucide="user-minus"></i></button></div></td>
+              </tr>
+              <tr data-search="陈舟 13700137022 物理">
+                <td>
+                  <div class="teacher-cell">
+                    <div class="teacher-avatar a4">陈</div>
+                    <div><div class="teacher-name">陈舟</div><div class="teacher-phone">137 0013 7022</div></div>
+                  </div>
+                </td>
+                <td><div class="role-list"><span class="role-tag">学科老师</span></div></td>
+                <td><span class="subject-text">物理</span></td>
+                <td><span class="date-text">2026-05-28 14:05</span></td>
+                <td><div class="row-actions"><button class="more-btn edit" title="编辑老师" onclick="openEditTeacherModal(this)"><i data-lucide="pencil"></i></button><button class="more-btn danger" title="移除老师" onclick="removeTeacher(this)" data-track="/click/feixiangCampusAdminTeachersPage/removeTeacher | 移除老师 | 无"><i data-lucide="user-minus"></i></button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-mask" id="inviteModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-main">
+        <div class="modal-title">生成邀请链接</div>
+        <div class="modal-desc">生成后复制到老师群，老师用手机号登录并填写昵称即可加入。</div>
+      </div>
+      <button class="btn icon ghost" onclick="closeInviteModal()" aria-label="关闭"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tools">
+        <div class="modal-field">
+          <label>有效期</label>
+          <select id="expireSelect">
+            <option>7 天</option>
+            <option>30 天</option>
+          </select>
+        </div>
+        <div class="modal-tool-actions">
+          <button class="btn primary" onclick="resetInviteLink()" data-track="/click/feixiangCampusAdminTeachersPage/generateInviteLink | 生成邀请链接 | 无"><i data-lucide="link"></i>生成新链接</button>
+        </div>
+      </div>
+      <div class="history-title-row">
+        <div class="history-title">历史链接</div>
+        <div class="history-note">仅展示最近 30 条</div>
+      </div>
+      <div class="invite-history">
+        <div class="history-head">
+          <span>历史链接</span>
+          <span>生成时间</span>
+          <span>生成人</span>
+          <span>有效期</span>
+          <span>加入</span>
+          <span>状态</span>
+          <span style="text-align:right">操作</span>
+        </div>
+        <div class="history-row">
+          <span class="history-link" onclick="previewHistoryLink(this)">https://teacher.feixiangai.com/join/school/bjsyzx-teacher-7d</span>
+          <span>今天 10:18</span>
+          <span>张老师</span>
+          <span>7 天</span>
+          <span>6 位</span>
+          <span class="history-status">有效</span>
+          <span class="history-actions">
+            <button class="history-action" title="复制链接" onclick="copyHistoryLink(this)"><i data-lucide="copy"></i></button>
+            <button class="history-action danger" title="废弃链接" onclick="discardHistoryLink(this)"><i data-lucide="ban"></i></button>
+          </span>
+        </div>
+        <div class="history-row">
+          <span class="history-link" onclick="previewHistoryLink(this)">https://teacher.feixiangai.com/join/school/bjsyzx-teacher-may</span>
+          <span>05-24 18:32</span>
+          <span>张老师</span>
+          <span>7 天</span>
+          <span>18 位</span>
+          <span class="history-status expired">已过期</span>
+          <span class="history-actions">
+            <button class="history-action" title="复制链接" onclick="copyHistoryLink(this)"><i data-lucide="copy"></i></button>
+            <button class="history-action danger" title="已过期" disabled><i data-lucide="ban"></i></button>
+          </span>
+        </div>
+        <div class="history-row">
+          <span class="history-link" onclick="previewHistoryLink(this)">https://teacher.feixiangai.com/join/school/bjsyzx-open-week</span>
+          <span>05-10 09:05</span>
+          <span>李主任</span>
+          <span>7 天</span>
+          <span>12 位</span>
+          <span class="history-status expired">已过期</span>
+          <span class="history-actions">
+            <button class="history-action" title="复制链接" onclick="copyHistoryLink(this)"><i data-lucide="copy"></i></button>
+            <button class="history-action danger" title="已过期" disabled><i data-lucide="ban"></i></button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeInviteModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="editTeacherModal">
+  <div class="modal compact">
+    <div class="modal-head">
+      <div class="modal-title">编辑老师</div>
+      <button class="btn icon ghost" onclick="closeEditTeacherModal()" aria-label="关闭"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field" style="margin-bottom:14px">
+        <label>姓名</label>
+        <input id="editTeacherName" />
+      </div>
+      <div class="modal-field" style="margin-bottom:14px">
+        <label>角色</label>
+        <div class="role-checks" id="editTeacherRoles">
+          <label class="role-check"><input type="checkbox" value="学科老师" />学科老师</label>
+          <label class="role-check"><input type="checkbox" value="年级组长" />年级组长</label>
+          <label class="role-check"><input type="checkbox" value="校长" />校长</label>
+          <label class="role-check"><input type="checkbox" value="管理员" />管理员</label>
+        </div>
+      </div>
+      <div class="modal-field" style="margin-bottom:14px">
+        <label>学科</label>
+        <select id="editTeacherSubject">
+          <option>语文</option>
+          <option>数学</option>
+          <option>英语</option>
+          <option>物理</option>
+          <option>化学</option>
+          <option>生物</option>
+          <option>历史</option>
+          <option>地理</option>
+          <option>政治</option>
+          <option>信息技术</option>
+          <option>体育</option>
+          <option>美术</option>
+          <option>音乐</option>
+          <option>其他</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>手机号（不可编辑）</label>
+        <input id="editTeacherPhone" disabled />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeEditTeacherModal()">取消</button>
+      <button class="btn primary" onclick="saveTeacherProfile()" data-track="/click/feixiangCampusAdminTeachersPage/saveTeacherProfile | 保存老师信息 | 无">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="assets/feixiang-shell.js"></script>
+<script>
+  renderFeixiangSidebar('admin-teachers');
+
+  const main = document.getElementById('main');
+  const header = document.querySelector('.page-header');
+  main.addEventListener('scroll', () => {
+    header.dataset.compact = main.scrollTop > 8 ? 'true' : 'false';
+  });
+
+  let toastTimer = null;
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.style.opacity = '0', 2200);
+  }
+
+  function copyInviteLink() {
+    const firstCopyButton = document.querySelector('.history-row .history-action');
+    if (firstCopyButton) copyHistoryLink(firstCopyButton);
+  }
+
+  function sendInviteLink() {
+    copyInviteLink();
+    showToast('邀请链接已复制，可发送到老师群');
+  }
+
+  function openInviteModal() {
+    document.getElementById('inviteModal').classList.add('open');
+  }
+
+  function closeInviteModal() {
+    document.getElementById('inviteModal').classList.remove('open');
+  }
+
+  function resetInviteLink() {
+    const suffix = Math.random().toString(36).slice(2, 8);
+    const code = 'bjsyzx-teacher-' + suffix;
+    const url = 'https://teacher.feixiangai.com/join/school/' + code;
+    const history = document.querySelector('.invite-history');
+    const row = document.createElement('div');
+    row.className = 'history-row';
+    row.innerHTML = `
+      <span class="history-link" onclick="previewHistoryLink(this)">${url}</span>
+      <span>刚刚</span>
+      <span>张老师</span>
+      <span>${document.getElementById('expireSelect')?.value || '7 天'}</span>
+      <span>0 位</span>
+      <span class="history-status">有效</span>
+      <span class="history-actions">
+        <button class="history-action" title="复制链接" onclick="copyHistoryLink(this)"><i data-lucide="copy"></i></button>
+        <button class="history-action danger" title="废弃链接" onclick="discardHistoryLink(this)"><i data-lucide="ban"></i></button>
+      </span>
+    `;
+    history.querySelector('.history-head').insertAdjacentElement('afterend', row);
+    const rows = history.querySelectorAll('.history-row');
+    if (rows.length > 30) rows[rows.length - 1].remove();
+    if (window.lucide) lucide.createIcons();
+    showToast('新邀请链接已生成，可复制发送');
+  }
+
+  function removeTeacher(button) {
+    const row = button.closest('tr');
+    const name = row.querySelector('.teacher-name').textContent;
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(8px)';
+    row.style.transition = 'opacity .18s ease, transform .18s ease';
+    setTimeout(() => {
+      row.remove();
+      const count = document.getElementById('teacherCount');
+      count.textContent = String(Math.max(0, Number(count.textContent) - 1));
+      showToast(name + '已从本校老师列表移除');
+    }, 180);
+  }
+
+  function copyHistoryLink(button) {
+    const row = button.closest('.history-row');
+    const url = row.querySelector('.history-link').textContent.trim();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).catch(() => {});
+    }
+    showToast('邀请链接已复制');
+  }
+
+  function discardHistoryLink(button) {
+    const row = button.closest('.history-row');
+    const url = row.querySelector('.history-link').textContent.trim();
+    const status = row.querySelector('.history-status');
+    status.textContent = '已废弃';
+    status.classList.add('discarded');
+    row.querySelectorAll('.history-action').forEach((action) => {
+      if (action.classList.contains('danger')) action.disabled = true;
+    });
+    showToast(url.split('/').pop() + ' 已废弃');
+  }
+
+  function previewHistoryLink(link) {
+    const row = link.closest('.history-row');
+    const status = row.querySelector('.history-status');
+    const inviteCode = link.textContent.trim().split('/').pop();
+    const state = status.classList.contains('expired') || status.classList.contains('discarded') ? 'expired' : 'valid';
+    window.location.href = 'join-school.html?invite=' + encodeURIComponent(inviteCode) + '&state=' + state;
+  }
+
+  let editingTeacherRow = null;
+  function openEditTeacherModal(button) {
+    editingTeacherRow = button.closest('tr');
+    const name = editingTeacherRow.querySelector('.teacher-name').textContent.trim();
+    const phone = editingTeacherRow.querySelector('.teacher-phone').textContent.trim();
+    const roles = Array.from(editingTeacherRow.querySelectorAll('.role-tag')).map((tag) => tag.textContent.trim());
+    const subject = editingTeacherRow.querySelector('.subject-text').textContent.trim();
+    document.getElementById('editTeacherName').value = name;
+    document.querySelectorAll('#editTeacherRoles input').forEach((input) => {
+      input.checked = roles.includes(input.value);
+    });
+    document.getElementById('editTeacherSubject').value = subject || '其他';
+    document.getElementById('editTeacherPhone').value = phone;
+    document.getElementById('editTeacherModal').classList.add('open');
+  }
+
+  function closeEditTeacherModal() {
+    document.getElementById('editTeacherModal').classList.remove('open');
+  }
+
+  function roleClass(role) {
+    if (role === '年级组长') return 'lead';
+    if (role === '校长') return 'principal';
+    if (role === '管理员') return 'admin';
+    return '';
+  }
+
+  function renderRoleTags(container, roles) {
+    container.innerHTML = roles.map((role) => {
+      const cls = ['role-tag', roleClass(role)].filter(Boolean).join(' ');
+      return '<span class="' + cls + '">' + role + '</span>';
+    }).join('');
+  }
+
+  function saveTeacherProfile() {
+    if (!editingTeacherRow) return;
+    const name = document.getElementById('editTeacherName').value.trim() || '未命名老师';
+    const roles = Array.from(document.querySelectorAll('#editTeacherRoles input:checked')).map((input) => input.value);
+    const nextRoles = roles.length ? roles : ['学科老师'];
+    const subject = document.getElementById('editTeacherSubject').value;
+    const phone = editingTeacherRow.querySelector('.teacher-phone').textContent.trim();
+    editingTeacherRow.querySelector('.teacher-name').textContent = name;
+    editingTeacherRow.querySelector('.teacher-avatar').textContent = name.slice(0, 1);
+    renderRoleTags(editingTeacherRow.querySelector('.role-list'), nextRoles);
+    editingTeacherRow.querySelector('.subject-text').textContent = subject;
+    editingTeacherRow.dataset.search = (name + ' ' + phone.replace(/\s/g, '') + ' ' + subject + ' ' + nextRoles.join(' ')).toLowerCase();
+    closeEditTeacherModal();
+    if (window.lucide) lucide.createIcons();
+    showToast('已保存' + name + '的信息');
+  }
+
+  function filterTeachers() {
+    const q = document.getElementById('teacherSearch').value.trim().toLowerCase();
+    document.querySelectorAll('#teacherRows tr').forEach((row) => {
+      row.style.display = row.dataset.search.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  document.getElementById('inviteModal').addEventListener('click', (event) => {
+    if (event.target.id === 'inviteModal') closeInviteModal();
+  });
+  document.getElementById('editTeacherModal').addEventListener('click', (event) => {
+    if (event.target.id === 'editTeacherModal') closeEditTeacherModal();
+  });
+
+  if (window.lucide) lucide.createIcons();
+</script>
+<template id="review-template">
+{
+  "title": "学校管理 · 老师成员与权限",
+  "summary": "学校管理页服务管理员维护老师成员、邀请方式和角色范围，重点说明老师入校、停用、权限调整与最后管理员保护。",
+  "sections": [
+    {
+      "id": "admin-teacher-list",
+      "title": "1. 老师列表",
+      "body": "列表展示学校内老师的姓名、手机号、角色、学科、状态、加入时间和最近活跃，帮助管理员判断成员是否仍在校内工作。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：学校管理员。",
+            "用途：查看老师成员身份、状态和最近活跃情况。",
+            "产出：成员列表、状态标识和后续管理入口。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "进入页面",
+              "text": "管理员从侧栏进入学校管理后，默认看到全部老师，活跃成员优先展示。"
+            },
+            {
+              "label": "查看成员",
+              "text": "点击成员行可查看基础信息、角色、学科和最近活跃记录。"
+            },
+            {
+              "label": "搜索定位",
+              "text": "按姓名、手机号或学科查找老师，结果为空时保留邀请入口。"
+            },
+            {
+              "label": "状态识别",
+              "text": "待加入、已加入、已停用使用不同状态标识，避免把离校老师误认为可用成员。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "普通老师不展示学校管理入口。",
+            "停用老师不能访问学校空间，但个人账号和个人资料不被删除。",
+            "成员列表默认不展示敏感完整手机号，可保留必要脱敏信息用于确认。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "成员列表展示姓名、手机号脱敏信息、角色、学科、状态、加入时间和最近活跃。",
+            "停用状态和权限范围需要在成员行内可识别。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "无管理员权限",
+              "处理方式": "隐藏入口；若通过链接进入，提示无权限并引导返回首页。"
+            },
+            {
+              "场景": "成员为空",
+              "处理方式": "展示空状态和“邀请老师”主操作。"
+            },
+            {
+              "场景": "老师已离校",
+              "处理方式": "列表保留停用记录，不能继续授权学校知识库。"
+            },
+            {
+              "场景": "搜索无结果",
+              "处理方式": "展示无结果说明，并允许清空筛选。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "join-school.html",
+              "说明": "老师接受邀请后进入加入学校流程，成功后回写到成员列表。"
+            },
+            {
+              "关联对象": "teacher-login.html",
+              "说明": "未登录老师需要先完成手机号登录。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "成员状态影响学校知识库访问范围。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "普通老师看不到学校管理入口。",
+            "成员状态、角色和最近活跃展示正确。",
+            "停用老师不能继续访问学校空间。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-invite",
+      "title": "2. 邀请老师",
+      "body": "邀请模块用于生成学校专属邀请方式，管理员可以复制链接或查看待加入老师状态。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：学校管理员。",
+            "用途：生成学校邀请方式，并跟踪待加入老师。",
+            "产出：邀请链接、邀请状态和待加入记录。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "创建邀请",
+              "text": "管理员点击邀请老师，选择邀请范围或默认学校范围。"
+            },
+            {
+              "label": "复制链接",
+              "text": "系统生成邀请链接后，管理员复制给老师。"
+            },
+            {
+              "label": "老师打开",
+              "text": "老师打开链接后进入加入学校页，看到学校名称和邀请说明。"
+            },
+            {
+              "label": "待加入跟踪",
+              "text": "已发出但未完成的邀请在列表中显示待加入状态。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "邀请链接只绑定当前学校，不允许跨学校复用。",
+            "邀请链接失效后不能继续加入，需要管理员重新生成。",
+            "同一手机号重复打开邀请时，应识别其是否已在学校内。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "邀请信息包含邀请链接、邀请人、学校名称、有效期和待加入状态。",
+            "待加入记录需要关联手机号或老师身份，避免重复创建成员。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "邀请链接过期",
+              "处理方式": "加入页提示链接已失效，并建议联系管理员重新邀请。"
+            },
+            {
+              "场景": "老师已在学校",
+              "处理方式": "直接提示已加入，不重复创建成员。"
+            },
+            {
+              "场景": "复制失败",
+              "处理方式": "保留链接文本并提示老师手动复制。"
+            },
+            {
+              "场景": "邀请被撤销",
+              "处理方式": "加入页提示邀请不可用。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "join-school.html",
+              "说明": "承接邀请链接校验、手机号验证和加入结果。"
+            },
+            {
+              "关联对象": "admin-teacher-list",
+              "说明": "加入成功后成员状态从待加入变为已加入。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "邀请链接只绑定当前学校。",
+            "链接失效后不能继续加入。",
+            "老师已在学校时不重复创建成员。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-role",
+      "title": "3. 角色与范围",
+      "body": "角色与范围用于控制老师在学校空间中的可见入口、资料访问和管理动作。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：学校管理员。",
+            "用途：调整老师在学校空间内的角色和可见范围。",
+            "产出：角色、学科范围、管理权限和保护提示。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "编辑角色",
+              "text": "管理员在成员详情中调整老师角色。"
+            },
+            {
+              "label": "确认影响",
+              "text": "角色变更前展示影响范围，例如是否能邀请成员、管理学校资料。"
+            },
+            {
+              "label": "保存结果",
+              "text": "保存后列表角色即时更新，并提示已生效。"
+            },
+            {
+              "label": "撤销/取消",
+              "text": "未保存时关闭弹层不改变原角色。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "至少保留一名管理员，不能把最后管理员降级或停用。",
+            "角色变更只影响学校空间，不影响个人知识库和个人应用。",
+            "普通老师不能修改其他老师角色。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "权限展示信息包括老师角色、管理范围、学科范围和状态。",
+            "最后管理员保护需要识别当前管理员数量。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "最后管理员被降级",
+              "处理方式": "阻止操作并说明需先设置另一名管理员。"
+            },
+            {
+              "场景": "成员状态为停用",
+              "处理方式": "不能继续提升为管理员，需先恢复成员状态。"
+            },
+            {
+              "场景": "保存失败",
+              "处理方式": "保留当前编辑内容，提示稍后重试。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "权限决定学校资料的查看、上传、分享能力。"
+            },
+            {
+              "关联对象": "resource-square.html",
+              "说明": "学校资源的复制和共享范围受角色影响。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "最后一个管理员不能被停用或降权。",
+            "角色调整后可见入口同步变化。",
+            "无权限老师不能访问管理动作。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'admin-teachers.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+</body>
+</html>

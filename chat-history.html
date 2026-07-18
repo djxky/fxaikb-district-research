@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飞象 AI · 历史对话</title>
+  <script src="assets/lucide-loader.js"></script>
+  <link rel="stylesheet" href="assets/v28.css?v=20260521d" />
+  <link rel="stylesheet" href="assets/shared/v28-modals.css?v=20260521g" />
+  <link rel="stylesheet" href="assets/feixiang-shell.css" />
+  <link rel="stylesheet" href="assets/page-header.css" />
+  <style>
+    .ch-page{ padding: 18px 22px 56px; }
+    .ch-container{
+      width: min(920px, 100%);
+      margin: 0 auto;
+    }
+    .ch-head{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .ch-title{
+      font-size: 30px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+    }
+    .ch-head-actions{
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ch-head-btn{
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 7px;
+      border: 1px solid transparent;
+      font-size: 12.5px;
+      color: #5A5550;
+      background: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .ch-head-btn [data-lucide]{ width: 13px; height: 13px; }
+    .ch-head-btn.ghost{ border-color:#D8D3C9; }
+    .ch-head-btn.ghost:hover{ background:#F5F1EB; border-color:#CFC9BD; color:#3A3A3A; }
+    .ch-head-btn.primary{
+      background:#A87E2C;
+      border-color:#A87E2C;
+      color:#FAFAF8;
+    }
+    .ch-head-btn.primary:hover{ background:#8F6A22; border-color:#8F6A22; }
+    .ch-head-btn.primary [data-lucide]{ color:#FAFAF8; }
+
+    .ch-search{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      width:100%;
+      margin-bottom:12px;
+      background:#fff;
+      border:1px solid #D8D3C9;
+      border-radius:8px;
+      padding:8px 12px;
+      transition:border-color .15s, box-shadow .15s;
+    }
+    .ch-search:focus-within{
+      border-color:#A87E2C;
+      box-shadow:0 0 0 2px rgba(168,126,44,.12);
+    }
+    .ch-search [data-lucide]{
+      width:14px;
+      height:14px;
+      color:#9A968F;
+      flex-shrink:0;
+    }
+    .ch-search input{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      font-size:12.5px;
+      color:#3A3A3A;
+      font-family:inherit;
+    }
+    .ch-search input::placeholder{ color:#B8B3AA; }
+
+    .ch-list{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+	    .ch-item{
+	      display:flex;
+	      align-items:center;
+	      gap:10px;
+      width:100%;
+      background:transparent;
+      border:none;
+      border-radius:8px;
+      padding:10px 10px;
+      text-align:left;
+      cursor:pointer;
+	      transition:background .12s, opacity .16s, transform .16s;
+    }
+    .ch-item:hover{ background:#F5F1EB; }
+    .ch-item:hover .ch-item-actions{ opacity:1; }
+
+    .ch-item-icon{
+      width:28px;
+      height:28px;
+      border-radius:6px;
+      border:1px solid #ECE9E2;
+      background:#FAFAF8;
+      display:grid;
+      place-items:center;
+      color:#A5A198;
+      flex-shrink:0;
+    }
+    .ch-item-icon [data-lucide]{ width:13px; height:13px; }
+
+    .ch-item-main{ min-width:0; flex:1; }
+    .ch-item-title{
+      font-size:12.8px;
+      color:#1E1B16;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      line-height:1.4;
+    }
+    .ch-item-meta{
+      margin-top:1px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      color:#B8B3AA;
+    }
+    .ch-item-actions{
+      display:flex;
+      align-items:center;
+      gap:2px;
+      opacity:0.3; /* 默认微弱可见，避免幽灵按钮 */
+      transition:opacity .12s;
+      flex-shrink:0;
+    }
+    .ch-action{
+      width:26px;
+      height:26px;
+      border:none;
+      border-radius:6px;
+      display:grid;
+      place-items:center;
+      background:transparent;
+      color:#9A968F;
+      cursor:pointer;
+      transition:background .12s, color .12s;
+    }
+	    .ch-action [data-lucide]{ width:12px; height:12px; }
+	    .ch-action:hover{
+	      background:#E8E2D8;
+	      color:#3A3A3A;
+	    }
+	    .ch-action.danger:hover{
+	      background:#FFF1EE;
+	      color:#C83C28;
+	    }
+	    .ch-title-input{
+	      width:100%;
+	      height:26px;
+	      border:1px solid #D8D3C9;
+	      border-radius:6px;
+	      background:#FFFFFF;
+	      color:#1E1B16;
+	      font:inherit;
+	      font-size:12.8px;
+	      padding:0 8px;
+	      outline:none;
+	      box-shadow:0 0 0 2px rgba(168,126,44,.1);
+	    }
+	    .ch-item.is-deleting{
+	      opacity:0;
+	      transform:translateX(8px);
+	      pointer-events:none;
+	    }
+	    .ch-confirm-backdrop{
+	      position:fixed;
+	      inset:0;
+	      z-index:5000;
+	      display:grid;
+	      place-items:center;
+	      padding:24px;
+	      background:rgba(23, 19, 12, .32);
+	    }
+	    .ch-confirm-dialog{
+	      width:min(420px, calc(100vw - 32px));
+	      background:var(--surface);
+	      border:1px solid var(--border);
+	      border-radius:16px;
+	      box-shadow:0 32px 80px -28px rgba(30,24,14,.42);
+	      position:relative;
+	      overflow:hidden;
+	    }
+	    .ch-confirm-head{
+	      display:flex;
+	      align-items:center;
+	      gap:10px;
+	      padding:16px 18px 12px;
+	      border-bottom:1px solid var(--border);
+	      padding-right:56px;
+	    }
+	    .ch-confirm-icon{
+	      width:28px;
+	      height:28px;
+	      border-radius:8px;
+	      display:grid;
+	      place-items:center;
+	      flex-shrink:0;
+	      background:#FFF1EE;
+	      color:#A4372F;
+	      border:1px solid #F3C6BE;
+	    }
+	    .ch-confirm-icon [data-lucide]{ width:16px; height:16px; }
+	    .ch-confirm-title{
+	      margin:0;
+	      color:var(--text);
+	      font-size:15px;
+	      line-height:1.35;
+	      font-weight:700;
+	    }
+	    .ch-confirm-close{
+	      position:absolute;
+	      top:12px;
+	      right:14px;
+	      width:28px;
+	      height:28px;
+	      border:0;
+	      background:transparent;
+	      border-radius:8px;
+	      color:var(--text-3);
+	      cursor:pointer;
+	      display:grid;
+	      place-items:center;
+	      transition:background-color .12s, color .12s;
+	    }
+	    .ch-confirm-close:hover{
+	      background:var(--surface-3);
+	      color:var(--text-1);
+	    }
+	    .ch-confirm-close [data-lucide]{ width:16px; height:16px; }
+	    .ch-confirm-body{
+	      padding:16px 18px 18px;
+	      color:var(--text-2);
+	      font-size:13px;
+	      line-height:1.65;
+	    }
+	    .ch-confirm-actions{
+	      display:flex;
+	      align-items:center;
+	      justify-content:flex-end;
+	      gap:10px;
+	      padding:14px 18px;
+	      border-top:1px solid var(--border);
+	      background:var(--surface-2);
+	    }
+	    .ch-confirm-btn{
+	      min-width:72px;
+	      height:32px;
+	      border-radius:8px;
+	      border:1px solid var(--border);
+	      background:var(--surface);
+	      color:var(--text-1);
+	      font-size:12.5px;
+	      font-weight:500;
+	      font-family:inherit;
+	      cursor:pointer;
+	      display:inline-flex;
+	      align-items:center;
+	      justify-content:center;
+	      gap:6px;
+	      transition:background-color .12s, border-color .12s, color .12s;
+	    }
+	    .ch-confirm-btn:hover{
+	      background:var(--surface-3);
+	    }
+	    .ch-confirm-btn.danger{
+	      min-width:88px;
+	      border-color:#A4372F;
+	      background:#A4372F;
+	      color:#FFFFFF;
+	      font-weight:600;
+	    }
+	    .ch-confirm-btn.danger:hover{
+	      border-color:#8F2E27;
+	      background:#8F2E27;
+	    }
+	    @media (max-width: 640px){
+	      .ch-confirm-actions{ justify-content:stretch; }
+	      .ch-confirm-btn{ flex:1; min-width:0; }
+	    }
+	  </style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="chat-history">
+
+<div class="app" id="app" data-view="wiki" data-chat="closed">
+  <aside class="sidebar-left" id="feixiang-sidebar"></aside>
+
+  <main class="workspace">
+    <!-- 统一页面顶栏 · page-header -->
+    <header class="page-header" data-page-header="chat-history">
+      <div class="ph-left">
+        <i class="ph-icon" data-lucide="message-square"></i>
+        <h1 class="ph-title">历史对话</h1>
+        <span class="ph-subtitle">你和飞象的所有对话记录，可继续、可搜索、可管理</span>
+      </div>
+      <div class="ph-right"></div>
+    </header>
+
+    <div class="workspace-scroll">
+      <section class="ch-page">
+        <div class="ch-container">
+
+          <div class="ch-search">
+            <i data-lucide="search"></i>
+            <input type="text" placeholder="搜索对话…" />
+          </div>
+
+          <div class="ch-list">
+            <div class="ch-item" onclick="openChat('resume')">
+              <div class="ch-item-icon"><i data-lucide="message-circle"></i></div>
+              <div class="ch-item-main">
+                <div class="ch-item-title">围绕「二次函数图像与性质」出 5 道分层练习，A/B/C 三难度，给八(3)班用</div>
+                <div class="ch-item-meta"><span>2026-05-13 18:42</span></div>
+              </div>
+              <div class="ch-item-actions">
+	                <button class="ch-action" onclick="startRenameHistory(event)" title="重命名"><i data-lucide="pencil"></i></button>
+	                <button class="ch-action danger" onclick="deleteHistoryItem(event)" title="删除"><i data-lucide="trash-2"></i></button>
+              </div>
+            </div>
+
+            <div class="ch-item" onclick="openChat('resume')">
+              <div class="ch-item-icon"><i data-lucide="message-circle"></i></div>
+              <div class="ch-item-main">
+                <div class="ch-item-title">帮我把「二次函数图像与性质」整理成第二课时的课件提纲</div>
+                <div class="ch-item-meta"><span>2026-05-13 16:20</span></div>
+              </div>
+              <div class="ch-item-actions">
+	                <button class="ch-action" onclick="startRenameHistory(event)" title="重命名"><i data-lucide="pencil"></i></button>
+	                <button class="ch-action danger" onclick="deleteHistoryItem(event)" title="删除"><i data-lucide="trash-2"></i></button>
+              </div>
+            </div>
+
+            <div class="ch-item" onclick="openChat('resume')">
+              <div class="ch-item-icon"><i data-lucide="message-circle"></i></div>
+              <div class="ch-item-main">
+                <div class="ch-item-title">全等三角形错题统计与讲评方案——基于八(2)班期中试卷</div>
+                <div class="ch-item-meta"><span>2026-05-12 21:15</span></div>
+              </div>
+              <div class="ch-item-actions">
+	                <button class="ch-action" onclick="startRenameHistory(event)" title="重命名"><i data-lucide="pencil"></i></button>
+	                <button class="ch-action danger" onclick="deleteHistoryItem(event)" title="删除"><i data-lucide="trash-2"></i></button>
+              </div>
+            </div>
+
+            <div class="ch-item" onclick="openChat('resume')">
+              <div class="ch-item-icon"><i data-lucide="message-circle"></i></div>
+              <div class="ch-item-main">
+                <div class="ch-item-title">出 10 道二次函数变式题（B 卷难度），含解析</div>
+                <div class="ch-item-meta"><span>2026-05-12 14:30</span></div>
+              </div>
+              <div class="ch-item-actions">
+	                <button class="ch-action" onclick="startRenameHistory(event)" title="重命名"><i data-lucide="pencil"></i></button>
+	                <button class="ch-action danger" onclick="deleteHistoryItem(event)" title="删除"><i data-lucide="trash-2"></i></button>
+              </div>
+            </div>
+
+            <div class="ch-item" onclick="openChat('resume')">
+              <div class="ch-item-icon"><i data-lucide="message-circle"></i></div>
+              <div class="ch-item-main">
+                <div class="ch-item-title">整理二次函数图像与性质的完整知识点大纲，适配中考考纲</div>
+                <div class="ch-item-meta"><span>2026-05-09 19:26</span></div>
+              </div>
+              <div class="ch-item-actions">
+	                <button class="ch-action" onclick="startRenameHistory(event)" title="重命名"><i data-lucide="pencil"></i></button>
+	                <button class="ch-action danger" onclick="deleteHistoryItem(event)" title="删除"><i data-lucide="trash-2"></i></button>
+              </div>
+            </div>
+
+            <div class="ch-item" onclick="openChat('resume')">
+              <div class="ch-item-icon"><i data-lucide="message-circle"></i></div>
+              <div class="ch-item-main">
+                <div class="ch-item-title">帮我分析一下这份期中试卷的难度分布和得分率</div>
+                <div class="ch-item-meta"><span>2026-05-07 15:08</span></div>
+              </div>
+              <div class="ch-item-actions">
+	                <button class="ch-action" onclick="startRenameHistory(event)" title="重命名"><i data-lucide="pencil"></i></button>
+	                <button class="ch-action danger" onclick="deleteHistoryItem(event)" title="删除"><i data-lucide="trash-2"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="sidebar-right"></aside>
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('chat-history');</script>
+<script src="assets/v28-shell.js?v=20260522b"></script>
+<script src="assets/v28.js?v=20260522e"></script>
+<script src="assets/page-header.js"></script>
+<script>
+  function startRenameHistory(event){
+    event.stopPropagation();
+    const item = event.currentTarget.closest('.ch-item');
+    const title = item && item.querySelector('.ch-item-title');
+    if(!item || !title || item.querySelector('.ch-title-input')) return;
+
+    const original = title.textContent.trim();
+    const input = document.createElement('input');
+    input.className = 'ch-title-input';
+    input.value = original;
+    input.maxLength = 60;
+    input.setAttribute('aria-label', '重命名对话标题');
+
+    let finished = false;
+    const finish = (shouldSave) => {
+      if(finished) return;
+      const next = input.value.trim();
+      if(shouldSave && !next){
+        showToast('标题不能为空');
+        input.focus();
+        return;
+      }
+      finished = true;
+      title.textContent = shouldSave ? next : original;
+      title.style.display = '';
+      input.remove();
+      if(shouldSave && next !== original) showToast('已重命名对话');
+    };
+
+    input.addEventListener('click', e => e.stopPropagation());
+    input.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        finish(true);
+      }
+      if(e.key === 'Escape'){
+        e.preventDefault();
+        finish(false);
+      }
+    });
+    input.addEventListener('blur', () => finish(true));
+
+    title.style.display = 'none';
+    title.insertAdjacentElement('afterend', input);
+    input.focus();
+    input.select();
+  }
+
+	  function deleteHistoryItem(event){
+	    event.stopPropagation();
+	    const item = event.currentTarget.closest('.ch-item');
+	    const title = item && item.querySelector('.ch-item-title');
+	    const name = title ? title.textContent.trim() : '这条对话';
+	    openHistoryDeleteConfirm(item, name);
+	  }
+
+	  function openHistoryDeleteConfirm(item, name){
+	    const existing = document.querySelector('.ch-confirm-backdrop');
+	    if(existing) existing.remove();
+
+	    const backdrop = document.createElement('div');
+	    backdrop.className = 'ch-confirm-backdrop';
+	    backdrop.setAttribute('role', 'presentation');
+	    backdrop.innerHTML = `
+	      <div class="ch-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="ch-confirm-title">
+	        <button class="ch-confirm-close" type="button" aria-label="关闭"><i data-lucide="x"></i></button>
+	        <div class="ch-confirm-head">
+	          <span class="ch-confirm-icon" aria-hidden="true"><i data-lucide="triangle-alert"></i></span>
+	          <h2 class="ch-confirm-title" id="ch-confirm-title">确认删除历史记录？</h2>
+	        </div>
+	        <div class="ch-confirm-body">删除后将无法恢复，是否继续？</div>
+	        <div class="ch-confirm-actions">
+	          <button class="ch-confirm-btn" type="button" data-action="cancel">取消</button>
+	          <button class="ch-confirm-btn danger" type="button" data-action="confirm">确认删除</button>
+	        </div>
+	      </div>
+	    `;
+
+	    const close = (showCancelToast = true) => {
+	      backdrop.remove();
+	      document.removeEventListener('keydown', onKeydown);
+	      if(showCancelToast) showToast('已取消删除');
+	    };
+	    const confirmDelete = () => {
+	      close(false);
+	      item.classList.add('is-deleting');
+	      setTimeout(() => {
+	        item.remove();
+	        showToast(`已删除「${name}」`);
+	      }, 160);
+	    };
+	    const onKeydown = (e) => {
+	      if(e.key === 'Escape') close();
+	    };
+
+	    backdrop.addEventListener('click', (e) => {
+	      if(e.target === backdrop) close();
+	    });
+	    backdrop.querySelector('.ch-confirm-close').addEventListener('click', () => close());
+	    backdrop.querySelector('[data-action="cancel"]').addEventListener('click', () => close());
+	    backdrop.querySelector('[data-action="confirm"]').addEventListener('click', confirmDelete);
+	    document.addEventListener('keydown', onKeydown);
+	    document.body.appendChild(backdrop);
+	    if(window.lucide) lucide.createIcons();
+	    backdrop.querySelector('[data-action="cancel"]').focus();
+	  }
+	</script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'chat-history.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+<template id="review-template">
+{
+  "title": "历史对话 · 找回已发生的工作",
+  "summary": "历史对话页帮助老师找回已发生的 AI 工作，支持按时间和关键词定位、继续对话、重命名和删除。",
+  "sections": [
+    {
+      "id": "chat-history-list",
+      "title": "1. 对话列表",
+      "body": "对话列表展示老师过去的 AI 对话、生成任务和知识库检索记录，便于继续未完成工作。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要继续历史任务的老师。",
+            "用途：找回过去的 AI 对话、生成任务和知识库检索记录。",
+            "展示项：对话标题、类型、时间和继续入口。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "进入列表",
+              "text": "老师从侧栏或首页进入历史对话。"
+            },
+            {
+              "label": "浏览记录",
+              "text": "列表按最近更新时间倒序展示标题、摘要、时间和关联知识库。"
+            },
+            {
+              "label": "搜索对话",
+              "text": "输入关键词按标题、摘要或相关资料查找。"
+            },
+            {
+              "label": "继续对话",
+              "text": "点击记录主体进入对应对话页并恢复上下文。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "历史对话属于当前老师个人，不默认共享给学校。",
+            "继续对话应恢复原来的知识库范围和上下文。",
+            "创建应用、AI 组题、HTML 生成等带 Canvas 的会话，继续对话时应恢复任务类型、生成成果和最近激活的右侧 Canvas 状态。",
+            "删除对话只删除历史记录，不删除源文件或题库题目。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "对话列表展示标题、类型、最近更新时间、来源能力和继续入口。",
+            "生成任务和知识库检索记录需要区分类型。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "无历史记录",
+              "处理方式": "展示空状态和开始新对话入口。"
+            },
+            {
+              "场景": "搜索无结果",
+              "处理方式": "提示无匹配并允许清空关键词。"
+            },
+            {
+              "场景": "原关联资料失效",
+              "处理方式": "仍可打开对话，但提示部分引用不可查看。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "chat.html",
+              "说明": "继续对话后进入新对话页并恢复上下文。"
+            },
+            {
+              "关联对象": "wiki-entry.html",
+              "说明": "围绕词条发起的对话需要保留词条来源。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "历史记录按最近更新时间展示。",
+            "点击记录能继续对应对话。",
+            "空列表展示空状态。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chat-history-actions",
+      "title": "2. 行内管理",
+      "body": "行内管理用于维护历史对话标题和保留状态，避免列表长期混乱。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：整理历史对话的老师。",
+            "用途：维护标题和保留状态，减少列表混乱。",
+            "产出：重命名、删除或保留后的列表状态。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开更多",
+              "text": "老师将鼠标移到记录行，右侧露出重命名和删除两个图标按钮；点击图标不进入对话。"
+            },
+            {
+              "label": "重命名",
+              "text": "点击铅笔后，当前标题原地变成输入框并自动选中文本；输入新标题后按 Enter 或失焦保存，按 Esc 取消。保存后列表标题即时更新，后续进入对话页也使用新标题。"
+            },
+            {
+              "label": "删除",
+              "text": "点击垃圾桶后弹出简单二次确认弹窗，包含警示图标、确认删除历史记录、删除后将无法恢复、取消和确认删除；确认后该记录从列表淡出移除，取消则保留原记录。"
+            },
+            {
+              "label": "取消操作",
+              "text": "重命名时按 Esc 恢复原标题；删除确认框点取消时关闭确认框并提示已取消删除，列表不变化。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "重命名只改变会话标题，不改变消息内容。",
+            "删除需要二次确认。",
+            "删除历史只移出当前老师的历史记录，不删除知识库文件、源文件、题库题目、已生成的课件或题单成品。",
+            "正在进行或有生成中的对话应提示删除影响。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "行内管理展示当前标题、重命名输入状态、删除确认状态和操作结果。",
+            "重命名结果需要同步到列表和后续进入的对话页。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "标题为空",
+              "处理方式": "保存时提示标题不能为空，输入框保持焦点，不覆盖原标题。"
+            },
+            {
+              "场景": "删除取消",
+              "处理方式": "关闭确认框，记录保留在原位置，并给出已取消删除反馈。"
+            },
+            {
+              "场景": "删除失败",
+              "处理方式": "记录回到列表并提示稍后重试。"
+            },
+            {
+              "场景": "会话生成中",
+              "处理方式": "删除前提示可能终止当前生成。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "chat.html",
+              "说明": "重命名后的标题在对话页顶部、侧栏最近对话和继续对话入口同步展示；已删除的历史记录不可再从列表继续。"
+            },
+            {
+              "关联对象": "index.html",
+              "说明": "最近工作动态可引用历史对话标题。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "重命名后标题即时更新。",
+            "删除前有确认弹窗。",
+            "删除后列表不再展示该记录。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>

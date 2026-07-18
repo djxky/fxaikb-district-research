@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飞象教育分析引擎 · 领导沟通版</title>
+  <script src="assets/lucide-local.js"></script>
+  <style>
+    :root {
+      --paper: #f7f7f3;
+      --surface: #ffffff;
+      --ink: #16202b;
+      --muted: #66717d;
+      --line: #dfe4e7;
+      --navy: #08213b;
+      --blue: #126893;
+      --blue-soft: #edf7fb;
+      --gold: #9f772b;
+      --gold-soft: #fbf5e7;
+      --green: #287554;
+      --green-soft: #edf7f1;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; min-height: 100%; margin: 0; }
+    body {
+      color: var(--ink);
+      background: var(--paper);
+      font: 14px/1.55 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    [data-lucide] { width: 18px; height: 18px; stroke-width: 1.8; }
+    .page { width: min(1380px, calc(100% - 64px)); min-height: 100vh; margin: 0 auto; padding: 28px 0 24px; }
+    .header { display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; color: white; border-radius: 10px; background: var(--gold); }
+    .brand strong { display: block; font-size: 15px; }
+    .brand span { color: var(--muted); font-size: 10px; }
+    .header-note { color: var(--green); font-size: 11px; }
+
+    .hero { padding: clamp(32px, 5vh, 54px) 0 clamp(24px, 3.4vh, 36px); text-align: center; }
+    .hero span { color: var(--gold); font-size: 11px; font-weight: 750; letter-spacing: .14em; }
+    .hero h1 { margin: 10px 0 12px; font-size: clamp(36px, 4.2vw, 62px); line-height: 1.12; letter-spacing: -.05em; }
+    .hero h1 em { color: var(--gold); font-style: normal; }
+    .hero p { margin: 0; color: var(--muted); font-size: clamp(14px, 1.3vw, 18px); }
+
+    .story { display: grid; grid-template-columns: minmax(260px, .85fr) 46px minmax(480px, 1.55fr) 46px minmax(280px, .95fr); align-items: stretch; }
+    .story-arrow { display: grid; place-items: center; color: #aab4bc; }
+    .story-arrow [data-lucide] { width: 24px; height: 24px; }
+    .panel { min-height: 390px; padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: 0 18px 50px rgba(29,42,54,.06); }
+    .panel-label { display: flex; align-items: center; gap: 7px; color: var(--blue); font-size: 10px; font-weight: 750; letter-spacing: .09em; }
+    .panel h2 { margin: 11px 0 8px; font-size: 23px; letter-spacing: -.025em; }
+    .panel > p { margin: 0; color: var(--muted); font-size: 12px; }
+
+    .question-panel { display: flex; flex-direction: column; background: linear-gradient(160deg, #fff, #f3f7f9); }
+    .question-quote { margin-top: 32px; padding: 20px; border-left: 4px solid var(--blue); background: var(--blue-soft); font-size: 18px; font-weight: 700; line-height: 1.6; }
+    .scope { display: grid; gap: 7px; margin-top: auto; }
+    .scope span { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
+    .scope [data-lucide] { width: 13px; color: var(--blue); }
+
+    .ai-panel { color: white; border-color: var(--navy); background: var(--navy); box-shadow: 0 24px 70px rgba(8,33,59,.18); }
+    .ai-panel .panel-label { color: #76c8e8; }
+    .ai-panel > p { color: rgba(255,255,255,.58); }
+    .expert-steps { display: grid; gap: 7px; margin-top: 17px; }
+    .expert-step { display: grid; grid-template-columns: 30px 142px 1fr; align-items: center; gap: 10px; min-height: 48px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.09); border-radius: 9px; background: rgba(255,255,255,.035); }
+    .expert-step b { display: grid; place-items: center; width: 26px; height: 26px; color: #8fd7f1; border: 1px solid rgba(118,200,232,.25); border-radius: 50%; font-size: 9px; }
+    .expert-step strong { font-size: 12px; }
+    .expert-step span { color: rgba(255,255,255,.55); font-size: 10px; }
+    .expert-step.counter { border-color: rgba(220,176,84,.3); background: rgba(159,119,43,.12); }
+    .expert-step.counter b { color: #e8c476; border-color: rgba(232,196,118,.3); }
+
+    .answer-panel { display: flex; flex-direction: column; border-color: rgba(40,117,84,.25); background: linear-gradient(160deg, #fff, var(--green-soft)); }
+    .answer-panel .panel-label { color: var(--green); }
+    .answer { margin-top: 20px; padding: 17px; border: 1px solid rgba(40,117,84,.18); border-radius: 10px; background: white; }
+    .answer > span { color: var(--green); font-size: 9px; font-weight: 750; }
+    .answer strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.55; }
+    .answer-list { display: grid; gap: 8px; margin-top: 14px; }
+    .answer-list div { display: grid; grid-template-columns: 62px 1fr; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+    .answer-list span { color: var(--muted); font-size: 10px; }
+    .answer-list b { font-size: 11px; }
+    .trace { display: flex; align-items: center; gap: 7px; margin-top: auto; padding-top: 18px; color: var(--green); font-size: 11px; font-weight: 650; }
+    .trace [data-lucide] { width: 14px; }
+
+    .bottom-line { display: grid; grid-template-columns: 1.2fr repeat(3, 1fr); margin-top: 18px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .bottom-line > div { padding: 14px 17px; border-right: 1px solid var(--line); }
+    .bottom-line > div:last-child { border-right: 0; }
+    .bottom-line .value { color: white; background: var(--gold); }
+    .bottom-line span { color: var(--muted); font-size: 9px; }
+    .bottom-line strong { display: block; margin-top: 3px; font-size: 12px; }
+    .bottom-line .value span { color: rgba(255,255,255,.72); }
+    .bottom-line .value strong { font-size: 14px; }
+
+    @media (max-width: 1050px) {
+      .story { grid-template-columns: 1fr; gap: 10px; }
+      .story-arrow { transform: rotate(90deg); }
+      .panel { min-height: auto; }
+      .bottom-line { grid-template-columns: 1fr 1fr; }
+      .bottom-line > div:nth-child(2) { border-right: 0; }
+      .bottom-line > div { border-bottom: 1px solid var(--line); }
+    }
+    @media (max-width: 640px) {
+      .page { width: calc(100% - 28px); }
+      .header-note { display: none; }
+      .expert-step { grid-template-columns: 30px 1fr; }
+      .expert-step span { grid-column: 2; }
+      .bottom-line { grid-template-columns: 1fr; }
+      .bottom-line > div { border-right: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <div class="brand"><div class="brand-mark"><i data-lucide="sparkles"></i></div><div><strong>飞象教育分析引擎</strong><span>领导沟通版 · 一屏看懂</span></div></div>
+      <div class="header-note">所有结论有来源、有反证、有边界</div>
+    </header>
+
+    <section class="hero">
+      <span>从“有很多数据”到“能回答教育问题”</span>
+      <h1>问一句话，AI 驱动全局数据，<em>像专家一样完成研究</em></h1>
+      <p>不是再做一张数据大屏，而是让教育局和学校真正用数据回答问题、发现问题、采取行动。</p>
+    </section>
+
+    <section class="story">
+      <article class="panel question-panel">
+        <div class="panel-label"><i data-lucide="message-square-text"></i>第一步</div>
+        <h2>提出教育问题</h2>
+        <p>学生、班级、学校、区域，任何层级都可以问。</p>
+        <div class="question-quote">“全面分析林知遥本学期的发展情况，并给出学校支持建议。”</div>
+        <div class="scope">
+          <span><i data-lucide="users"></i>也可以问：八年级数学为什么下降？</span>
+          <span><i data-lucide="school"></i>也可以问：区域课程机会是否均衡？</span>
+          <span><i data-lucide="activity"></i>也可以问：体育活动是否有效？</span>
+        </div>
+      </article>
+
+      <div class="story-arrow"><i data-lucide="arrow-right"></i></div>
+
+      <article class="panel ai-panel">
+        <div class="panel-label"><i data-lucide="brain-circuit"></i>AI 像专家一样工作</div>
+        <h2>自动完成五个专业动作</h2>
+        <p>根据问题动态选择方法，不套固定报告模板。</p>
+        <div class="expert-steps">
+          <div class="expert-step"><b>01</b><strong>先把问题讲清楚</strong><span>明确对象、时间、比较口径和用途</span></div>
+          <div class="expert-step"><b>02</b><strong>找到真正能用的数据</strong><span>跨系统调取，并检查缺失、重复和权限</span></div>
+          <div class="expert-step"><b>03</b><strong>选择合适分析方法</strong><span>做趋势、比较、诊断或效果评估</span></div>
+          <div class="expert-step counter"><b>04</b><strong>主动反驳自己的判断</strong><span>检查反例和其他可能原因，修正结论</span></div>
+          <div class="expert-step"><b>05</b><strong>形成有边界的结论</strong><span>说明依据、可信程度和不能怎么用</span></div>
+        </div>
+      </article>
+
+      <div class="story-arrow"><i data-lucide="arrow-right"></i></div>
+
+      <article class="panel answer-panel">
+        <div class="panel-label"><i data-lucide="file-check-2"></i>最终得到</div>
+        <h2>可以行动的答案</h2>
+        <p>不是一个神秘分数，而是结论、依据、限制和下一步。</p>
+        <div class="answer">
+          <span>本次示例结论</span>
+          <strong>高阶任务表现持续改善，但基础稳定性与作答节奏限制了常规成绩转化。</strong>
+          <div class="answer-list">
+            <div><span>依据</span><b>3 类系统、18 周数据、4 项反证检查</b></div>
+            <div><span>边界</span><b>用于制定支持计划，不用于能力定级</b></div>
+            <div><span>下一步</span><b>2 次低压力短测确认问题来源</b></div>
+          </div>
+        </div>
+        <div class="trace"><i data-lucide="git-branch"></i>点击任何结论，都能反查原始数据和分析过程</div>
+      </article>
+    </section>
+
+    <section class="bottom-line">
+      <div class="value"><span>平台真正的价值</span><strong>让散落的数据开始共同回答问题</strong></div>
+      <div><span>对教育局</span><strong>发现区域问题，支持资源配置</strong></div>
+      <div><span>对校长</span><strong>看清学校与学生真正需要什么</strong></div>
+      <div><span>对教师</span><strong>把分析结果变成可执行支持</strong></div>
+    </section>
+  </main>
+  <script>window.lucide && window.lucide.createIcons();</script>
+</body>
+</html>

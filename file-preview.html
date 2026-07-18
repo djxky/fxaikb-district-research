@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>导入课件.pptx · 飞象 AI</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/v28.css?v=20260521d" />
+<link rel="stylesheet" href="assets/shared/v28-modals.css?v=20260521g" />
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/page-header.css" />
+<!-- 兜底·内联样式（不走 v28.css 缓存） -->
+<!-- 默认 collapsed=56px icon-only；点 sb-collapse-btn → 切到展开态 240px -->
+<style>
+  /* ① 折叠态：56px icon-only */
+  body[data-page="file-preview"] .app[data-left="collapsed"]{
+    grid-template-columns: 56px 1fr 0 !important;
+  }
+  body[data-page="file-preview"] .app[data-left="collapsed"][data-right="expanded"],
+  body[data-page="file-preview"] .app[data-left="collapsed"][data-chat="open"]{
+    grid-template-columns: 56px 1fr 1fr !important;
+  }
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sidebar-left{
+    overflow:hidden;
+  }
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-brand-name,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-new-chat > .sb-new-chat-label,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-section-head,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-group-label,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-kb .kb-name,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-kb .kb-count,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-item .sb-item-label,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-user .sb-user-name,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-user > [data-lucide]:not(.sb-avatar [data-lucide]){
+    display:none !important;
+  }
+  /* collapsed 态保留所有 KB icon，方便跨库切换（不再 hide 非 active） */
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-kb .kb-name,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-kb .kb-count{
+    display:none !important;
+  }
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-new-chat,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-kb,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-item,
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-user{
+    width:32px !important;height:32px !important;padding:0 !important;
+    margin-left:auto !important;margin-right:auto !important;
+    justify-content:center !important;
+  }
+  body[data-page="file-preview"] .app[data-left="collapsed"] .sb-item-badge{
+    position:absolute !important;top:2px !important;right:1px !important;
+  }
+
+  /* ② 展开态：240px 宽态（去掉 data-left 属性即触发） */
+  body[data-page="file-preview"] .app:not([data-left="collapsed"]){
+    grid-template-columns: 240px 1fr 0 !important;
+  }
+  body[data-page="file-preview"] .app:not([data-left="collapsed"])[data-right="expanded"],
+  body[data-page="file-preview"] .app:not([data-left="collapsed"])[data-chat="open"]{
+    grid-template-columns: 240px 1fr 1fr !important;
+  }
+
+  /* ★ 文件预览页专属样式 ★ */
+  body[data-page="file-preview"] .fp-badge-pptx{
+    background:rgba(216,82,82,.10) !important;
+    border-color:rgba(216,82,82,.32) !important;
+    color:#9A3D3D !important;
+  }
+  body[data-page="file-preview"] .fp-badge-pptx [data-lucide]{
+    color:#C84A4A !important;
+  }
+  body[data-page="file-preview"] .fp-badge-file{
+    background:var(--gold-bg) !important;
+    border-color:#EAD8B6 !important;
+    color:var(--gold-deep) !important;
+  }
+  body[data-page="file-preview"] .fp-badge-file [data-lucide]{
+    color:var(--gold) !important;
+  }
+  body[data-page="file-preview"] .fp-qbank-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
+    color:var(--text-3);
+    font-size:12.5px;
+  }
+  body[data-page="file-preview"] .fp-qbank-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    min-height:24px;
+    padding:2px 9px;
+    border-radius:999px;
+    border:1px solid #E4DED2;
+    background:#F4F3EF;
+    color:#8F877D;
+    font-weight:650;
+    white-space:nowrap;
+  }
+  body[data-page="file-preview"] .fp-qbank-chip [data-lucide]{
+    width:12px;
+    height:12px;
+  }
+  body[data-page="file-preview"] .fp-qbank-chip.is-none{
+    background:#F6F1E9;
+    border-color:#E7D8BE;
+    color:#8A6B3E;
+  }
+  body[data-page="file-preview"] .fp-qbank-chip.is-doing{
+    background:#FFF7E8;
+    border-color:#EAD4A7;
+    color:#A66B13;
+  }
+  body[data-page="file-preview"] .fp-qbank-chip.is-done{
+    background:#EEF7F0;
+    border-color:#CFE4D3;
+    color:#267A43;
+  }
+  body[data-page="file-preview"] .fp-qbank-chip.is-failed{
+    background:#FFF0ED;
+    border-color:#F1C8BE;
+    color:#C64032;
+  }
+  body[data-page="file-preview"] .fp-qbank-action{
+    height:26px;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:0 10px;
+    border:1px solid #DCCAA8;
+    border-radius:999px;
+    background:#FFFEFB;
+    color:var(--gold-deep);
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .15s, border-color .15s, transform .15s;
+  }
+  body[data-page="file-preview"] .fp-qbank-action:hover{
+    border-color:var(--gold-light);
+    background:var(--gold-bg);
+    transform:translateY(-1px);
+  }
+  body[data-page="file-preview"] .fp-qbank-action [data-lucide]{
+    width:13px;
+    height:13px;
+  }
+  body[data-page="file-preview"] .fp-qbank-modal-mask{
+    position:fixed;
+    inset:0;
+    z-index:230;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(30, 25, 17, .36);
+  }
+  body[data-page="file-preview"] .fp-qbank-modal-mask.open{ display:flex; }
+  body[data-page="file-preview"] .fp-qbank-modal{
+    position:relative;
+    width:min(420px, calc(100vw - 48px));
+    border:1px solid #E9DDCB;
+    border-radius:14px;
+    background:#fff;
+    box-shadow:0 24px 72px -28px rgba(0,0,0,.42);
+    padding:24px;
+    text-align:center;
+  }
+  body[data-page="file-preview"] .fp-qbank-modal-close{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:30px;
+    height:30px;
+    display:grid;
+    place-items:center;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:#8E887F;
+    cursor:pointer;
+  }
+  body[data-page="file-preview"] .fp-qbank-modal-close:hover{
+    background:#F5F1EA;
+    color:#2B261D;
+  }
+  body[data-page="file-preview"] .fp-qbank-modal-close [data-lucide]{
+    width:17px;
+    height:17px;
+  }
+  body[data-page="file-preview"] .fp-qbank-modal-icon{
+    width:44px;
+    height:44px;
+    display:grid;
+    place-items:center;
+    margin:0 auto 14px;
+    border-radius:12px;
+    background:var(--gold-bg);
+    color:var(--gold);
+  }
+  body[data-page="file-preview"] .fp-qbank-modal h3{
+    margin:0;
+    color:#171512;
+    font-size:18px;
+    font-weight:750;
+  }
+  body[data-page="file-preview"] .fp-qbank-modal p{
+    margin:8px 0 0;
+    color:#8E887F;
+    font-size:13px;
+    line-height:1.7;
+  }
+  body[data-page="file-preview"] .fp-qbank-modal-actions{
+    display:flex;
+    justify-content:center;
+    margin-top:18px;
+  }
+  body[data-page="file-preview"] .fp-qbank-modal-btn{
+    height:34px;
+    padding:0 14px;
+    border-radius:8px;
+    border:1px solid #DDD4C6;
+    background:#fff;
+    color:#2B261D;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  body[data-page="file-preview"] .fp-qbank-modal-btn.primary{
+    border-color:#050501;
+    background:#050501;
+    color:#fff;
+  }
+  body[data-page="file-preview"] .fp-viewer{
+    margin:24px 0 8px;
+    display:flex;flex-direction:column;gap:14px;
+  }
+  body[data-page="file-preview"] .fp-slide-stage{
+    background:#FBFAF7;
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 1px 2px rgba(60,50,40,.04);
+  }
+  body[data-page="file-preview"] .fp-stage-bar{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 12px;
+    background:rgba(255,255,255,.6);
+    border-bottom:1px solid var(--border);
+    font-size:12px;color:var(--text-2);
+  }
+  body[data-page="file-preview"] .fp-nav-btn{
+    width:24px;height:24px;border-radius:5px;
+    background:transparent;border:1px solid transparent;
+    display:grid;place-items:center;cursor:pointer;
+    color:var(--text-3);
+    transition:all .12s var(--ease);
+  }
+  body[data-page="file-preview"] .fp-nav-btn:hover{
+    background:var(--surface-2);border-color:var(--border-2);
+    color:var(--text);
+  }
+  body[data-page="file-preview"] .fp-nav-btn [data-lucide]{width:14px;height:14px}
+  body[data-page="file-preview"] .fp-page-no{
+    font-weight:600;color:var(--text-1);
+    font-variant-numeric:tabular-nums;letter-spacing:.01em;
+    min-width:64px;text-align:center;
+  }
+  body[data-page="file-preview"] .fp-page-total{color:var(--text-4);font-weight:500}
+  body[data-page="file-preview"] .fp-stage-spacer{flex:1}
+  body[data-page="file-preview"] .fp-stage-cite{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:3px 9px;border-radius:5px;
+    background:var(--gold-bg);color:var(--gold-deep);
+    font-size:11px;font-weight:600;
+  }
+  body[data-page="file-preview"] .fp-stage-cite [data-lucide]{width:11px;height:11px;color:var(--gold)}
+
+  /* PPT slide 主体 */
+  body[data-page="file-preview"] .fp-slide{
+    aspect-ratio:16/9;
+    background:#FFFFFF;
+    padding:36px 42px;
+    display:flex;flex-direction:column;gap:18px;
+    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+    position:relative;
+  }
+  body[data-page="file-preview"] .fp-slide-title{
+    font-size:24px;font-weight:700;color:#1A1A1A;
+    letter-spacing:-.01em;
+    padding-bottom:12px;border-bottom:3px solid #C84A4A;
+    align-self:flex-start;
+  }
+  body[data-page="file-preview"] .fp-slide-points{
+    list-style:none;padding:0;margin:0;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  body[data-page="file-preview"] .fp-slide-points li{
+    display:flex;align-items:flex-start;gap:12px;
+    font-size:15px;line-height:1.7;color:#3A3733;
+  }
+  body[data-page="file-preview"] .fp-slide-num{
+    flex-shrink:0;
+    width:24px;height:24px;border-radius:50%;
+    background:#C84A4A;color:#fff;
+    display:grid;place-items:center;
+    font-size:13px;font-weight:700;
+    margin-top:2px;
+  }
+  body[data-page="file-preview"] .fp-slide-points b{color:#1A1A1A;font-weight:700}
+
+  body[data-page="file-preview"] .fp-slide-figure{
+    flex:1;min-height:140px;
+    background:#FBFAF7;border:1px dashed #DDD5C0;
+    border-radius:8px;
+    display:grid;place-items:center;
+    position:relative;
+  }
+  body[data-page="file-preview"] .fp-fig-axes{
+    position:relative;width:240px;height:140px;
+  }
+  body[data-page="file-preview"] .fp-fig-axis-x,
+  body[data-page="file-preview"] .fp-fig-axis-y{
+    position:absolute;background:#9A968F;
+  }
+  body[data-page="file-preview"] .fp-fig-axis-x{
+    left:0;right:0;top:50%;height:1px;
+  }
+  body[data-page="file-preview"] .fp-fig-axis-y{
+    top:0;bottom:0;left:50%;width:1px;
+  }
+  body[data-page="file-preview"] .fp-fig-label{
+    position:absolute;font-size:10.5px;color:var(--text-3);font-style:italic;
+  }
+  body[data-page="file-preview"] .fp-fig-lx{right:0;top:calc(50% - 14px)}
+  body[data-page="file-preview"] .fp-fig-ly{left:calc(50% + 4px);top:0}
+  body[data-page="file-preview"] .fp-fig-curve{
+    position:absolute;font-size:11px;font-weight:600;
+    padding:2px 6px;border-radius:4px;
+    background:rgba(255,255,255,.85);
+    font-family:ui-monospace,Menlo,monospace;
+  }
+  body[data-page="file-preview"] .fp-fig-up{
+    top:8px;left:54%;color:#C84A4A;border:1px solid rgba(200,74,74,.3);
+  }
+  body[data-page="file-preview"] .fp-fig-down{
+    bottom:8px;left:54%;color:#2E7A4A;border:1px solid rgba(46,122,74,.3);
+  }
+  body[data-page="file-preview"] .fp-fig-narrow{
+    top:8px;left:8%;color:#A87E2C;border:1px solid rgba(168,126,44,.3);
+  }
+  body[data-page="file-preview"] .fp-slide-foot{
+    position:absolute;bottom:14px;right:18px;
+    font-size:10.5px;color:var(--text-4);letter-spacing:.005em;
+  }
+
+  /* 缩略图横条 */
+  body[data-page="file-preview"] .fp-strip{
+    display:flex;gap:8px;overflow-x:auto;
+    padding:2px 2px 8px;
+  }
+  body[data-page="file-preview"] .fp-thumb{
+    flex-shrink:0;
+    width:96px;height:74px;
+    background:#FFFFFF;border:1px solid var(--border);
+    border-radius:6px;padding:8px 10px;
+    cursor:pointer;text-align:left;
+    display:flex;flex-direction:column;gap:5px;
+    transition:all .15s var(--ease);
+    position:relative;
+  }
+  body[data-page="file-preview"] .fp-thumb:hover{
+    border-color:var(--border-warm);
+    transform:translateY(-1px);
+  }
+  body[data-page="file-preview"] .fp-thumb.active{
+    border-color:#C84A4A;
+    box-shadow:0 0 0 2px rgba(200,74,74,.12);
+  }
+  body[data-page="file-preview"] .fp-thumb-no{
+    font-size:11px;font-weight:700;color:var(--text-3);
+    font-variant-numeric:tabular-nums;
+  }
+  body[data-page="file-preview"] .fp-thumb.active .fp-thumb-no{color:#C84A4A}
+  body[data-page="file-preview"] .fp-thumb-title{
+    font-size:11.5px;color:var(--text-2);line-height:1.4;
+    overflow:hidden;text-overflow:ellipsis;
+    display:-webkit-box;line-clamp:2;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  }
+  body[data-page="file-preview"] .fp-thumb.active .fp-thumb-title{color:var(--text);font-weight:600}
+  body[data-page="file-preview"] .fp-thumb-cite-ico{
+    position:absolute;top:5px;right:5px;
+    width:11px;height:11px;color:var(--gold);
+  }
+  body[data-page="file-preview"] .fp-thumb.more{
+    background:transparent;border-style:dashed;
+    color:var(--text-3);
+    display:grid;place-items:center;
+    text-align:center;
+  }
+  body[data-page="file-preview"] .fp-thumb.more .fp-thumb-no [data-lucide]{
+    width:14px;height:14px;
+  }
+
+  /* ★ AI 摘要 pane 内容样式 ★ */
+  body[data-page="file-preview"] .fp-ai-block{
+    margin-bottom:20px;padding-bottom:18px;
+    border-bottom:1px solid var(--border);
+  }
+  body[data-page="file-preview"] .fp-ai-block:last-of-type{
+    border-bottom:0;margin-bottom:8px;padding-bottom:0;
+  }
+  body[data-page="file-preview"] .fp-ai-label{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11.5px;font-weight:700;letter-spacing:.04em;
+    color:var(--gold-deep);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  body[data-page="file-preview"] .fp-ai-label [data-lucide]{
+    width:13px;height:13px;color:var(--gold);
+  }
+  body[data-page="file-preview"] .fp-ai-text{
+    font-size:13px;line-height:1.78;color:var(--text-1);
+    letter-spacing:.005em;
+  }
+  body[data-page="file-preview"] .fp-ai-text b{color:var(--text);font-weight:600}
+  body[data-page="file-preview"] .fp-ai-list{
+    list-style:none;padding:0;margin:0;
+    display:flex;flex-direction:column;gap:7px;
+  }
+  body[data-page="file-preview"] .fp-ai-list li{
+    font-size:12.5px;line-height:1.68;color:var(--text-1);
+    padding-left:14px;position:relative;letter-spacing:.005em;
+  }
+  body[data-page="file-preview"] .fp-ai-list li::before{
+    content:'';position:absolute;left:2px;top:9px;
+    width:4px;height:4px;border-radius:50%;
+    background:var(--gold);
+  }
+  body[data-page="file-preview"] .fp-ai-list b{color:var(--text);font-weight:600}
+  body[data-page="file-preview"] .fp-ai-list .wlink{
+    color:var(--gold-deep);text-decoration:underline;
+    text-decoration-color:rgba(122,93,32,.3);
+    text-underline-offset:2px;
+    cursor:pointer;
+  }
+  body[data-page="file-preview"] .fp-ai-list .wlink:hover{
+    text-decoration-color:var(--gold-deep);
+  }
+
+  /* ★ file-preview 默认双栏：让 sidebar-right 在 data-right="expanded" 下显形（覆盖 v28.css 通用规则） */
+  body[data-page="file-preview"] .app[data-right="expanded"] .sidebar-right{
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  /* file-preview 即使 view=folder 也保留右栏（与 wiki-entry 不同：03 切文件夹会让位，04 反而要保留 AI 摘要） */
+  body[data-page="file-preview"] .app[data-view="folder"][data-right="expanded"] .sidebar-right,
+  body[data-page="file-preview"] .app[data-view="graph"][data-right="expanded"] .sidebar-right{
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* ④ wiki-page 在 file-preview · 双栏态下：拉满主区，padding 48px 跟右栏对齐 */
+  body[data-page="file-preview"] .wiki-page{
+    max-width: 880px;
+  }
+  body[data-page="file-preview"] .app[data-right="expanded"] .wiki-page,
+  body[data-page="file-preview"] .app[data-chat="open"] .wiki-page{
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 42px 48px 96px !important;
+  }
+  /* 面包屑条在双栏 expanded 下，也跟着改 padding */
+  body[data-page="file-preview"] .app[data-right="expanded"] .entry-bcbar{
+    padding: 10px 48px !important;
+  }
+  /* 右栏内容区跟主区一样的 48 左 padding */
+  body[data-page="file-preview"] .app[data-right="expanded"] .canvas-head{
+    padding: 8px 48px 8px !important;
+  }
+  body[data-page="file-preview"] .app[data-right="expanded"] .cv-pane{
+    padding: 42px 48px 96px !important;
+  }
+  body[data-page="file-preview"] .app[data-right="expanded"] .cv-meta{
+    max-width: 520px !important;
+    margin: 0 !important;
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="file-preview">
+
+<div class="app" id="app" data-view="wiki" data-chat="closed" data-right="expanded">
+
+  <!-- ════════════ 左栏 · 公共壳由 v28-shell.js 渲染 ════════════ -->
+  <aside class="sidebar-left" id="feixiang-sidebar"></aside>
+
+  <!-- ════════════ 中栏 · 工作区 ════════════ -->
+  <main class="workspace">
+
+    <!-- 统一页面顶栏 · page-header（带面包屑） -->
+    <header class="page-header" data-page-header="file-preview">
+      <div class="ph-left">
+        <i class="ph-icon" data-lucide="library"></i>
+        <nav class="ph-crumb" aria-label="面包屑">
+          <a class="ph-crumb-item" href="school-wiki.html" title="回到学校知识库">
+            <span>学校知识库</span>
+          </a>
+          <span class="ph-crumb-sep" aria-hidden="true"><i data-lucide="chevron-right"></i></span>
+          <a class="ph-crumb-item" href="school-wiki.html#grade-9" title="九年级">
+            <span>数学 · 九年级</span>
+          </a>
+          <span class="ph-crumb-sep" aria-hidden="true"><i data-lucide="chevron-right"></i></span>
+          <a class="ph-crumb-item" href="wiki-entry.html" title="回到 二次函数图像与性质">
+            <i data-lucide="folder"></i><span>二次函数图像与性质 · 文件夹</span>
+          </a>
+          <span class="ph-crumb-sep" aria-hidden="true"><i data-lucide="chevron-right"></i></span>
+          <span class="ph-crumb-current"><i data-lucide="file-text"></i><span>导入课件.pptx</span></span>
+        </nav>
+      </div>
+      <div class="ph-right">
+        <button class="ph-action ph-action-icon tb-search" onclick="toggleTopSearch(event)" title="搜索 Wiki、文件" aria-expanded="false">
+          <i data-lucide="search"></i>
+        </button>
+        <button class="ph-action is-meta" id="btn-toggle-right" onclick="toggleRight()" title="查看飞象对这份原文件的 AI 解读">
+          <i data-lucide="panel-right-open"></i><span>AI 解读</span>
+        </button>
+        <span class="ph-action-sep" aria-hidden="true"></span>
+        <button class="ph-action" data-doc="download-btn-file-preview" onclick="V28DownloadDialog.open({ context:'file-preview', subject:'二次函数·导入课件.pptx' })" title="下载" data-track="/click/feixiangCampusFilePreviewPage/download | 下载文件 | fileType#STRING">
+          <i data-lucide="download"></i><span>下载</span>
+        </button>
+        <button class="ph-action" data-doc="share-btn-file-preview" onclick="V28ShareDialog.open({ context:'file-preview', subject:'二次函数·导入课件.pptx' })" title="分享" data-track="/click/feixiangCampusFilePreviewPage/share | 分享文件 | fileType#STRING">
+          <i data-lucide="share-2"></i><span>分享</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 主滚动区 -->
+    <div class="workspace-scroll">
+
+      <article class="wiki-page wiki-entry file-preview-page" id="view-wiki">
+
+        <!-- ───── 文件 Hero ───── -->
+        <header class="entry-hero">
+          <div class="entry-kicker">
+            <span class="entry-badge fp-badge-pptx"><i data-lucide="presentation"></i> PPTX · 原文件</span>
+            <span class="entry-subj">数学 · 九年级 · 函数 · 第一课时</span>
+          </div>
+          <h1 class="entry-title">二次函数 · 导入课件.pptx</h1>
+          <p class="entry-lead">
+            张明华为<b>八(3)班第一课时</b>准备的导入课件，覆盖 <b>开口方向、对称轴、顶点坐标</b> 三个核心考点。
+            飞象 AI 读完这份课件后，把第 <b>3、5、12 页</b> 的内容融进了
+            <a class="wlink" onclick="window.location.href='wiki-entry.html'">《二次函数图像与性质》</a> Wiki——
+            右侧看 AI 是怎么吸收这份资料的。
+          </p>
+          <div class="entry-meta">
+            <span class="em-item">上传人 <b>张明华</b></span>
+            <span class="em-sep">·</span>
+            <span class="em-item"><b>4.2 MB</b></span>
+            <span class="em-sep">·</span>
+            <span class="em-item">上传 <b>5 天前</b></span>
+          </div>
+          <div class="fp-qbank-row">
+            <span class="fp-qbank-chip"><i data-lucide="ban"></i>校本题库：暂不支持</span>
+            <span>PPT 暂不支持自动沉淀；支持 PDF / Word / 单张图片。</span>
+          </div>
+        </header>
+
+        <!-- ───── PPT 预览主体 ───── -->
+        <div class="fp-viewer">
+
+          <!-- 大图：当前页 -->
+          <div class="fp-slide-stage">
+            <div class="fp-stage-bar">
+              <button class="fp-nav-btn" onclick="showToast('（演示）上一页')" title="上一页">
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <span class="fp-page-no">P3 <span class="fp-page-total">/ 28</span></span>
+              <button class="fp-nav-btn" onclick="showToast('（演示）下一页')" title="下一页">
+                <i data-lucide="chevron-right"></i>
+              </button>
+              <div class="fp-stage-spacer"></div>
+              <span class="fp-stage-cite"><i data-lucide="link"></i> 本页被 Wiki §1 开口方向 引用</span>
+            </div>
+
+            <div class="fp-slide">
+              <div class="fp-slide-title">3 · 开口方向 — 由系数 a 决定</div>
+              <ul class="fp-slide-points">
+                <li><span class="fp-slide-num">①</span><span>当 <b>a &gt; 0</b>：开口<b>向上</b>，函数有最<b>小</b>值</span></li>
+                <li><span class="fp-slide-num">②</span><span>当 <b>a &lt; 0</b>：开口<b>向下</b>，函数有最<b>大</b>值</span></li>
+                <li><span class="fp-slide-num">③</span><span><b>|a|</b> 越大，开口越<b>窄</b>；反之越扁</span></li>
+              </ul>
+              <div class="fp-slide-figure">
+                <div class="fp-fig-axes">
+                  <div class="fp-fig-curve fp-fig-up" title="a&gt;0 抛物线开口向上">y = x²</div>
+                  <div class="fp-fig-curve fp-fig-down" title="a&lt;0 抛物线开口向下">y = -x²</div>
+                  <div class="fp-fig-curve fp-fig-narrow" title="|a|&gt;1 开口变窄">y = 2x²</div>
+                  <div class="fp-fig-axis-x"></div>
+                  <div class="fp-fig-axis-y"></div>
+                  <div class="fp-fig-label fp-fig-lx">x</div>
+                  <div class="fp-fig-label fp-fig-ly">y</div>
+                </div>
+              </div>
+              <div class="fp-slide-foot">二次函数 · 第一课时 · 张老师 · 2026 春</div>
+            </div>
+          </div>
+
+          <!-- 缩略图横条 -->
+          <div class="fp-strip">
+            <button class="fp-thumb" data-p="1" onclick="showToast('（演示）跳到 P1 · 封面')">
+              <span class="fp-thumb-no">1</span>
+              <span class="fp-thumb-title">封面</span>
+            </button>
+            <button class="fp-thumb" data-p="2" onclick="showToast('（演示）跳到 P2')">
+              <span class="fp-thumb-no">2</span>
+              <span class="fp-thumb-title">教学目标</span>
+            </button>
+            <button class="fp-thumb active" data-p="3">
+              <span class="fp-thumb-no">3</span>
+              <span class="fp-thumb-title">开口方向</span>
+              <i data-lucide="link" class="fp-thumb-cite-ico" title="本页被 Wiki 引用"></i>
+            </button>
+            <button class="fp-thumb" data-p="4" onclick="showToast('（演示）跳到 P4')">
+              <span class="fp-thumb-no">4</span>
+              <span class="fp-thumb-title">对称轴</span>
+            </button>
+            <button class="fp-thumb" data-p="5" onclick="showToast('（演示）跳到 P5')">
+              <span class="fp-thumb-no">5</span>
+              <span class="fp-thumb-title">顶点坐标</span>
+              <i data-lucide="link" class="fp-thumb-cite-ico" title="本页被 Wiki 引用"></i>
+            </button>
+            <button class="fp-thumb" data-p="6" onclick="showToast('（演示）跳到 P6')">
+              <span class="fp-thumb-no">6</span>
+              <span class="fp-thumb-title">增减性</span>
+            </button>
+            <button class="fp-thumb more" onclick="showToast('（演示）展开全部 28 页缩略图')">
+              <span class="fp-thumb-no"><i data-lucide="more-horizontal"></i></span>
+              <span class="fp-thumb-title">全部 28 页</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ───── 底部说明（占位，下面所有旧 wiki 内容会被删掉） ───── -->
+        <div class="wiki-foot entry-foot" style="margin-top:32px">
+          这份原文件由 <b>张明华 5 天前上传</b>。飞象 AI 已读完 28 页，把第 <b>3、5、12 页</b> 的内容
+          融进了《二次函数图像与性质》Wiki——右边「AI 解读」面板里能看到 AI 怎么理解这份资料，以及它进入了哪些
+          相关 Wiki。
+          <a onclick="window.location.href='wiki-entry.html'">查看本文件参与的 Wiki →</a>
+        </div>
+
+        <!-- 以下是旧 wiki 词条内容，下面这段会被 CSS hide。保留为 fallback。 -->
+        <div hidden>
+        <!-- ───── 正文 1：开口方向 ───── -->
+        <section class="entry-sec" id="s-open">
+          <h2 class="entry-h2">1 · 开口方向</h2>
+          <p class="entry-p">
+            将函数写成一般式 <span class="m">y = ax² + bx + c</span> 后，<b>a 决定开口方向</b>：
+          </p>
+          <ul class="entry-ul">
+            <li><b>a &gt; 0</b>：开口<b>向上</b>，函数有最<b>小</b>值；</li>
+            <li><b>a &lt; 0</b>：开口<b>向下</b>，函数有最<b>大</b>值；</li>
+            <li><b>|a| 越大</b>，开口<b>越窄</b>；反之越扁。</li>
+          </ul>
+          <p class="entry-p">
+            进一步的几何意义见
+            <a class="wlink" onclick="openWiki('函数图像变换')">函数图像变换</a>——
+            a 也控制了抛物线相对于 <span class="m">y = x²</span> 的<b>纵向拉伸/翻转</b>。
+          </p>
+          <p class="entry-cite">
+            <i data-lucide="quote"></i>
+            来源：
+            <a class="flink" onclick="showToast('（演示）打开《二次函数·导入课件.pptx》第 3 页')">导入课件.pptx · P3</a>
+            <span class="sep">·</span>
+            <a class="flink" onclick="showToast('（演示）打开《教学设计·二次函数.docx》第 2 页')">教学设计 · P2</a>
+          </p>
+        </section>
+
+        <!-- ───── 正文 2：对称轴 ───── -->
+        <section class="entry-sec" id="s-axis">
+          <h2 class="entry-h2">2 · 对称轴</h2>
+          <p class="entry-p">
+            抛物线是<b>轴对称图形</b>，其对称轴是一条平行于 y 轴的直线，方程为：
+          </p>
+          <div class="entry-formula">x = − b / (2a)</div>
+          <p class="entry-p">
+            对称轴是连接 <a class="wlink" onclick="scrollToSec('s-vertex')">顶点</a> 与 <b>函数最值</b> 的关键。
+            一旦确定对称轴位置，就能用
+            <a class="wlink" onclick="openWiki('轴对称')">轴对称</a> 性质，由抛物线上任一点反推另一点的坐标。
+          </p>
+          <p class="entry-cite">
+            <i data-lucide="quote"></i>
+            来源：
+            <a class="flink" onclick="showToast('（演示）打开《配套习题汇编.pdf》第 12 页')">配套习题汇编.pdf · P12</a>
+            <span class="sep">·</span>
+            <a class="flink" onclick="showToast('（演示）打开王建华公开课板书')">公开课板书 · 王建华</a>
+          </p>
+        </section>
+
+        <!-- ───── 正文 3：顶点坐标 ───── -->
+        <section class="entry-sec" id="s-vertex">
+          <h2 class="entry-h2">3 · 顶点坐标</h2>
+          <p class="entry-p">
+            顶点是抛物线的最高点或最低点，对应函数的<b>最值</b>。一般式下顶点坐标公式：
+          </p>
+          <div class="entry-formula">( − b/(2a),  (4ac − b²) / (4a) )</div>
+          <p class="entry-p">
+            实际教学中，更推荐先把函数<b>配方</b>为顶点式
+            <span class="m">y = a(x − h)² + k</span>，
+            则顶点直接是 <b>(h, k)</b>。配方法见
+            <a class="wlink" onclick="openWiki('一元二次方程综合')">一元二次方程综合 · 配方法</a>。
+          </p>
+          <p class="entry-cite">
+            <i data-lucide="quote"></i>
+            来源：
+            <a class="flink" onclick="showToast('（演示）打开《教学设计·二次函数.docx》第 5 页')">教学设计 · P5</a>
+            <span class="sep">·</span>
+            <a class="flink" onclick="showToast('（演示）打开《赵明杰·错题剖析.docx》')">赵明杰·错题剖析</a>
+          </p>
+        </section>
+
+        <!-- ───── 正文 4：增减性 ───── -->
+        <section class="entry-sec" id="s-mono">
+          <h2 class="entry-h2">4 · 增减性</h2>
+          <p class="entry-p">
+            以对称轴 <span class="m">x = -b/(2a)</span> 为界，函数的单调性如下：
+          </p>
+          <ul class="entry-ul">
+            <li><b>a &gt; 0</b>：对称轴左侧 y 随 x 增大而<b>减小</b>；右侧 y 随 x 增大而<b>增大</b>；</li>
+            <li><b>a &lt; 0</b>：左侧<b>增大</b>，右侧<b>减小</b>；</li>
+            <li>结合<a class="wlink" onclick="openWiki('一元一次不等式')">不等式</a>，常用来求"使 y 在某区间单调"的参数范围。</li>
+          </ul>
+          <p class="entry-p">
+            <b>易错点</b>（八(3)班上学期错题统计）：
+            学生常忽略<b>对称轴随参数 m 在变化</b>这一前提，把 m 当作已知数代入。
+            详见 <a class="flink" onclick="showToast('（演示）打开《八(3)班·错题精选》')">八(3)班·错题精选</a>。
+          </p>
+          <p class="entry-cite">
+            <i data-lucide="quote"></i>
+            来源：
+            <a class="flink" onclick="showToast('（演示）打开《海淀区 2026 一模卷·数学.pdf》T6')">海淀区 2026 一模卷 · T6</a>
+            <span class="sep">·</span>
+            <a class="flink" onclick="showToast('（演示）打开《八(3)班·错题精选》')">八(3)班·错题精选</a>
+          </p>
+        </section>
+
+        <!-- ───── 正文 5：与坐标轴交点 ───── -->
+        <section class="entry-sec" id="s-cross">
+          <h2 class="entry-h2">5 · 与坐标轴的交点</h2>
+          <p class="entry-p">
+            令 x = 0，得 y 轴交点 <b>(0, c)</b>；令 y = 0，方程
+            <span class="m">ax² + bx + c = 0</span> 的根即为 x 轴交点的横坐标，
+            个数由<b>判别式</b> Δ = b² − 4ac 决定：
+          </p>
+          <ul class="entry-ul">
+            <li><b>Δ &gt; 0</b>：与 x 轴交于<b>两点</b>；</li>
+            <li><b>Δ = 0</b>：与 x 轴<b>相切</b>（仅一个交点）；</li>
+            <li><b>Δ &lt; 0</b>：与 x 轴<b>无交点</b>。</li>
+          </ul>
+          <p class="entry-p">
+            这与 <a class="wlink" onclick="openWiki('一元二次方程综合')">一元二次方程</a> 的根的情况一一对应——
+            "图像看 Δ"是处理函数与方程综合题的标准套路。
+          </p>
+          <p class="entry-cite">
+            <i data-lucide="quote"></i>
+            来源：
+            <a class="flink" onclick="showToast('（演示）打开《配套习题汇编.pdf》第 15 页')">配套习题汇编 · P15</a>
+            <span class="sep">·</span>
+            <a class="flink" onclick="showToast('（演示）打开《北京中考真题 2021-2025》')">北京中考真题 2021-2025</a>
+          </p>
+        </section>
+
+        <!-- ───── 相关词条 ───── -->
+        <section class="entry-sec" id="s-related">
+          <h2 class="entry-h2">相关词条</h2>
+          <p class="entry-p entry-related-intro">
+            学生学这一节时，通常需要先掌握下面这些前置概念；学完之后，会去到这些进阶应用：
+          </p>
+          <div class="related-cluster">
+            <div class="rc-group">
+              <div class="rc-label">前置 · 学这一节前要先会</div>
+              <p class="subject-para">
+                <a class="wlink" onclick="openWiki('一次函数')">一次函数</a>
+                <span class="sep">·</span>
+                <a class="wlink" onclick="openWiki('一元二次方程综合')">一元二次方程</a>
+                <span class="sep">·</span>
+                <a class="wlink" onclick="openWiki('整式乘法与因式分解')">整式乘法与因式分解</a>
+                <span class="sep">·</span>
+                <a class="wlink" onclick="openWiki('轴对称')">轴对称</a>
+              </p>
+            </div>
+            <div class="rc-group">
+              <div class="rc-label">进阶 · 学完之后能用来做什么</div>
+              <p class="subject-para">
+                <a class="wlink" onclick="openWiki('二次函数应用题')">二次函数应用题</a>
+                <span class="sep">·</span>
+                <a class="wlink" onclick="openWiki('中考压轴·函数综合')">中考压轴 · 函数综合</a>
+                <span class="sep">·</span>
+                <a class="wlink" onclick="openWiki('动点问题与变化规律')">动点问题</a>
+                <span class="sep">·</span>
+                <a class="wlink" onclick="openWiki('函数图像变换')">函数图像变换</a>
+              </p>
+            </div>
+            <div class="rc-group">
+              <div class="rc-label">同章 · 一起出现频率最高</div>
+              <p class="subject-para">
+                <a class="wlink" onclick="openWiki('反比例函数综合')">反比例函数综合</a>
+                <span class="sep">·</span>
+                <a class="wlink" onclick="openWiki('相似三角形判定与性质')">相似三角形</a>
+                <span class="sep">·</span>
+                <a class="wlink" onclick="openWiki('圆与直线的位置关系')">圆与直线</a>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ───── 本词条来源（raw sources）───── -->
+        <section class="entry-sec" id="s-sources">
+          <h2 class="entry-h2">
+            本词条来源
+            <span class="h2-note">12 份原文件 · AI 引用追溯到行级</span>
+          </h2>
+          <p class="entry-p entry-sources-intro">
+            这一页所有内容，都来自下面这 12 份资料。<b>每段正文末尾的引文</b>都会跳回原文相应位置——
+            想看原版始终能回去。
+          </p>
+          <ul class="src-list">
+            <li>
+              <a class="src-item" onclick="showToast('（演示）打开《二次函数·导入课件.pptx》')">
+                <i data-lucide="presentation"></i>
+                <span class="src-name">二次函数·导入课件.pptx</span>
+                <span class="src-by">张明华 · 上传于 5 天前</span>
+                <span class="src-use">引用 3 处</span>
+              </a>
+            </li>
+            <li>
+              <a class="src-item" onclick="showToast('（演示）打开《教学设计·二次函数.docx》')">
+                <i data-lucide="file-text"></i>
+                <span class="src-name">教学设计·二次函数.docx</span>
+                <span class="src-by">张明华 · 上传于 5 天前</span>
+                <span class="src-use">引用 4 处</span>
+              </a>
+            </li>
+            <li>
+              <a class="src-item" onclick="showToast('（演示）打开《配套习题汇编.pdf》')">
+                <i data-lucide="book"></i>
+                <span class="src-name">八下函数·配套习题汇编.pdf</span>
+                <span class="src-by">全校共建 · 1 个月前</span>
+                <span class="src-use">引用 6 处</span>
+              </a>
+            </li>
+            <li>
+              <a class="src-item" onclick="showToast('（演示）打开《海淀区 2026 一模卷·数学.pdf》')">
+                <i data-lucide="file-text"></i>
+                <span class="src-name">海淀区 2026 一模卷·数学.pdf</span>
+                <span class="src-by">李素芬 · 上传于 1 周前</span>
+                <span class="src-use">引用 5 处（T6 / T22 等）</span>
+              </a>
+            </li>
+            <li>
+              <a class="src-item" onclick="showToast('（演示）打开《SAS 判定·公开课板书.jpg》')">
+                <i data-lucide="image"></i>
+                <span class="src-name">王建华·公开课板书（4 张）</span>
+                <span class="src-by">王建华 · 上传于 2 周前</span>
+                <span class="src-use">引用 2 处</span>
+              </a>
+            </li>
+            <li>
+              <a class="src-item" onclick="showToast('（演示）打开《赵明杰·错题剖析.docx》')">
+                <i data-lucide="file-text"></i>
+                <span class="src-name">赵明杰·错题剖析.docx</span>
+                <span class="src-by">赵明杰 · 上传于 2 周前</span>
+                <span class="src-use">引用 3 处</span>
+              </a>
+            </li>
+            <li>
+              <a class="src-item" onclick="showToast('（演示）打开《八(3)班·错题精选》')">
+                <i data-lucide="clipboard-list"></i>
+                <span class="src-name">八(3)班·错题精选.xlsx</span>
+                <span class="src-by">张明华 · 上传于 3 周前</span>
+                <span class="src-use">引用 2 处</span>
+              </a>
+            </li>
+            <li>
+              <a class="src-item" onclick="showToast('（演示）打开《北京中考真题 2021-2025》')">
+                <i data-lucide="folder-archive"></i>
+                <span class="src-name">北京中考真题 2021-2025（5 份）</span>
+                <span class="src-by">学校公共库 · 3 周前</span>
+                <span class="src-use">引用 8 处</span>
+              </a>
+            </li>
+            <li>
+              <a class="src-item more" onclick="showToast('（演示）展开剩余 4 份资料')">
+                <i data-lucide="more-horizontal"></i>
+                <span class="src-name">…还有 4 份资料</span>
+                <span class="src-by">点击展开</span>
+                <span class="src-use"></span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <!-- ───── 衍生对话与笔记（Karpathy: file back into wiki）───── -->
+        <section class="entry-sec" id="s-conv">
+          <h2 class="entry-h2">
+            衍生对话与笔记
+            <span class="h2-note">从这页延伸出的 4 段对话 / 老师备注 · AI 已归档回这页</span>
+          </h2>
+          <p class="entry-p entry-conv-intro">
+            老师跟 AI 围绕这一页问过的好问题、做过的好作品，可以归档回本词条，
+            下次再来这页就能直接看到。
+          </p>
+          <ul class="conv-list">
+
+            <li class="conv-item">
+              <div class="conv-head">
+                <i data-lucide="message-square-text" class="conv-ico"></i>
+                <span class="conv-title">
+                  <a onclick="openChat('replay','围绕「二次函数图像与性质」出 5 道分层练习，A/B/C 三难度，给八(3)班用')">
+                    围绕这页出 5 道分层练习，A/B/C 三难度
+                  </a>
+                </span>
+                <span class="conv-by">张老师 · 今天 18:42</span>
+              </div>
+              <p class="conv-snippet">
+                AI 已基于 12 份资料生成 <b>5 道题</b>（A 基础 2、B 提高 2、C 拔高 1），并导出到
+                <a class="flink" onclick="showToast('（演示）打开《八(3)班·随堂练习》')">八(3)班·随堂练习</a> 分组。
+              </p>
+            </li>
+
+            <li class="conv-item">
+              <div class="conv-head">
+                <i data-lucide="message-square-text" class="conv-ico"></i>
+                <span class="conv-title">
+                  <a onclick="openChat('replay','把第 4 节（增减性）换一种讲法，更直观一些')">
+                    第 4 节"增减性"能换种更直观的讲法吗？
+                  </a>
+                </span>
+                <span class="conv-by">张老师 · 昨天 11:08</span>
+              </div>
+              <p class="conv-snippet">
+                AI 给了 <b>2 种类比</b>："滑梯 + 缆车"模型；"球被斜抛"模型。张老师选了后者，
+                <a onclick="showToast('（演示）查看记录')">已采纳并写入本词条 §4 备注</a>。
+              </p>
+            </li>
+
+            <li class="conv-item">
+              <div class="conv-head">
+                <i data-lucide="sticky-note" class="conv-ico"></i>
+                <span class="conv-title">
+                  <a onclick="showToast('（演示）打开李老师笔记')">
+                    八(3)班讲到顶点坐标卡了——配方法做得不熟
+                  </a>
+                </span>
+                <span class="conv-by">李老师 · 3 天前</span>
+              </div>
+              <p class="conv-snippet">
+                建议下次教时<b>先复习 5 分钟配方法</b>，再讲顶点坐标公式。AI 已把这条提示放到
+                <a class="wlink" onclick="openWiki('一元二次方程综合')">一元二次方程 · 配方法</a> 顶部。
+              </p>
+            </li>
+
+            <li class="conv-item">
+              <div class="conv-head">
+                <i data-lucide="message-square-text" class="conv-ico"></i>
+                <span class="conv-title">
+                  <a onclick="openChat('replay','基于这一页做一份 12 页课件，给八(3)班第二课时用')">
+                    基于这一页做一份 12 页课件，给八(3)班第二课时用
+                  </a>
+                </span>
+                <span class="conv-by">张老师 · 上周</span>
+              </div>
+              <p class="conv-snippet">
+                AI 输出了 <b>12 页课件</b>，<a class="flink" onclick="showToast('（演示）打开课件')">《二次函数·第二课时.pptx》</a>
+                已保存进全校共建库。
+              </p>
+            </li>
+
+          </ul>
+
+          <div class="conv-cta">
+            <i data-lucide="lightbulb"></i>
+            <span>
+              觉得某段对话有价值，想沉淀到这一页？
+              <a onclick="showToast('（演示）选择对话归档到本词条 · §备注 或 §例题')">把它归档到这里 →</a>
+            </span>
+          </div>
+        </section>
+
+        </div>
+        <!-- /旧 wiki fallback 结束 -->
+
+      </article>
+    </div>
+
+    <!-- ════════════ 对话流（chat 态显示） ════════════ -->
+    <div class="chat-stream" id="view-chat">
+      <div class="chat-head">
+        <nav class="ch-breadcrumb" aria-label="面包屑">
+          <a class="bc-item" href="school-wiki.html" title="回到 学校知识库 知识库">
+            <i data-lucide="library"></i>
+            <span>学校知识库</span>
+          </a>
+          <span class="bc-sep" aria-hidden="true">
+            <i data-lucide="chevron-right"></i>
+          </span>
+          <button class="bc-item" onclick="backToKnowledgeBase()" title="回到 二次函数图像与性质 词条">
+            <i data-lucide="book-open"></i>
+            <span>二次函数图像与性质</span>
+          </button>
+          <span class="bc-sep" aria-hidden="true">
+            <i data-lucide="chevron-right"></i>
+          </span>
+          <span class="bc-current">
+            <i data-lucide="message-square-text"></i>
+            <span id="ch-title">基于这一页给八(3)班出 5 道分层练习</span>
+          </span>
+        </nav>
+        <div class="ch-spacer"></div>
+        <div class="ch-ctx" title="飞象基于本词条 12 份资料回答">
+          <i data-lucide="layers"></i>
+          <span>本词条 · 12 份</span>
+        </div>
+      </div>
+
+      <!-- 空对话态：老师自由输入欢迎页 -->
+      <div class="chat-empty" id="chat-empty">
+        <div class="ce-hero">
+          <div class="ce-brand">
+            <span class="ce-brand-dot">飞</span>
+            <span class="ce-brand-name">飞象 AI</span>
+            <span class="ce-brand-sep">·</span>
+            <span class="ce-brand-tag">老师的 AI 助手</span>
+          </div>
+          <h1 class="ce-greet" id="ce-greet">下午好，张老师</h1>
+          <p class="ce-sub">基于<b id="ce-kb-name">数学组共建库</b>的 <b id="ce-kb-count">925</b> 份资料，问我任何事——或者直接生成教学内容</p>
+        </div>
+
+        <div class="ce-composer">
+          <textarea id="ce-input" rows="2"
+            placeholder="想做什么？比如：基于这条词条出一组阶梯练习给八(3)班用"
+            oninput="autosize(this);refreshCeSend()"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ceSend()}"></textarea>
+
+          <div class="ce-chips">
+            <button class="ce-chip" onclick="ceUseChip('基于「二次函数图像与性质」给八(3)班出 5 道分层练习，A/B/C 三难度')">
+              <i data-lucide="sparkles"></i><span>AI 组题</span>
+            </button>
+            <button class="ce-chip" onclick="ceUseChip('帮我把「二次函数图像与性质」做成第二课时课件，约 12 页')">
+              <i data-lucide="layout"></i><span>多页课件</span>
+            </button>
+            <button class="ce-chip" onclick="ceUseChip('给「二次函数图像与性质」做个 2 分钟动画讲解')">
+              <i data-lucide="play-circle"></i><span>教学动画</span>
+            </button>
+            <button class="ce-chip" onclick="ceUseChip('设计一个 5 分钟的课堂小游戏，关于「二次函数对称轴与顶点」')">
+              <i data-lucide="gamepad-2"></i><span>教学游戏</span>
+            </button>
+            <button class="ce-chip more" onclick="showToast('更多工具规划中：教案、学情分析、AI 翻译润色…')">
+              <i data-lucide="more-horizontal"></i>
+            </button>
+          </div>
+
+          <div class="ce-foot">
+            <div class="ce-foot-left">
+              <button class="ce-icon-btn" title="附件" onclick="showToast('（演示）添加附件')">
+                <i data-lucide="paperclip"></i>
+              </button>
+              <button class="ce-icon-btn" title="语音输入" onclick="showToast('（演示）语音输入')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+              </button>
+              <span class="ce-divider"></span>
+              <button class="ce-kb-attach" onclick="showToast('当前范围：数学组共建库 · 925 份。点击切换上下文。')">
+                <i data-lucide="library"></i>
+                <span id="ce-kb-label">数学组 · 925 份</span>
+              </button>
+            </div>
+            <button class="ce-send idle" id="ce-send" onclick="ceSend()" title="发送（Enter）">
+              <i data-lucide="arrow-up"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="ce-trust">
+          <i data-lucide="lock"></i>
+          <span>对话只属于你 · 不进通用模型</span>
+        </div>
+      </div>
+
+      <div class="chat-body" id="chat-body">
+        <!-- 用户消息 -->
+        <div class="chat-msg user">
+          <div class="msg-bubble" id="chat-user-text">
+            围绕「二次函数图像与性质」出 5 道分层练习，A/B/C 三难度，给八(3)班用
+          </div>
+        </div>
+
+        <!-- AI 回复（带流式效果 + 引用 + 操作） -->
+        <div class="chat-msg ai" id="chat-ai-msg">
+          <div class="msg-avatar">F</div>
+          <div class="msg-content">
+            <p id="chat-ai-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中间底部输入 -->
+      <div class="chat-composer">
+        <div class="cc-wrap">
+          <div class="cc-input">
+            <textarea id="cc-textarea" rows="1" placeholder="继续问飞象，比如「再难一点」「换个出题角度」…"
+              oninput="autosize(this);refreshCcSend()"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendInChat()}"></textarea>
+            <button class="cc-btn" title="附件" onclick="showToast('（演示）添加附件')">
+              <i data-lucide="paperclip"></i>
+            </button>
+            <button class="cc-btn send idle" id="cc-send" title="发送（Enter）" onclick="sendInChat()">
+              <i data-lucide="arrow-up"></i>
+            </button>
+          </div>
+          <div class="cc-hint">
+            <b>Enter</b> 发送 · <b>Shift+Enter</b> 换行 · 回到 Wiki 可点右上角 ×
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ 底部 Command Bar ════════════ -->
+    <div class="bottom-bar" id="bottom-bar" data-mode="knowledge-qa">
+
+      <div class="bb-wrap">
+        <!-- 默认一行：知识库范围 + 问答输入 + 发送 -->
+        <div class="bb-input">
+          <button class="bb-ctx" tabindex="-1"
+            title="当前知识库范围：当前文件">
+            <i data-lucide="book-open" class="lead"></i>
+            <span class="ctx-name">当前文件 · 导入课件</span>
+          </button>
+          <textarea id="bb-textarea" rows="1" placeholder="基于当前文件提问…"
+            oninput="autosize(this);refreshBarSend()"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitFromBar()}"></textarea>
+          <button class="bb-input-btn send idle" id="bb-send" title="发送（Enter）" onclick="submitFromBar()">
+            <i data-lucide="arrow-up"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ════════════ 右栏 · Canvas（chat 态下 1:1） ════════════ -->
+  <aside class="sidebar-right">
+
+    <!-- Canvas 顶部 tab 切换 · 文件预览态的 AI 视图 -->
+    <div class="canvas-head">
+      <div class="canvas-tabs" id="canvas-tabs">
+        <!-- AI 解读 tabs · 阅读 mode 显示 -->
+        <button class="cv-tab tab-meta active" data-cv="wiki" onclick="switchCanvas('wiki')">
+          <i data-lucide="sparkles"></i>
+          AI 摘要
+        </button>
+        <button class="cv-tab tab-meta" data-cv="backlinks" onclick="switchCanvas('backlinks')">
+          <i data-lucide="book-open"></i>
+          相关 Wiki
+          <span class="cv-tab-meta">· 3</span>
+        </button>
+        <!-- AI 产物 tab · chat-open mode 显示 -->
+        <button class="cv-tab tab-canvas" data-cv="quiz" onclick="switchCanvas('quiz')" hidden id="cv-tab-quiz">
+          <i data-lucide="sparkles"></i>
+          题目集
+          <span class="cv-tab-meta">· 5 道</span>
+        </button>
+      </div>
+      <button class="cv-collapse-btn" onclick="collapseRight()" title="收起 AI 面板">
+        <i data-lucide="panel-right-close"></i>
+      </button>
+    </div>
+
+    <div class="canvas-body">
+
+      <!-- Pane 1：AI 摘要 · 默认 active -->
+      <div class="cv-pane active" data-pane="wiki">
+        <article class="cv-meta">
+
+          <header class="cm-head">
+            <div class="cm-head-title">AI 摘要</div>
+            <div class="cm-head-sub">
+              飞象 AI 整理于 <b>今天 09:14</b> · 基于全文 28 页提炼
+            </div>
+          </header>
+
+          <div class="fp-ai-block">
+            <div class="fp-ai-label"><i data-lucide="target"></i> 这份课件主要讲什么</div>
+            <p class="fp-ai-text">
+              张明华为<b>八(3)班</b>第一课时准备的导入课件，串起<b>3 个核心考点</b>：
+              <b>开口方向</b>（P3）、<b>对称轴</b>（P12）、<b>顶点坐标</b>（P5）。
+              整体节奏偏导入型——用 5 张图像对比让学生先建立直觉，再给出代数公式。
+            </p>
+          </div>
+
+          <div class="fp-ai-block">
+            <div class="fp-ai-label"><i data-lucide="map"></i> 适用范围</div>
+            <p class="fp-ai-text">
+              适合用于九年级数学二次函数起始课或复习导入。资料偏概念建立和图像观察，不适合作为完整练习课材料单独使用。
+            </p>
+          </div>
+
+          <div class="fp-ai-block">
+            <div class="fp-ai-label"><i data-lucide="git-compare"></i> 与组里其他课件的差异</div>
+            <ul class="fp-ai-list">
+              <li><b>图示数量更多</b>——5 张抛物线对比，比组内平均（2.1 张）更直观</li>
+              <li><b>例题偏少</b>——只在 P14 给了 2 道；李老师课件平均 6 道</li>
+              <li><b>未覆盖增减性</b>——P6 之后跳到对称轴，缺第 4 节的内容</li>
+            </ul>
+          </div>
+
+          <div class="fp-ai-block">
+            <div class="fp-ai-label"><i data-lucide="lightbulb"></i> AI 推荐的搭配资料</div>
+            <ul class="fp-ai-list">
+              <li>
+                <a class="wlink" onclick="openWiki('一元二次方程综合')">配套习题汇编.pdf</a>
+                · P12-P15 补齐例题
+              </li>
+              <li>
+                <a class="wlink" onclick="showToast('（演示）打开《八(3)班·错题精选》')">八(3)班·错题精选</a>
+                · 针对易错点配讲解
+              </li>
+            </ul>
+          </div>
+
+          <footer class="cm-foot">
+            <i data-lucide="info"></i>
+            <span>摘要由 AI 基于全文生成 · 内容仅供参考，最终判断以原文件为准。</span>
+          </footer>
+
+        </article>
+      </div>
+
+      <!-- Pane 2：相关 Wiki -->
+      <div class="cv-pane" data-pane="backlinks">
+        <article class="cv-meta">
+
+          <header class="cm-head">
+            <div class="cm-head-title">相关 Wiki · 3 个</div>
+            <div class="cm-head-sub">
+              本文件已进入以下 Wiki，点击词条查看完整整理
+            </div>
+          </header>
+
+          <ul class="cm-backlink-list">
+            <li class="cm-backlink">
+              <a class="cm-bl-name" onclick="window.location.href='wiki-entry.html'">
+                <i data-lucide="book-open"></i>
+                二次函数图像与性质
+              </a>
+              <span class="cm-bl-count">P3 / P5 / P12 · 支撑开口方向、顶点坐标和对称轴说明</span>
+            </li>
+            <li class="cm-backlink">
+              <a class="cm-bl-name" onclick="openWiki('中考压轴 · 函数综合')">
+                <i data-lucide="book-open"></i>
+                中考压轴 · 函数综合
+              </a>
+              <span class="cm-bl-count">P5 · 补充顶点公式在压轴题中的使用方式</span>
+            </li>
+            <li class="cm-backlink">
+              <a class="cm-bl-name" onclick="openWiki('分层练习设计法')">
+                <i data-lucide="book-open"></i>
+                分层练习设计法
+              </a>
+              <span class="cm-bl-count">P3 · 作为 A 档基础练习的题源参考</span>
+            </li>
+          </ul>
+
+          <footer class="cm-foot">
+            <i data-lucide="info"></i>
+            <span>相关 Wiki 由 AI 根据引用位置和内容语义生成，可用于追溯这份文件被如何使用。</span>
+          </footer>
+
+        </article>
+      </div>
+
+      <!-- Pane 2：题目集作品（AI 生成后切到这里） -->
+      <div class="cv-pane" data-pane="quiz">
+        <div class="cv-quiz-head">
+          <h1>《二次函数》分层练习 · 5 道</h1>
+          <div class="meta">
+            AI 基于 <b>12 份资料</b> 生成 · 难度 <b>A / B / C 三档</b> ·
+            适配 <b>八(3)班</b> 学情 · <b>今天 18:42</b>
+          </div>
+        </div>
+
+        <div class="cv-quiz-group">
+          <div class="cv-quiz-group-label a">A · 基础题</div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">A1</span>
+            <span class="qi-q">已知二次函数 y = 2x² − 4x + 1，求其对称轴和顶点坐标。</span>
+            <div class="qi-a">参考答案：对称轴 <b>x = 1</b>，顶点 <b>(1, −1)</b></div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 改编自《配套习题汇编》P12</div>
+          </div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">A2</span>
+            <span class="qi-q">下列函数的图像开口方向，正确的是（   ）<br>A. y = −3x²+1 向上 &nbsp; B. y = x²−2 向上 &nbsp; C. y = −x²−x 向上 &nbsp; D. y = 2x² 向下</span>
+            <div class="qi-a">参考答案：<b>B</b></div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 改编自《导入课件》P3 例 2</div>
+          </div>
+        </div>
+
+        <div class="cv-quiz-group">
+          <div class="cv-quiz-group-label b">B · 提高题</div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">B1</span>
+            <span class="qi-q">抛物线 y = ax² + bx + c 的顶点为 (2, −3)，且经过点 (0, 5)，求 a、b、c。</span>
+            <div class="qi-a">参考答案：<b>a = 2, b = −8, c = 5</b></div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 改编自《教学设计·二次函数》P7</div>
+          </div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">B2</span>
+            <span class="qi-q">已知 y = x² − 2mx + 3，当 x ≥ 1 时 y 随 x 增大而增大，求 m 的取值范围。</span>
+            <div class="qi-a">参考答案：<b>m ≤ 1</b>（关键：对称轴 x = m 在 1 的左侧）</div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 王老师·公开课板书原题</div>
+          </div>
+        </div>
+
+        <div class="cv-quiz-group">
+          <div class="cv-quiz-group-label c">C · 拔高题</div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">C1</span>
+            <span class="qi-q">设抛物线 y = x² − (k+2)x + 2k 与 x 轴交于 A、B 两点，与 y 轴交于 C 点。若 △ABC 面积为 3，求 k。</span>
+            <div class="qi-a">参考答案：<b>k = 3 或 k = −1</b>（需讨论 k 正负与韦达定理）</div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 海淀区 2026 一模 T22 改编</div>
+          </div>
+        </div>
+
+        <div class="cv-actions">
+          <button class="cv-action primary" onclick="showToast('（演示）已导出为 .docx，已发送到「八(3)班·随堂练习」分组')">
+            <i data-lucide="download"></i>
+            导出为 Word
+          </button>
+          <button class="cv-action" onclick="showToast('（演示）已加入《二次函数》第二课时教案')">
+            <i data-lucide="book-plus"></i>
+            加入教案
+          </button>
+          <button class="cv-action" onclick="showToast('（演示）让 AI 再改改难度')">
+            <i data-lucide="refresh-ccw"></i>
+            重新生成
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- 占位（hidden）：兼容旧 JS 中 ai-textarea 引用 -->
+  <div style="display:none">
+    <textarea id="ai-textarea"></textarea>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('school-wiki');</script>
+<script src="assets/v28-shell.js?v=20260522b"></script>
+<script src="assets/v28.js?v=20260522e"></script>
+<script src="assets/shared/v28-modals.js?v=20260617a"></script>
+<script src="assets/page-header.js"></script>
+<script>
+  (function(){
+    const params = new URLSearchParams(location.search);
+    const fileName = params.get('file') || '二次函数·导入课件.pptx';
+    const extRaw = (params.get('type') || fileName.split('.').pop() || 'pptx').toLowerCase();
+    const ext = extRaw === fileName.toLowerCase() ? 'pptx' : extRaw;
+    const source = params.get('source') || '张明华';
+    const size = params.get('size') || '4.2 MB';
+    const time = params.get('time') || '5 天前';
+    const wiki = params.get('wiki') || '二次函数图像与性质';
+    const scope = params.get('scope') || 'school';
+    let qbankState = params.get('qbank') || inferFileQbankState(fileName, ext);
+
+    const typeMeta = getFileTypeMeta(ext);
+    const scopeLabel = scope === 'personal' ? '我的知识库' : '学校知识库';
+
+    document.title = `${fileName} · 飞象 AI`;
+
+    const rootCrumb = document.querySelector('.ph-crumb-item:first-child span');
+    const rootLink = document.querySelector('.ph-crumb-item:first-child');
+    if(rootCrumb) rootCrumb.textContent = scopeLabel;
+    if(rootLink) rootLink.setAttribute('href', scope === 'personal' ? 'my-wiki.html?view=folder' : 'school-wiki.html?view=folder');
+
+    const currentCrumb = document.querySelector('.ph-crumb-current span');
+    if(currentCrumb) currentCrumb.textContent = fileName;
+
+    const subject = document.querySelector('.entry-subj');
+    if(subject) subject.textContent = `${scopeLabel} · ${wiki || '来源资料'}`;
+
+    const badge = document.querySelector('.entry-badge');
+    if(badge){
+      badge.className = `entry-badge ${ext === 'pptx' || ext === 'ppt' ? 'fp-badge-pptx' : 'fp-badge-file'}`;
+      badge.innerHTML = `<i data-lucide="${typeMeta.icon}"></i> ${typeMeta.label} · 原文件`;
+    }
+
+    const title = document.querySelector('.entry-title');
+    if(title) title.textContent = fileName;
+
+    const lead = document.querySelector('.entry-lead');
+    if(lead){
+      lead.innerHTML = `${escapeHtml(source)}上传到<b>${escapeHtml(scopeLabel)}</b>的${escapeHtml(typeMeta.cn)}资料，飞象 AI 会基于原文件整理摘要、关联 Wiki 和可追溯来源。${wiki ? `当前资料已关联 <a class="wlink" onclick="window.location.href='wiki-entry.html?w=${encodeURIComponent(wiki)}'">《${escapeHtml(wiki)}》</a> Wiki。` : '当前资料尚未形成可读 Wiki 主题。'}`;
+    }
+
+    const meta = document.querySelector('.entry-meta');
+    if(meta){
+      meta.innerHTML = `
+        <span class="em-item">上传人 <b>${escapeHtml(source)}</b></span>
+        <span class="em-sep">·</span>
+        <span class="em-item"><b>${escapeHtml(size)}</b></span>
+        <span class="em-sep">·</span>
+        <span class="em-item">上传 <b>${escapeHtml(time)}</b></span>
+      `;
+    }
+
+    const downloadBtn = document.querySelector('[data-doc="download-btn-file-preview"]');
+    if(downloadBtn) downloadBtn.setAttribute('onclick', `V28DownloadDialog.open({ context:'file-preview', subject:'${escapeAttr(fileName)}' })`);
+    const shareBtn = document.querySelector('[data-doc="share-btn-file-preview"]');
+    if(shareBtn) shareBtn.setAttribute('onclick', `V28ShareDialog.open({ context:'file-preview', subject:'${escapeAttr(fileName)}' })`);
+
+    renderQbankState();
+    renderPreviewBody();
+    if(window.lucide) lucide.createIcons();
+
+    function getFileTypeMeta(type){
+      if(['doc', 'docx'].includes(type)) return { label:'WORD', cn:'Word', icon:'file-text' };
+      if(type === 'pdf') return { label:'PDF', cn:'PDF', icon:'file-text' };
+      if(['jpg', 'jpeg', 'png'].includes(type)) return { label:'图片', cn:'图片', icon:'image' };
+      if(type === 'folder') return { label:'资料包', cn:'集合资料', icon:'folder-archive' };
+      if(['xls', 'xlsx'].includes(type)) return { label:'表格', cn:'表格', icon:'file-spreadsheet' };
+      if(['mp4', 'mov'].includes(type)) return { label:'视频', cn:'视频', icon:'video' };
+      if(['ppt', 'pptx'].includes(type)) return { label:'PPTX', cn:'PPT', icon:'presentation' };
+      return { label:type.toUpperCase(), cn:'文件', icon:'file' };
+    }
+
+    function inferFileQbankState(name, type){
+      if(!['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'].includes(type)) return 'unsupported';
+      if(['jpg', 'jpeg', 'png'].includes(type) && /[（(]\s*\d+\s*张/.test(name)) return 'unsupported';
+      if(name.includes('配套习题汇编') || name.includes('期中数学卷')) return 'done';
+      if(name.includes('一模卷') || name.includes('周测卷')) return 'processing';
+      if(name.includes('板书')) return 'failed';
+      return 'none';
+    }
+
+    function renderQbankState(){
+      const row = document.querySelector('.fp-qbank-row');
+      if(!row) return;
+      const status = getQbankStatus(qbankState);
+      row.innerHTML = `
+        ${status.label ? `<span class="fp-qbank-chip ${status.className}"><i data-lucide="${status.icon}"></i>${status.label}</span>` : ''}
+        <span>${status.copy}</span>
+        ${status.action ? `<button class="fp-qbank-action" type="button" onclick="${status.action}"><i data-lucide="${status.actionIcon}"></i>${status.actionText}</button>` : ''}
+      `;
+      if(window.lucide) lucide.createIcons();
+    }
+
+    function getQbankStatus(state){
+      if(state === 'done'){
+        return {
+          className:'is-done',
+          icon:'check-circle-2',
+          label:'已添加进入校本题库',
+          copy:'已识别并入库的题目可在 AI 校本题库中使用。'
+        };
+      }
+      if(state === 'processing'){
+        return {
+          className:'is-doing',
+          icon:'loader-2',
+          label:'AI 录题处理中',
+          copy:'正在识别、校验并准备入库，可稍后查看处理进度。',
+          action:`goAiRecordFromKb(event,'${escapeAttr(fileName)}','parsing',18)`,
+          actionIcon:'external-link',
+          actionText:'查看结果'
+        };
+      }
+      if(state === 'failed'){
+        return {
+          className:'is-failed',
+          icon:'alert-circle',
+          label:'AI 录题处理失败',
+          copy:'本次处理未完成，可到 AI 录题页面查看失败原因。',
+          action:`goAiRecordFromKb(event,'${escapeAttr(fileName)}','failed',0)`,
+          actionIcon:'external-link',
+          actionText:'查看结果'
+        };
+      }
+      if(state === 'unsupported'){
+        return {
+          className:'is-muted',
+          icon:'ban',
+          label:'校本题库：暂不支持',
+          copy:'仅支持 PDF、Word、单张图片；PPT、表格、视频、多图或集合资料只进入知识库。'
+        };
+      }
+      return {
+        className:'',
+        icon:'',
+        label:'',
+        copy:'该文件满足 AI 录题格式条件，可手动添加至校本题库。',
+        action:'startFileQbankRecord()',
+        actionIcon:'plus',
+        actionText:'添加至校本题库'
+      };
+    }
+
+    window.startFileQbankRecord = function(){
+      qbankState = 'processing';
+      renderQbankState();
+      const mask = ensureQbankModal();
+      mask.classList.add('open');
+      if(window.lucide) lucide.createIcons();
+    };
+
+    window.closeFileQbankModal = function(){
+      const mask = document.getElementById('fp-qbank-modal-mask');
+      if(mask) mask.classList.remove('open');
+    };
+
+    function ensureQbankModal(){
+      let mask = document.getElementById('fp-qbank-modal-mask');
+      if(mask) return mask;
+      mask = document.createElement('div');
+      mask.id = 'fp-qbank-modal-mask';
+      mask.className = 'fp-qbank-modal-mask';
+      mask.innerHTML = `
+        <div class="fp-qbank-modal" role="dialog" aria-modal="true" aria-labelledby="fp-qbank-modal-title">
+          <button class="fp-qbank-modal-close" type="button" onclick="closeFileQbankModal()" aria-label="关闭">
+            <i data-lucide="x"></i>
+          </button>
+          <div class="fp-qbank-modal-icon"><i data-lucide="loader-2"></i></div>
+          <h3 id="fp-qbank-modal-title">AI 录题处理中</h3>
+          <p>已开始分析符合条件的题目，稍后可以在「应用广场 - AI 录题」页面查看进度。</p>
+          <div class="fp-qbank-modal-actions">
+            <button class="fp-qbank-modal-btn primary" type="button" onclick="goAiRecordFromKb(event,'${escapeAttr(fileName)}','parsing',18)">查看进度</button>
+          </div>
+        </div>
+      `;
+      mask.addEventListener('click', event => {
+        if(event.target === mask) closeFileQbankModal();
+      });
+      document.body.appendChild(mask);
+      return mask;
+    }
+
+    function renderPreviewBody(){
+      if(['ppt', 'pptx'].includes(ext)) return;
+      const viewer = document.querySelector('.fp-viewer');
+      if(!viewer) return;
+      const previewTitle = ext === 'pdf'
+        ? 'PDF 原文预览'
+        : ['doc', 'docx'].includes(ext)
+          ? 'Word 原文预览'
+          : ['jpg', 'jpeg', 'png'].includes(ext)
+            ? '图片预览'
+            : '文件预览';
+      viewer.innerHTML = `
+        <div class="fp-slide-stage">
+          <div class="fp-stage-bar">
+            <span class="fp-page-no">${escapeHtml(previewTitle)}</span>
+            <div class="fp-stage-spacer"></div>
+            ${wiki ? `<span class="fp-stage-cite"><i data-lucide="link"></i> 已关联 Wiki：${escapeHtml(wiki)}</span>` : '<span class="fp-stage-cite"><i data-lucide="sparkles"></i> AI 正在整理来源</span>'}
+          </div>
+          <div class="fp-slide">
+            <div class="fp-slide-title">${escapeHtml(fileName)}</div>
+            <ul class="fp-slide-points">
+              <li><span class="fp-slide-num">①</span><span>文件已进入 <b>${escapeHtml(scopeLabel)}</b>，原文件归属不因录题沉淀而改变。</span></li>
+              <li><span class="fp-slide-num">②</span><span>AI 会优先提取可读文本、题号、选项、答案区和解析区等结构。</span></li>
+              <li><span class="fp-slide-num">③</span><span>如老师手动添加至校本题库，处理进度会进入 <b>AI 录题</b> 页面。</span></li>
+            </ul>
+            <div class="fp-slide-foot">${escapeHtml(typeMeta.label)} · ${escapeHtml(size)} · ${escapeHtml(source)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(value){
+      return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;',
+      }[ch]));
+    }
+    function escapeAttr(value){
+      return String(value == null ? '' : value).replace(/[\\'"]/g, ch => ch === "'" ? '\\&#39;' : '&quot;');
+    }
+  })();
+
+  /* wiki-entry · 根据 URL ?w= 参数动态切换词条标题（共用模板） */
+  (function(){
+    const params = new URLSearchParams(location.search);
+    const w = params.get('w');
+    if(!w || w === '二次函数图像与性质') return;
+
+    /* 1. tab 标题 */
+    document.title = `${w} · 飞象 AI [build ag]`;
+
+    /* 2. 面包屑末项 */
+    const lastCrumb = document.querySelector('.entry-breadcrumb .ebc-current span:last-child');
+    if(lastCrumb) lastCrumb.textContent = w;
+
+    /* 3. wiki hero 大标题 */
+    const heroTitle = document.querySelector('.entry-hero .entry-title');
+    if(heroTitle) heroTitle.textContent = w;
+
+    /* 4. 顶部 wiki badge 旁的学科标签（如果词条名带「函数」「几何」可以保留；这里简化处理） */
+    /* 跳过，演示阶段所有词条都属于「数学 · 九年级 · 函数」也合理 */
+
+    /* 5. hero 下加一行极低调的演示提示，正文为何不变 */
+    const meta = document.querySelector('.entry-hero .entry-meta');
+    if(meta && !document.getElementById('demo-fallback-hint')){
+      const hint = document.createElement('div');
+      hint.id = 'demo-fallback-hint';
+      hint.style.cssText = 'margin-top:14px;padding:8px 12px;background:rgba(192,142,79,.06);border:1px solid rgba(192,142,79,.18);border-radius:8px;font-size:12px;color:var(--text-2);line-height:1.5;letter-spacing:.005em;display:flex;gap:8px;align-items:flex-start;';
+      hint.innerHTML = `<i data-lucide="info" style="width:14px;height:14px;color:var(--gold);flex-shrink:0;margin-top:2px;"></i><span>演示版：所有 wiki 词条共用本页结构。当前以 <b>《二次函数图像与性质》</b> 的正文作范式，正式版本《${w}》会有 AI 独立整理的内容。</span>`;
+      meta.parentNode.insertBefore(hint, meta.nextSibling);
+      if(window.lucide) lucide.createIcons();
+    }
+  })();
+</script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'file-preview.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+<template id="review-template">
+{
+  "title": "文件页 · 原文预览与 AI 解读",
+  "summary": "文件页不是 Wiki，而是来源资料页。它负责展示原始文件、基础信息和 AI 对文件的理解；右侧 AI 解读固定为 AI 摘要和相关 Wiki，帮助老师判断这份资料讲什么、适合什么场景、进入了哪些 Wiki。",
+  "reviewVersions": [
+    {
+      "id": "v1.0",
+      "label": "v1.0 本次新增",
+      "default": true,
+      "title": "文件页 · v1.0 本次新增",
+      "summary": "本次只评审文件页中的添加至校本题库、AI 录题状态展示和跳转逻辑；原文预览和 AI 摘要沿用历史稿。",
+      "sections": [
+        {
+          "id": "file-preview-v1-qbank",
+          "title": "1. 添加至校本题库",
+          "body": "文件页承接从知识库文件夹进入后的单文件处理，支持老师后续把符合条件的文件加入 AI 校本题库。",
+          "blocks": [
+            {
+              "title": "本次新增 / 调整",
+              "items": [
+                "【新增】文件夹视图中的文件点击后进入文件页，并带入文件类型、来源、大小、所属知识库和 AI 录题状态。",
+                "【新增】未添加的支持文件不展示“未添加”状态标签；展示说明文案“该文件满足 AI 录题格式条件，可手动添加至校本题库。”和按钮“添加至校本题库”。",
+                "【新增】点击“添加至校本题库”后弹窗标题为“AI 录题处理中”，正文为“已开始分析符合条件的题目，稍后可以在「应用广场 - AI 录题」页面查看进度。”，保留右上角关闭按钮和“查看进度”主按钮。",
+                "【调整】AI 录题处理中和 AI 录题处理失败在文件页展示“查看结果”，点击进入 AI 录题页面。",
+                "【调整】已添加进入校本题库只展示状态，不展示“查看结果”按钮。",
+                "【不变】添加至校本题库不改变文件所属知识库和原文件权限。"
+              ]
+            },
+            {
+              "title": "状态口径",
+              "type": "table",
+              "columns": [
+                "状态",
+                "状态标签",
+                "说明文案",
+                "按钮",
+                "点击结果"
+              ],
+              "rows": [
+                {
+                  "状态": "未添加",
+                  "状态标签": "不展示",
+                  "说明文案": "该文件满足 AI 录题格式条件，可手动添加至校本题库。",
+                  "按钮": "添加至校本题库",
+                  "点击结果": "打开 AI 录题处理中弹窗，并把文件状态切到处理中。"
+                },
+                {
+                  "状态": "AI 录题处理中",
+                  "状态标签": "AI 录题处理中",
+                  "说明文案": "正在识别、校验并准备入库，可稍后查看处理进度。",
+                  "按钮": "查看结果",
+                  "点击结果": "进入「应用广场 - AI 录题」页面查看任务。"
+                },
+                {
+                  "状态": "已添加进入校本题库",
+                  "状态标签": "已添加进入校本题库",
+                  "说明文案": "已识别并入库的题目可在 AI 校本题库中使用。",
+                  "按钮": "不展示",
+                  "点击结果": "无操作。"
+                },
+                {
+                  "状态": "AI 录题处理失败",
+                  "状态标签": "AI 录题处理失败",
+                  "说明文案": "本次处理未完成，可到 AI 录题页面查看失败原因。",
+                  "按钮": "查看结果",
+                  "点击结果": "进入「应用广场 - AI 录题」页面查看失败原因。"
+                },
+                {
+                  "状态": "暂不支持 AI 录题",
+                  "状态标签": "校本题库：暂不支持",
+                  "说明文案": "仅支持 PDF、Word、单张图片；PPT、表格、视频、多图或集合资料只进入知识库。",
+                  "按钮": "不展示",
+                  "点击结果": "无操作。"
+                }
+              ]
+            },
+            {
+              "title": "处理中弹窗",
+              "type": "table",
+              "columns": [
+                "元素",
+                "文案 / 行为"
+              ],
+              "rows": [
+                {
+                  "元素": "标题",
+                  "文案 / 行为": "AI 录题处理中"
+                },
+                {
+                  "元素": "正文",
+                  "文案 / 行为": "已开始分析符合条件的题目，稍后可以在「应用广场 - AI 录题」页面查看进度。"
+                },
+                {
+                  "元素": "主按钮",
+                  "文案 / 行为": "查看进度；点击进入「应用广场 - AI 录题」页面。"
+                },
+                {
+                  "元素": "关闭",
+                  "文案 / 行为": "右上角关闭按钮；关闭弹窗，不中断 AI 录题任务。"
+                },
+                {
+                  "元素": "不展示",
+                  "文案 / 行为": "不展示“知道了”按钮。"
+                }
+              ]
+            },
+            {
+              "title": "QA 检查点",
+              "items": [
+                "PDF、Word、单张图片支持添加至校本题库。",
+                "PPT、表格、视频、多图或集合资料只展示暂不支持说明。",
+                "点击添加至校本题库后弹窗没有“知道了”按钮，只有关闭按钮和查看进度主按钮。",
+                "查看进度 / 查看结果均进入 AI 录题页面。"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "file-viewer",
+      "title": "1. 原文件预览",
+      "body": "原文件预览区展示资料正文、页码和基础信息，是 AI 摘要、内容 Wiki 和题目追溯的依据。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：查看资料原文的老师。",
+            "用途：阅读资料，并追溯 AI 摘要、内容 Wiki 或题目来源。",
+            "展示项：资料正文、页码、基础信息和校本题库处理状态。"
+          ]
+        },
+        {
+          "title": "本次新增 / 调整",
+          "items": [
+            "【新增】文件夹视图中的文件点击后进入文件页，并带入文件类型、来源、大小、所属知识库和 AI 录题状态。",
+            "【新增】文件页支持添加至校本题库；未添加的支持文件只展示说明文案和添加至校本题库按钮，不展示未添加状态标签。",
+            "【新增】点击添加至校本题库后弹窗提示 AI 录题处理中，保留右上角关闭按钮和查看进度主按钮。",
+            "【调整】AI 录题处理中和 AI 录题处理失败在文件页展示查看结果，点击进入 AI 录题页面。",
+            "【调整】已添加进入校本题库只展示状态，不展示查看结果按钮。",
+            "【不变】添加至校本题库不改变文件所属知识库和原文件权限。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开文件",
+              "text": "从知识库、词条来源或分享链接进入文件预览。"
+            },
+            {
+              "label": "浏览原文",
+              "text": "老师滚动查看文件内容，必要时按页码定位。"
+            },
+            {
+              "label": "查看来源",
+              "text": "页头展示上传人全名、文件大小和上传/更新时间；权限范围在文件说明或操作反馈中体现。"
+            },
+            {
+              "label": "处理录题",
+              "text": "PDF、Word、单张图片等支持文件可手动添加至校本题库；处理中或处理失败时，可点击查看结果进入 AI 录题页面。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "原文预览必须保留资料来源和权限说明。",
+            "无权限老师不能查看学校私有文件内容。",
+            "文件预览不改变知识库资料本身。",
+            "文件页不展示关联文件标签页；它自身就是来源文件。",
+            "添加至校本题库只发起 AI 录题处理，不改变文件所属知识库和原文件权限。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "文件预览页头基础信息固定展示上传人全名、文件大小和上传/更新时间。",
+            "上传人全名指该文件上传记录对应老师的完整姓名，不使用“张老师”等泛称。",
+            "文件大小指原文件在资料库中的存储大小。",
+            "上传/更新时间优先展示文件最近更新时间；没有更新记录时展示上传时间。",
+            "文件预览展示文件标题、正文、页码、来源和资料归属。",
+            "页码和位置用于 AI 摘要、内容 Wiki 和题目追溯。",
+            "校本题库状态包括未添加、AI 录题处理中、已添加进入校本题库、AI 录题处理失败和暂不支持。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "文件不存在",
+              "处理方式": "提示文件已删除或不可用，并提供返回知识库。"
+            },
+            {
+              "场景": "无权限",
+              "处理方式": "隐藏正文，提示联系资料拥有者或管理员。"
+            },
+            {
+              "场景": "文件格式暂不可预览",
+              "处理方式": "提供下载或返回入口。"
+            },
+            {
+              "场景": "文件不满足 AI 录题条件",
+              "处理方式": "展示暂不支持状态，不提供添加至校本题库按钮。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "学校知识库文件进入预览。"
+            },
+            {
+              "关联对象": "my-wiki.html",
+              "说明": "个人知识库文件进入预览。"
+            },
+            {
+              "关联对象": "wiki-entry.html",
+              "说明": "词条引用来源可定位到原文件。"
+            },
+            {
+              "关联对象": "ai-record-jobs.html",
+              "说明": "承接 AI 录题处理中、失败和已入库结果查看。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "原文页码和正文展示正确。",
+            "无权限文件不能预览正文。",
+            "大文件加载中有状态反馈。",
+            "未添加的支持文件只展示说明文案和添加至校本题库按钮，不重复展示未添加状态标签。",
+            "AI 录题处理中和处理失败状态可点击查看结果进入 AI 录题页面。",
+            "已添加进入校本题库状态不再展示查看结果按钮。",
+            "手动添加后弹窗保留右上角关闭按钮和查看进度主按钮，不展示知道了按钮。",
+            "不支持文件只展示状态说明，不出现添加按钮。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "file-ai-summary",
+      "title": "2. AI 解读",
+      "body": "AI 解读区固定为 AI 摘要和相关 Wiki 两个入口，帮助老师理解这份文件的内容价值和被哪些 Wiki 使用。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "AI 摘要展示文件概括、适用范围、关键页码和使用建议。",
+            "相关 Wiki 展示这份文件进入了哪些 Wiki，以及对应页码和贡献说明。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "查看摘要",
+              "text": "老师打开文件后看到 AI 摘要，快速判断这份资料适合什么场景。"
+            },
+            {
+              "label": "查看相关 Wiki",
+              "text": "切换到相关 Wiki，了解这份文件被哪些 Wiki 吸收，以及贡献了哪些内容。"
+            },
+            {
+              "label": "继续提问",
+              "text": "围绕该文件发起对话时，默认把文件作为上下文。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "AI 解读必须能追溯到原文位置。",
+            "摘要是辅助理解，不替代原文。",
+            "继续提问应限定在当前文件或明确展示上下文范围。",
+            "同主题资料、题目集不作为文件页 AI 解读的一级标签页；如需展示，可作为 AI 摘要中的建议内容。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "AI 解读展示摘要、关键点、引用页码和生成状态。",
+            "解读结果需要关联当前文件版本。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "摘要生成失败",
+              "处理方式": "展示原文预览，并提示暂未生成 AI 解读。"
+            },
+            {
+              "场景": "引用定位失败",
+              "处理方式": "提示位置不可用，但保留摘要内容。"
+            },
+            {
+              "场景": "文件内容过短",
+              "处理方式": "展示简短摘要或说明暂无可提炼内容。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "chat.html",
+              "说明": "围绕文件继续对话。"
+            },
+            {
+              "关联对象": "wiki-entry.html",
+              "说明": "文件中的知识点可生成词条。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "摘要不脱离当前文件来源。",
+            "引用页码可追溯到原文。",
+            "解读失败时可重试或提示稍后查看。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "download-btn-file-preview",
+      "title": "3. 下载原文件",
+      "body": "下载原文件用于老师保留或线下使用资料，受文件权限和来源约束。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：有文件访问权限的老师。",
+            "用途：保留或线下使用当前资料。",
+            "产出：原文件下载结果和权限反馈。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "点击下载",
+              "text": "老师点击下载按钮。"
+            },
+            {
+              "label": "权限判断",
+              "text": "页面确认当前老师是否有下载权限。"
+            },
+            {
+              "label": "下载反馈",
+              "text": "允许下载时给出开始下载反馈；不可下载时说明原因。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "下载原文件不改变知识库资料。",
+            "学校资料可按学校权限限制下载。",
+            "分享访问者可能只能预览不能下载。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "下载动作需要当前文件、文件名称、文件格式和访问权限。",
+            "下载结果需要反馈成功、失败或无权限。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "无下载权限",
+              "处理方式": "按钮置灰或提示不可下载。"
+            },
+            {
+              "场景": "文件已删除",
+              "处理方式": "提示无法下载。"
+            },
+            {
+              "场景": "下载失败",
+              "处理方式": "提示稍后重试。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "share-btn-file-preview",
+              "说明": "分享视图的下载权限需与分享范围一致。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "学校资料下载权限来自学校设置。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "无权限时不能下载。",
+            "文件不存在时提示不可用。",
+            "下载的是当前预览文件。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "share-btn-file-preview",
+      "title": "4. 分享文件视图",
+      "body": "分享文件视图让老师把资料预览链接发给同事，但必须保留可见范围控制。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：有分享权限的老师。",
+            "用途：把资料预览链接发给同事。",
+            "产出：分享链接、可见范围和权限提示。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "点击分享",
+              "text": "老师点击分享按钮。"
+            },
+            {
+              "label": "选择范围",
+              "text": "选择仅自己、学校内老师或指定老师可见。"
+            },
+            {
+              "label": "复制链接",
+              "text": "生成链接后复制，并提示分享范围。"
+            },
+            {
+              "label": "访问链接",
+              "text": "被分享者打开后按权限展示预览或拒绝页。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "分享不能突破文件所属知识库权限。",
+            "个人资料默认不公开给学校，除非老师主动选择。",
+            "知识库分享链接生成后永久有效，不设置过期时间。",
+            "链接访问仍受当前文件状态和知识库权限约束。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "分享信息展示当前文件、分享对象、可见范围和链接状态。",
+            "分享范围不能超过文件本身权限。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "无分享权限",
+              "处理方式": "隐藏分享或提示不可分享。"
+            },
+            {
+              "场景": "复制失败",
+              "处理方式": "显示链接并提示手动复制。"
+            },
+            {
+              "场景": "文件删除或权限收回",
+              "处理方式": "访问者看到无权限或内容不可用说明。"
+            },
+            {
+              "场景": "访问者无权限",
+              "处理方式": "展示无权限说明。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "file-viewer",
+              "说明": "分享访问展示同一文件预览。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "学校资料遵守学校可见范围。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "无分享权限时不展示或禁用。",
+            "分享链接保留可见范围控制。",
+            "取消分享后链接不可访问。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>

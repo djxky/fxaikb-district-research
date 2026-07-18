@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>应用详情 · 飞象老师</title>
+<style>
+  :root {
+    --bg: #faf9f6;
+    --side: #f4f3ef;
+    --surface: #ffffff;
+    --ink: #111110;
+    --muted: #6b6a65;
+    --faint: #a19f99;
+    --line: rgba(0, 0, 0, 0.06);
+    --line-strong: rgba(0, 0, 0, 0.12);
+    --gold: #a87e2c;
+    --gold-soft: #fbf5e6;
+    --green: #4a755b;
+    --green-soft: #eaf3ed;
+    --blue: #53759e;
+    --blue-soft: #edf3f8;
+    --purple: #81628f;
+    --purple-soft: #f4eff5;
+    --rose: #a8626c;
+    --rose-soft: #f8eff0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+    font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { cursor: pointer; border: 0; background: none; font: inherit; color: inherit; transition: all .18s; }
+  a { color: inherit; text-decoration: none; }
+
+  /* 顶栏 */
+  .topbar {
+    height: 56px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    padding: 0 28px;
+    display: flex; align-items: center; gap: 14px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 15px; font-weight: 700;
+    color: var(--ink);
+  }
+  .brand-logo {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--ink);
+    color: #fff;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .brand-logo svg { width: 16px; height: 16px; color: var(--gold); }
+  .brand-text {
+    display: inline-flex; align-items: baseline; gap: 2px;
+  }
+  .brand .star {
+    color: var(--gold);
+    margin-left: 1px;
+    font-size: 10px;
+    transform: translateY(-4px);
+  }
+  .brand-domain {
+    color: var(--faint);
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 8px;
+    letter-spacing: 0.2px;
+  }
+
+  /* 主区 */
+  .app-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 0;
+    min-height: calc(100vh - 56px);
+    padding-bottom: 68px; /* 给吸底 actions 让位 */
+  }
+
+  /* 左：交互演示区 */
+  .stage {
+    padding: 32px 28px;
+    display: flex; flex-direction: column;
+    background: var(--bg);
+  }
+  .stage-top {
+    display: flex; justify-content: flex-end; margin-bottom: 16px;
+  }
+  .stage-fullscreen {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 7px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    font-size: 12.5px; color: var(--muted);
+  }
+  .stage-fullscreen:hover { color: var(--ink); }
+
+  .stage-frame {
+    flex: 1;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    padding: 28px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 460px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  /* 右：应用详情面板 */
+  .panel {
+    background: var(--side);
+    border-left: 1px solid var(--line);
+    padding: 32px 28px;
+    overflow-y: auto;
+  }
+  .p-section { margin-bottom: 28px; }
+  .p-title {
+    font-size: 12.5px; font-weight: 700;
+    color: var(--ink); margin-bottom: 12px;
+    letter-spacing: 0.3px;
+  }
+  .app-head {
+    display: flex; gap: 14px; align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .app-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .app-icon svg { width: 28px; height: 28px; }
+  .app-name {
+    font-size: 18px; font-weight: 700; color: var(--ink);
+    line-height: 1.3; margin-bottom: 4px;
+  }
+  .app-when {
+    font-size: 11.5px; color: var(--muted);
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .app-intro {
+    font-size: 13px; line-height: 1.75; color: #3a3633;
+    margin-bottom: 10px;
+  }
+
+  /* 数据卡 */
+  .stat-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .stat-cell {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .stat-num {
+    font-size: 18px; font-weight: 700; color: var(--ink);
+    line-height: 1.1;
+  }
+  .stat-num .unit { font-size: 11px; color: var(--faint); font-weight: 500; margin-left: 2px; }
+  .stat-lbl {
+    font-size: 11px; color: var(--muted);
+    margin-top: 4px;
+  }
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .chart-card-title {
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 8px;
+    display: flex; justify-content: space-between;
+  }
+  .chart-card-title b { color: var(--green); font-weight: 700; }
+
+  /* sparkline */
+  .spark { display: block; width: 100%; height: 64px; }
+
+  /* 作者 */
+  .author-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+  }
+  .author-ava {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--green); color: #fff;
+    display: grid; place-items: center;
+    font-weight: 600; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .author-name {
+    font-size: 13px; font-weight: 600; color: var(--ink);
+  }
+  .author-meta {
+    font-size: 11px; color: var(--muted);
+    margin-top: 2px; line-height: 1.4;
+  }
+
+  /* 底部 CTA · 吸底 */
+  .actions {
+    display: flex; gap: 8px;
+    padding: 12px 28px;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 50;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
+  }
+  .actions .pmeta {
+    flex: 1; display: flex; align-items: center; gap: 12px;
+    font-size: 12px; color: var(--muted);
+  }
+  .actions .pmeta b { color: var(--ink); font-weight: 600; }
+  .btn {
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn.ghost {
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .btn.ghost:hover { background: var(--bg); }
+  .btn.primary {
+    background: var(--ink); color: #fff;
+  }
+  .btn.primary:hover { background: #000; }
+
+  /* 应用专属 stage 内容 */
+  .stage-empty {
+    text-align: center;
+    color: var(--muted);
+  }
+  .stage-empty-icon {
+    width: 72px; height: 72px; border-radius: 18px;
+    margin: 0 auto 16px;
+    display: grid; place-items: center;
+  }
+  .stage-empty-title {
+    font-size: 18px; font-weight: 700; color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .stage-empty-desc {
+    font-size: 13.5px; max-width: 380px; margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* 通知应用 stage */
+  .notify-preview {
+    width: 100%; max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 24px;
+  }
+  .notify-preview-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .notify-preview-ico {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--blue-soft); color: var(--blue);
+    display: grid; place-items: center;
+  }
+  .notify-preview h3 { margin: 0; font-size: 14px; font-weight: 700; }
+  .notify-preview-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .notify-field { margin-bottom: 14px; }
+  .notify-field-lbl {
+    font-size: 11.5px; color: var(--muted);
+    font-weight: 600; margin-bottom: 6px;
+  }
+  .notify-field-val {
+    font-size: 13px; color: var(--ink);
+    padding: 8px 12px;
+    background: var(--bg); border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .notify-field-val.tall {
+    min-height: 80px; line-height: 1.6;
+  }
+  .notify-receivers {
+    display: flex; gap: 4px; flex-wrap: wrap;
+  }
+  .notify-receivers span {
+    background: var(--blue-soft); color: var(--blue);
+    padding: 3px 9px; border-radius: 6px;
+    font-size: 11.5px; font-weight: 500;
+  }
+  .notify-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+  /* 排课应用 stage */
+  .schedule-grid {
+    width: 100%; max-width: 560px;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid var(--line);
+  }
+  .schedule-head {
+    font-size: 14px; font-weight: 700;
+    margin-bottom: 14px;
+    display: flex; justify-content: space-between;
+    align-items: center;
+  }
+  .schedule-head .week { color: var(--muted); font-size: 11.5px; font-weight: 500; }
+  .schedule-table {
+    display: grid;
+    grid-template-columns: 40px repeat(5, 1fr);
+    gap: 4px;
+    font-size: 11px;
+  }
+  .schedule-table .h {
+    text-align: center;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 4px 0;
+  }
+  .schedule-cell {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 4px 5px;
+    min-height: 36px;
+    font-size: 10.5px;
+    line-height: 1.3;
+  }
+  .schedule-cell.gold { background: var(--gold-soft); border-color: rgba(168, 126, 44, 0.2); color: var(--gold); font-weight: 600; }
+  .schedule-cell.green { background: var(--green-soft); border-color: rgba(74, 117, 91, 0.2); color: var(--green); font-weight: 600; }
+  .schedule-cell.blue { background: var(--blue-soft); border-color: rgba(83, 117, 158, 0.2); color: var(--blue); font-weight: 600; }
+  .schedule-cell.empty { background: transparent; border-style: dashed; }
+
+  /* 请假应用 stage */
+  .leave-list {
+    width: 100%; max-width: 440px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .leave-item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .leave-ava {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--purple); color: #fff;
+    display: grid; place-items: center;
+    font-weight: 600; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .leave-name {
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .leave-tag {
+    font-size: 10.5px; padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--rose-soft); color: var(--rose);
+    font-weight: 600;
+  }
+  .leave-desc {
+    font-size: 11.5px; color: var(--muted);
+    margin-top: 3px;
+  }
+  .leave-btns {
+    margin-left: auto;
+    display: flex; gap: 6px;
+  }
+  .leave-btn {
+    padding: 5px 10px; border-radius: 6px;
+    font-size: 11.5px; font-weight: 500;
+  }
+  .leave-btn.approve {
+    background: var(--green); color: #fff;
+  }
+  .leave-btn.reject {
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--line-strong);
+  }
+  .leave-btn:hover { opacity: .85; }
+
+  /* Toast */
+  #toast {
+    position: fixed; left: 50%; bottom: 24px;
+    transform: translateX(-50%);
+    background: rgba(17,17,16,0.92); color: #fff;
+    padding: 10px 18px; border-radius: 22px;
+    font-size: 12.5px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s; z-index: 9999;
+    backdrop-filter: blur(6px);
+  }
+  #toast.show { opacity: 1; }
+
+  @media (max-width: 1080px) {
+    .app-wrap { grid-template-columns: 1fr; }
+    .panel { border-left: 0; border-top: 1px solid var(--line); }
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="app-detail">
+
+<header class="topbar">
+  <a class="brand" href="index.html" title="回到首页">
+    <span class="brand-logo">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>
+    </span>
+    <span class="brand-text">飞象老师<span class="star">®</span></span>
+    <span class="brand-domain">feixianglaoshi.com</span>
+  </a>
+</header>
+
+<div class="app-wrap">
+  <!-- 左：交互演示区 -->
+  <section class="stage">
+    <div class="stage-top">
+      <button class="stage-fullscreen" onclick="showToast('（演示）全屏预览')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        全屏
+      </button>
+    </div>
+    <div class="stage-frame" id="stage-frame">
+      <!-- 由 JS 按应用类型渲染 -->
+    </div>
+  </section>
+
+  <!-- 右：应用详情面板 -->
+  <aside class="panel">
+    <div class="p-section">
+      <div class="p-title">应用详情</div>
+      <div class="app-head">
+        <div class="app-icon" id="app-icon"></div>
+        <div style="flex:1;min-width:0">
+          <div class="app-name" id="app-name">—</div>
+          <div class="app-when">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            创建时间：<span id="app-created">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-section">
+      <div class="p-title">应用简介</div>
+      <div class="app-intro" id="app-intro">—</div>
+    </div>
+
+    <div class="p-section">
+      <div class="p-title">应用数据</div>
+      <div class="stat-row">
+        <div class="stat-cell">
+          <div class="stat-num" id="stat-uses">—<span class="unit">次</span></div>
+          <div class="stat-lbl">使用次数</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num" id="stat-users">—<span class="unit">人</span></div>
+          <div class="stat-lbl">使用人数</div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">
+          <span>近 7 天使用量</span>
+          <b id="chart-trend">↑ +18%</b>
+        </div>
+        <svg class="spark" id="spark" viewBox="0 0 280 64" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+
+    <div class="p-section">
+      <div class="p-title">作者</div>
+      <div class="author-row">
+        <div class="author-ava" id="author-ava">王</div>
+        <div style="flex:1;min-width:0">
+          <div class="author-name" id="author-name">—</div>
+          <div class="author-meta" id="author-meta">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="actions">
+  <div class="pmeta">
+    <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:3px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><b id="pview">3.4w</b> 浏览</span>
+    <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:3px"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2"/></svg><b id="pstar">345</b> 收藏</span>
+  </div>
+  <button class="btn ghost" onclick="showToast('（演示）已添加到我的')" data-track="/click/feixiangCampusAppDetailPage/addToMyWorks | 添加到我的作品 | appSource#STRING">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    添加到我的
+  </button>
+  <button class="btn primary" onclick="showToast('（演示）已生成分享链接')" data-track="/click/feixiangCampusAppDetailPage/share | 分享应用 | appSource#STRING">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    分享
+  </button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function getParam(k) {
+  const m = window.location.search.match(new RegExp('[?&]' + k + '=([^&]*)'));
+  return m ? decodeURIComponent(m[1]) : '';
+}
+
+const APPS = {
+  notify: {
+    name: '班级通知小助手',
+    intro: '面向班主任和学科老师的智能通知工具。AI 根据你输入的关键信息自动撰写得体的通知文案，一键群发到家长群、企业微信、短信、电话，并跟踪送达率与已读率。',
+    created: '2026.3.12',
+    icon: { color: 'var(--blue)', bg: 'var(--blue-soft)', svg: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>' },
+    uses: '2.1万', users: '286',
+    trend: '↑ +24%',
+    sparkData: [12, 18, 16, 22, 28, 35, 42],
+    author: { name: '李老师', meta: '实验中学 · 教务处 · 高级教师', avaColor: 'var(--blue)', avaChar: '李' },
+    view: '3.4万', star: '512',
+    stage: 'notify',
+  },
+  schedule: {
+    name: '智能排课',
+    intro: '基于教师课时偏好、教室资源、学生选科组合自动生成最优课表。支持冲突检测、临时调课、跨班代课、家长查询四大功能。已接入实验中学走班选修系统。',
+    created: '2026.2.8',
+    icon: { color: 'var(--purple)', bg: 'var(--purple-soft)', svg: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>' },
+    uses: '8,422', users: '124',
+    trend: '↑ +12%',
+    sparkData: [8, 10, 9, 14, 18, 22, 28],
+    author: { name: '陈老师', meta: '实验中学 · 信息中心 · 副主任', avaColor: 'var(--purple)', avaChar: '陈' },
+    view: '1.8万', star: '267',
+    stage: 'schedule',
+  },
+  leave: {
+    name: '请假审批',
+    intro: '学生家长在线提交请假申请，AI 自动识别请假类型与时长，按学校规则路由到对应班主任或教务处审批。支持电子签字、家校同步、考勤回写。',
+    created: '2025.11.5',
+    icon: { color: 'var(--green)', bg: 'var(--green-soft)', svg: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/>' },
+    uses: '1.5万', users: '348',
+    trend: '↑ +8%',
+    sparkData: [22, 19, 21, 24, 23, 26, 28],
+    author: { name: '王老师', meta: '实验中学 · 学生处 · 副主任', avaColor: 'var(--green)', avaChar: '王' },
+    view: '2.6万', star: '189',
+    stage: 'leave',
+  },
+  exam: {
+    name: 'AI 试卷分析专家',
+    intro: '上传试卷或答题卡图片后，自动完成题目识别、得分率统计、易错题归因和讲评建议生成，适合考试后快速形成班级分析报告。',
+    created: '2026.4.18',
+    icon: { color: 'var(--gold)', bg: 'var(--gold-soft)', svg: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>' },
+    uses: '12.5万', users: '1,842',
+    trend: '↑ +31%',
+    sparkData: [20, 26, 31, 38, 45, 52, 61],
+    author: { name: '飞象星球', meta: '飞象星球 · 官方应用', avaColor: 'var(--gold)', avaChar: '飞' },
+    view: '18.6万', star: '3,482',
+    stage: 'default',
+  },
+  'classic-game': {
+    name: '文言文情景闯关 (H5)',
+    intro: '把文言文重点字词、句式和背诵检查改造成闯关式 H5，学生扫码进入，老师可以查看通关率和错题分布。',
+    created: '2026.5.6',
+    icon: { color: 'var(--purple)', bg: 'var(--purple-soft)', svg: '<line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><path d="M17.32 5H6.68a4 4 0 0 0-3.98 3.59C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.4-1.4A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.54-.6-6.58-.69-7.26A4 4 0 0 0 17.32 5z"/>' },
+    uses: '842', users: '286',
+    trend: '↑ +19%',
+    sparkData: [6, 8, 9, 13, 15, 20, 24],
+    author: { name: '李素芬', meta: '实验中学 · 语文组', avaColor: 'var(--purple)', avaChar: '李' },
+    view: '6,320', star: '421',
+    stage: 'default',
+  },
+  'lesson-plan': {
+    name: '智能教案排版',
+    intro: '输入教学目标、重难点和课堂活动，自动生成符合学校模板的 Word 教案，并支持按备课组格式统一排版。',
+    created: '2026.1.21',
+    icon: { color: 'var(--gold)', bg: 'var(--gold-soft)', svg: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>' },
+    uses: '8.9万', users: '1,204',
+    trend: '↑ +17%',
+    sparkData: [18, 22, 21, 28, 31, 36, 42],
+    author: { name: '飞象星球', meta: '飞象星球 · 官方应用', avaColor: 'var(--gold)', avaChar: '飞' },
+    view: '10.8万', star: '2,108',
+    stage: 'default',
+  },
+  finance: {
+    name: '班费记账本 (Web App)',
+    intro: '轻量级班费管理工具，支持扫码记账、附件留痕、自动生成月度收支图表，并可一键导出公示表。',
+    created: '2026.4.2',
+    icon: { color: 'var(--green)', bg: 'var(--green-soft)', svg: '<path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>' },
+    uses: '156', users: '42',
+    trend: '↑ +6%',
+    sparkData: [4, 5, 6, 6, 8, 10, 11],
+    author: { name: '王建华', meta: '实验中学 · 高一班主任', avaColor: 'var(--green)', avaChar: '王' },
+    view: '1,280', star: '96',
+    stage: 'default',
+  },
+  speaking: {
+    name: '英语口语对练 Agent',
+    intro: '模拟真实英语对话场景，支持语音输入、即时纠音和表达建议，老师可以按主题布置 5 分钟口语练习。',
+    created: '2026.3.1',
+    icon: { color: 'var(--blue)', bg: 'var(--blue-soft)', svg: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>' },
+    uses: '21.3万', users: '4,806',
+    trend: '↑ +28%',
+    sparkData: [30, 34, 42, 49, 58, 65, 72],
+    author: { name: '飞象星球', meta: '飞象星球 · 官方应用', avaColor: 'var(--gold)', avaChar: '飞' },
+    view: '25.4万', star: '4,921',
+    stage: 'default',
+  },
+  'sports-signup': {
+    name: '运动会报名收集',
+    intro: '快速生成报名表单，自动校验每人限报项目数，实时汇总班级报名情况，并一键导出 Excel。',
+    created: '2026.4.26',
+    icon: { color: 'var(--blue)', bg: 'var(--blue-soft)', svg: '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/>' },
+    uses: '1.1万', users: '530',
+    trend: '↑ +22%',
+    sparkData: [7, 10, 13, 18, 24, 28, 34],
+    author: { name: '全域热门', meta: '多校共用模板 · 热门应用', avaColor: 'var(--blue)', avaChar: '全' },
+    view: '2.9万', star: '842',
+    stage: 'default',
+  },
+  'chemistry-lab': {
+    name: '化学实验模拟器',
+    intro: 'H5 互动实验工具，学生可拖拽烧杯、试剂和实验器材，安全模拟危险反应现象，适合课前预习和实验复盘。',
+    created: '2026.5.9',
+    icon: { color: 'var(--rose)', bg: 'var(--rose-soft)', svg: '<path d="M10 2v7.5a2 2 0 0 1-.2.9L4.7 20.6A1 1 0 0 0 5.6 22h12.8a1 1 0 0 0 .9-1.4l-5.1-10.2a2 2 0 0 1-.2-.9V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/>' },
+    uses: '420', users: '118',
+    trend: '↑ +14%',
+    sparkData: [5, 6, 8, 9, 13, 15, 19],
+    author: { name: '赵明杰', meta: '实验中学 · 化学组', avaColor: 'var(--rose)', avaChar: '赵' },
+    view: '4,680', star: '302',
+    stage: 'default',
+  },
+};
+
+function renderApp() {
+  const key = getParam('app') || 'notify';
+  const app = APPS[key] || APPS.notify;
+
+  document.title = `${app.name} · 飞象老师`;
+  document.getElementById('app-name').textContent = app.name;
+  document.getElementById('app-intro').textContent = app.intro;
+  document.getElementById('app-created').textContent = app.created;
+  document.getElementById('stat-uses').innerHTML = app.uses + '<span class="unit">次</span>';
+  document.getElementById('stat-users').innerHTML = app.users + '<span class="unit">人</span>';
+  document.getElementById('chart-trend').textContent = app.trend;
+  document.getElementById('author-name').textContent = app.author.name;
+  document.getElementById('author-meta').textContent = app.author.meta;
+  document.getElementById('author-ava').textContent = app.author.avaChar;
+  document.getElementById('author-ava').style.background = app.author.avaColor;
+  document.getElementById('pview').textContent = app.view;
+  document.getElementById('pstar').textContent = app.star;
+
+  const ico = document.getElementById('app-icon');
+  ico.style.background = app.icon.bg;
+  ico.style.color = app.icon.color;
+  ico.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${app.icon.svg}</svg>`;
+
+  renderSpark(app.sparkData);
+  renderStage(app.stage);
+}
+
+function renderSpark(data) {
+  const svg = document.getElementById('spark');
+  const W = 280, H = 64, P = 4;
+  const max = Math.max(...data);
+  const step = (W - P * 2) / (data.length - 1);
+  const pts = data.map((v, i) => [P + i * step, H - P - (v / max) * (H - P * 2)]);
+  const d = pts.map((p, i) => (i === 0 ? `M ${p[0]} ${p[1]}` : `L ${p[0]} ${p[1]}`)).join(' ');
+  const dFill = d + ` L ${pts[pts.length - 1][0]} ${H} L ${pts[0][0]} ${H} Z`;
+  svg.innerHTML = `
+    <path d="${dFill}" fill="rgba(74, 117, 91, 0.12)"/>
+    <path d="${d}" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${pts.map((p, i) => i === pts.length - 1 ? `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="var(--green)"/>` : '').join('')}
+    ${(() => { const last = pts[pts.length - 1]; return `<text x="${last[0] - 4}" y="${last[1] - 8}" text-anchor="end" font-size="10" fill="var(--green)" font-weight="700">${data[data.length-1]}00次</text>`; })()}
+  `;
+}
+
+function renderStage(kind) {
+  const frame = document.getElementById('stage-frame');
+  if (kind === 'notify') {
+    frame.innerHTML = `
+      <div class="notify-preview">
+        <div class="notify-preview-head">
+          <div class="notify-preview-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <div>
+            <h3>新建通知 · 高一(3)班</h3>
+            <div class="notify-preview-meta">AI 已根据「期中考试 + 家长会」自动撰写</div>
+          </div>
+        </div>
+        <div class="notify-field">
+          <div class="notify-field-lbl">主题</div>
+          <div class="notify-field-val">高一(3)班期中考试家长会通知</div>
+        </div>
+        <div class="notify-field">
+          <div class="notify-field-lbl">正文（AI 生成）</div>
+          <div class="notify-field-val tall">各位家长好：本周五（5 月 29 日）下午 16:00 在高一(3)班教室召开期中考试家长会，将分享孩子近期学习情况，并就暑期学习规划做沟通。请提前安排好时间，准时到会。如不便参加请提前告知，谢谢！</div>
+        </div>
+        <div class="notify-field">
+          <div class="notify-field-lbl">接收人</div>
+          <div class="notify-receivers">
+            <span>家长 38 人</span><span>已加群 36 人</span><span>未加群 2 人 · 短信</span>
+          </div>
+        </div>
+        <div class="notify-actions">
+          <button class="btn ghost" onclick="showToast('（演示）让 AI 重写')">让 AI 改写</button>
+          <button class="btn primary" onclick="showToast('（演示）通知已发送 · 36 群消息 + 2 短信')" style="flex:1;justify-content:center">一键发送</button>
+        </div>
+      </div>
+    `;
+  } else if (kind === 'schedule') {
+    frame.innerHTML = `
+      <div class="schedule-grid">
+        <div class="schedule-head">
+          <span>高一(5)班 · 本周课表</span>
+          <span class="week">2026.5.25 - 5.29</span>
+        </div>
+        <div class="schedule-table">
+          <div></div>
+          <div class="h">周一</div><div class="h">周二</div><div class="h">周三</div><div class="h">周四</div><div class="h">周五</div>
+
+          <div class="h">1</div>
+          <div class="schedule-cell gold">语文<br>张</div>
+          <div class="schedule-cell">数学<br>刘</div>
+          <div class="schedule-cell green">英语<br>赵</div>
+          <div class="schedule-cell">物理<br>孙</div>
+          <div class="schedule-cell gold">语文<br>张</div>
+
+          <div class="h">2</div>
+          <div class="schedule-cell">数学<br>刘</div>
+          <div class="schedule-cell gold">语文<br>张</div>
+          <div class="schedule-cell">物理<br>孙</div>
+          <div class="schedule-cell green">英语<br>赵</div>
+          <div class="schedule-cell">数学<br>刘</div>
+
+          <div class="h">3</div>
+          <div class="schedule-cell blue">化学<br>周</div>
+          <div class="schedule-cell">物理<br>孙</div>
+          <div class="schedule-cell">数学<br>刘</div>
+          <div class="schedule-cell blue">化学<br>周</div>
+          <div class="schedule-cell green">英语<br>赵</div>
+
+          <div class="h">4</div>
+          <div class="schedule-cell">体育<br>吴</div>
+          <div class="schedule-cell blue">生物<br>郑</div>
+          <div class="schedule-cell">音乐<br>韩</div>
+          <div class="schedule-cell">美术<br>冯</div>
+          <div class="schedule-cell empty">自习</div>
+        </div>
+      </div>
+    `;
+  } else if (kind === 'leave') {
+    frame.innerHTML = `
+      <div class="leave-list">
+        <div class="leave-item">
+          <div class="leave-ava">张</div>
+          <div style="flex:1;min-width:0">
+            <div class="leave-name">张同学 <span class="leave-tag">病假</span></div>
+            <div class="leave-desc">高一(5)班 · 5 月 29 日全天 · 发烧 38.5℃ · 家长已提交医院证明</div>
+          </div>
+          <div class="leave-btns">
+            <button class="leave-btn reject" onclick="showToast('已退回 · 已通知家长')">退回</button>
+            <button class="leave-btn approve" onclick="showToast('已批准 · 已同步考勤')">批准</button>
+          </div>
+        </div>
+        <div class="leave-item">
+          <div class="leave-ava" style="background:var(--blue)">李</div>
+          <div style="flex:1;min-width:0">
+            <div class="leave-name">李同学 <span class="leave-tag" style="background:var(--blue-soft);color:var(--blue)">事假</span></div>
+            <div class="leave-desc">高一(5)班 · 5 月 30 日上午 · 区科技竞赛获奖颁奖典礼</div>
+          </div>
+          <div class="leave-btns">
+            <button class="leave-btn reject" onclick="showToast('已退回')">退回</button>
+            <button class="leave-btn approve" onclick="showToast('已批准')">批准</button>
+          </div>
+        </div>
+        <div class="leave-item">
+          <div class="leave-ava" style="background:var(--gold)">王</div>
+          <div style="flex:1;min-width:0">
+            <div class="leave-name">王同学 <span class="leave-tag">病假</span></div>
+            <div class="leave-desc">高一(5)班 · 5 月 29 日下午 · 牙科预约 · 家长口头说明</div>
+          </div>
+          <div class="leave-btns">
+            <button class="leave-btn reject" onclick="showToast('已退回')">退回</button>
+            <button class="leave-btn approve" onclick="showToast('已批准')">批准</button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    frame.innerHTML = `
+      <div class="stage-empty">
+        <div class="stage-empty-icon" style="background:var(--side);color:var(--muted)">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <div class="stage-empty-title">应用预览</div>
+        <div class="stage-empty-desc">这是该校自建应用的预览区，老板可以直接在这里看到学校自己创造出来的 AI 应用是怎么运行的。</div>
+      </div>
+    `;
+  }
+}
+
+renderApp();
+</script>
+
+<template id="review-template">
+{
+  "title": "应用详情 · 看清能力再使用",
+  "summary": "应用详情页让老师在使用前看清应用能力、适用场景、示例输入输出和可用范围，并提供添加、分享和直接使用动作。",
+  "sections": [
+    {
+      "id": "app-detail-hero",
+      "title": "1. 应用介绍",
+      "body": "应用介绍区说明应用解决什么教学问题、适合谁用、来源是什么，以及当前老师是否可用。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：准备了解应用的老师。",
+            "用途：判断应用是否适合当前教学场景。",
+            "展示项：解决问题、适用对象、来源和可用状态。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开详情",
+              "text": "从应用广场、我的应用或首页常用应用进入详情页。"
+            },
+            {
+              "label": "识别来源",
+              "text": "老师查看官方、学校或个人来源标签。"
+            },
+            {
+              "label": "查看适用场景",
+              "text": "阅读应用用途、适用学科、推荐使用方式。"
+            },
+            {
+              "label": "判断可用",
+              "text": "页面展示当前账号是否可直接使用、是否需要权限或付费。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "详情页必须保留应用来源和可用范围。",
+            "通过校园版创建的应用，详情页作者/创建者展示校园版老师身份信息，不展示个人版创作者身份信息。",
+            "不可用应用不展示可误触的主使用按钮。",
+            "应用说明应面向老师任务，不写技术能力堆叠。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "应用介绍展示应用名称、简介、来源、作者、开通状态、适用场景、收藏状态和跳转地址。",
+            "飞象官方应用、本校应用和飞象老师精选应用的来源与作者口径需与应用广场一致。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "应用不存在",
+              "处理方式": "展示应用不可用，并提供返回广场。"
+            },
+            {
+              "场景": "无权限",
+              "处理方式": "显示权限原因和申请或联系管理员提示。"
+            },
+            {
+              "场景": "已下架",
+              "处理方式": "禁止使用和分享，仅保留说明。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "app-square.html",
+              "说明": "广场卡片进入详情。"
+            },
+            {
+              "关联对象": "my-apps.html",
+              "说明": "我的应用卡片进入详情。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "应用来源和作者展示正确。",
+            "未开通官方应用不能直接进入业务系统。",
+            "本校应用作者使用校园版老师身份信息。",
+            "返回来源页后筛选状态不丢失。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "app-detail-preview",
+      "title": "2. 应用预览",
+      "body": "应用预览展示示例输入、示例输出或运行效果，帮助老师判断是否符合自己的教学场景。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：使用前需要确认效果的老师。",
+            "用途：查看应用运行前后的示例。",
+            "展示项：示例输入、示例输出或运行效果。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "查看示例",
+              "text": "老师浏览应用示例、适用材料和输出样张。"
+            },
+            {
+              "label": "切换示例",
+              "text": "若有多个场景，可切换不同学科或任务样例。"
+            },
+            {
+              "label": "预览限制",
+              "text": "无权限时仍可看公开介绍，但不能运行真实任务。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "预览内容应使用真实教学任务表达。",
+            "预览不改变老师的数据或生成正式结果。",
+            "涉及学校资料的应用需说明会基于所选知识库工作。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "预览展示信息包括封面、示例输入、示例输出、能力说明、可用状态和预览交互反馈。",
+            "预览只用于判断应用能力，不在详情页写入真实业务数据。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "预览为空",
+              "处理方式": "展示暂无预览，不影响收藏和返回。"
+            },
+            {
+              "场景": "样例加载失败",
+              "处理方式": "保留介绍区，提示稍后查看。"
+            },
+            {
+              "场景": "无权限预览",
+              "处理方式": "只展示公开样例，不展示学校私有数据。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "chat.html",
+              "说明": "运行应用时可能进入带预设能力的新对话。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "部分应用需要选择学校知识库作为上下文。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "预览区能说明应用用途。",
+            "无权限或未开通时预览不误导老师认为已可使用。",
+            "预览失败有反馈并保留返回入口。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "app-detail-actions",
+      "title": "3. 添加和分享",
+      "body": "操作区承接添加到我的应用、分享给同事、直接使用或返回广场等动作。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：当前应用的主态或客态老师。",
+            "用途：添加、分享、直接使用或返回应用广场。",
+            "产出：操作结果、权限反馈和目标页面跳转。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "添加应用",
+              "text": "点击添加/收藏后进入我的应用，并展示成功反馈。"
+            },
+            {
+              "label": "直接使用",
+              "text": "点击使用后进入应用流程，必要时先选择知识库或上传资料。"
+            },
+            {
+              "label": "分享应用",
+              "text": "点击分享生成可见范围内的分享方式。"
+            },
+            {
+              "label": "返回列表",
+              "text": "老师可回到应用广场继续浏览。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "添加是个人收藏，不复制学校应用本体。",
+            "分享必须受应用来源和学校权限约束。",
+            "使用前若缺少必要资料，需要先引导选择或上传。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "操作展示信息包括添加状态、收藏状态、分享权限、分享链接、可见范围和目标空间。",
+            "添加到我的作品只影响当前老师列表，不改变应用原归属。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "未满足使用条件",
+              "处理方式": "提示先选择知识库、上传资料或完成授权。"
+            },
+            {
+              "场景": "分享无权限",
+              "处理方式": "隐藏分享或提示不可分享。"
+            },
+            {
+              "场景": "重复添加",
+              "处理方式": "提示已在我的应用，不重复创建。"
+            },
+            {
+              "场景": "使用失败",
+              "处理方式": "停留详情页并提示原因。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "my-apps.html",
+              "说明": "添加后进入我的应用。"
+            },
+            {
+              "关联对象": "chat.html",
+              "说明": "直接使用进入新对话或应用运行页。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "需要知识库上下文的应用从学校知识库选择资料。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "添加后可在我的作品查看。",
+            "分享失败时不显示已复制成功。",
+            "无权限应用不展示可执行分享。",
+            "取消收藏不影响原应用。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'app-detail.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+</body>
+</html>

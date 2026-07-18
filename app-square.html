@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞象老师校园版 · 应用广场</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/page-header.css" />
+<link rel="stylesheet" href="assets/ai-create-dock.css" />
+<style>
+  :root{
+    --bg:#faf9f6;
+    --surface:#fff;
+    --ink:#111110;
+    --muted:#6b6a65;
+    --faint:#a19f99;
+    --line:rgba(0,0,0,.07);
+    --line-strong:rgba(0,0,0,.14);
+    --gold:#a87e2c;
+    --gold-bg:#fbf5e6;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  button,input{font:inherit;border:0;background:none;outline:0}
+  button{cursor:pointer}
+  .app{height:100vh;display:grid;grid-template-columns:240px minmax(0,1fr)}
+  .main{display:flex;flex-direction:column;overflow-y:auto}
+  .page-header[data-page-header="app-square"]{position:static}
+  .page-head-tabs{
+    position:sticky;
+    top:0;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 40px 0;
+    background:rgba(255,255,255,.92);
+    border-bottom:1px solid var(--line);
+    backdrop-filter:blur(14px) saturate(1.4);
+    -webkit-backdrop-filter:blur(14px) saturate(1.4);
+  }
+  .subject-tabs{
+    display:flex;
+    gap:4px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    scrollbar-width:none;
+  }
+  .subject-tabs::-webkit-scrollbar{display:none}
+  .subject-tab{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+    padding:8px 18px;
+    border-radius:18px;
+    color:var(--muted);
+    font-size:13.5px;
+    font-weight:500;
+    white-space:nowrap;
+    transition:background .15s,color .15s;
+  }
+  .subject-tab:hover{color:var(--ink);background:#f1f0ec}
+  .subject-tab.active{color:#7a5d20;background:var(--gold-bg);font-weight:650}
+  .head-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-shrink:0;
+    padding-bottom:12px;
+  }
+  .search-shell{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .search-shell .search-submit{
+    display:none;
+    height:34px;
+    padding:0 14px;
+    border-radius:17px;
+    background:var(--gold-bg);
+    color:#7a5d20;
+    font-size:13px;
+    font-weight:650;
+    white-space:nowrap;
+  }
+  .search-shell:focus-within .search-submit,
+  .search-shell.has-value .search-submit{
+    display:inline-flex;
+    align-items:center;
+  }
+  .search-shell .search-submit:hover{background:#f4e7c4}
+  .grid-wrap{
+    width:100%;
+    max-width:1480px;
+    margin:0 auto;
+    padding:28px 40px 132px;
+  }
+  .content-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:20px;
+  }
+  .app-card{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    min-height:226px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--surface);
+    color:inherit;
+    text-decoration:none;
+    transition:border-color .18s,box-shadow .18s,transform .18s;
+  }
+  .app-card:hover{
+    border-color:var(--line-strong);
+    box-shadow:0 12px 28px rgba(0,0,0,.06);
+    transform:translateY(-2px);
+  }
+  .app-cover{
+    position:relative;
+    height:126px;
+    display:grid;
+    place-items:center;
+    color:rgba(255,255,255,.84);
+  }
+  .bg-grad-1{background:linear-gradient(135deg,#edf5ee,#c8e0cd)}
+  .bg-grad-2{background:linear-gradient(135deg,#f5f0f6,#ddc8e3)}
+  .bg-grad-3{background:linear-gradient(135deg,#eff4f9,#c8d8e8)}
+  .bg-grad-4{background:linear-gradient(135deg,#fdfaf3,#f0deb3)}
+  .bg-grad-5{background:linear-gradient(135deg,#fbf0f1,#ecc7ca)}
+  .bg-grad-6{background:linear-gradient(135deg,#f7f2e8,#e3d4ae)}
+  .bg-grad-7{background:linear-gradient(135deg,#f1f3f5,#cdd5dd)}
+  .bg-grad-8{background:linear-gradient(135deg,#fbf3eb,#f0d3b8)}
+  .bg-grad-9{background:linear-gradient(135deg,#f0f0eb,#d3c8ad)}
+  .bg-grad-10{background:linear-gradient(135deg,#ecf3f0,#c2d7cd)}
+  .app-cover-icon{opacity:.46}
+  .app-cover-icon svg{width:42px;height:42px}
+  .app-tag{
+    position:absolute;
+    top:12px;
+    left:12px;
+    padding:3px 8px;
+    border-radius:999px;
+    background:rgba(255,255,255,.78);
+    color:var(--muted);
+    font-size:11px;
+    font-weight:650;
+  }
+  .app-tag.gold{color:#8a6720;background:rgba(255,248,226,.9)}
+  .app-tag.locked{color:#7c5f21;background:rgba(255,255,255,.88);border:1px solid rgba(168,126,44,.22)}
+  .app-stats{
+    position:absolute;
+    right:12px;
+    bottom:10px;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:3px 7px;
+    border-radius:999px;
+    background:rgba(0,0,0,.16);
+    color:#fff;
+    font-size:11px;
+    font-weight:650;
+  }
+  .app-body{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    flex:1;
+    padding:16px 16px 15px;
+  }
+  .app-title{
+    color:var(--ink);
+    font-size:15.5px;
+    line-height:1.35;
+    font-weight:700;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .app-author{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:auto;
+    color:var(--faint);
+    font-size:12px;
+  }
+  .author-avatar{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    flex-shrink:0;
+  }
+  .app-author-name{
+    min-width:0;
+    flex:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .app-favorite{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    height:26px;
+    padding:0 8px;
+    border-radius:7px;
+    color:var(--faint);
+    font-size:12px;
+    font-weight:600;
+    flex-shrink:0;
+    transition:background .12s,color .12s;
+  }
+  .app-favorite:hover{background:#f3f1ed;color:#8a6720}
+  .app-favorite.is-on{color:#8a6720;background:#fbf5e6}
+  .app-favorite svg{width:13px;height:13px}
+  .app-favorite.is-on svg{fill:currentColor}
+  .empty{
+    grid-column:1/-1;
+    padding:64px 0;
+    color:var(--faint);
+    text-align:center;
+  }
+  @media (max-width:1280px){
+    .content-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid-wrap,.page-head-tabs{padding-left:28px;padding-right:28px}
+  }
+  @media (max-width:960px){
+    .content-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width:720px){
+    .app{grid-template-columns:1fr}
+    .content-grid{grid-template-columns:1fr}
+    .page-head-tabs{align-items:flex-start;flex-direction:column}
+    .head-actions{width:100%}
+    .ph-search{width:100%}
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="app-square">
+
+<div class="app">
+  <aside id="feixiang-sidebar"></aside>
+
+  <main class="main">
+    <header class="page-header" data-page-header="app-square" data-scroll-target=".main">
+      <div class="ph-left">
+        <i class="ph-icon" data-lucide="layout-grid"></i>
+        <h1 class="ph-title">应用广场</h1>
+      </div>
+    </header>
+
+    <div class="page-head-tabs">
+      <div class="subject-tabs" id="subject-tabs">
+        <button class="subject-tab active" data-cat="official" data-track="/click/feixiangCampusAppSquarePage/selectSource | 切换应用来源 | appSource#STRING">飞象官方</button>
+        <button class="subject-tab" data-cat="global" data-track="/click/feixiangCampusAppSquarePage/selectSource | 切换应用来源 | appSource#STRING">飞象老师精选</button>
+        <button class="subject-tab" data-cat="school" data-track="/click/feixiangCampusAppSquarePage/selectSource | 切换应用来源 | appSource#STRING">本校应用</button>
+      </div>
+      <div class="head-actions">
+        <div class="search-shell" id="app-search-shell">
+          <label class="ph-search">
+            <i data-lucide="search"></i>
+            <input id="app-search" type="text" placeholder="快速搜索应用">
+          </label>
+          <button class="search-submit" id="app-search-submit" type="button" data-track="/click/feixiangCampusAppSquarePage/search | 搜索应用 | appSource#STRING">搜索</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-wrap">
+      <div class="content-grid" id="grid"></div>
+    </div>
+
+    <div class="ai-dock-spacer"></div>
+  </main>
+
+  <aside class="ai-dock"
+         data-kind="应用"
+         data-fixed-intent="create-app"
+         data-placeholders="描述你想要的应用,例如:做一个班费记账小工具|做一个家长会签到页面|做一个课堂随机点名器|生成一个错题归因分析器|做一个运动会报名收集表">
+    <span class="ai-dock-tag" title="固定为创建应用">
+      <i data-lucide="sparkles"></i>
+      <span>创建应用</span>
+    </span>
+    <div class="ai-dock-input-wrap">
+      <textarea class="ai-dock-input" rows="1" autocomplete="off" placeholder="描述你想创建的应用…"></textarea>
+    </div>
+    <div class="ai-dock-actions">
+      <button class="ai-dock-btn" type="button" title="语音输入" onclick="alert('（演示）语音输入')">
+        <i data-lucide="mic"></i>
+      </button>
+      <button class="ai-dock-btn ai-dock-send" type="button" title="发送(Enter)">
+        <i data-lucide="arrow-up"></i>
+      </button>
+    </div>
+  </aside>
+</div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('apps');</script>
+<script src="assets/page-header.js"></script>
+<script src="assets/ai-create-dock.js"></script>
+
+<script>
+  const APPS = [
+    { id:'ai-qbank', title:'AI 校本题库', desc:'把知识库里的题目结构化展示，方便老师查看、筛选、组题与收藏。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', usage:'18.6w', favorites:942, icon:'file-stack', grad:4, cat:['official','subject'], contract:'active', url:'ai-qbank.html' },
+    { id:'ai-record', title:'AI 录题', desc:'上传本地 PDF / Word 自动解析题目，老师校对后入题库。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', usage:'6.4w', favorites:420, icon:'scan-search', grad:6, cat:['official','tool'], contract:'active', url:'ai-record-jobs.html' },
+    { id:'ai-essay-star', title:'飞象 AI 作文星', desc:'作文批改、讲评和成长档案，沉淀学生写作过程。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', usage:'12.5w', favorites:860, icon:'file-text', grad:1, cat:['official','subject'], contract:'active', url:'essay-star-home.html' },
+    { id:'smart-homework', title:'飞象智能作业', desc:'布置、批改和分析作业，生成班级掌握情况。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', usage:'9.7w', favorites:618, icon:'clipboard-list', grad:4, cat:['official','tool'], contract:'locked', landingUrl:'official-app-landing.html?app=smart-homework' },
+    { id:'feixiang-classroom', title:'飞象人工智能通识课', desc:'承接人工智能通识课程内容、课堂使用和学习反馈，帮助学校开展 AI 通识教学。', author:'飞象星球', avatar:'飞', avatarColor:'#a87e2c', badge:'官方', usage:'10.2w', favorites:536, icon:'presentation', grad:10, cat:['official','tool'], contract:'active', url:'https://ke.feixiangxingqiu.com/#/lesson-list' },
+    { id:'classic-game', title:'文言文情景闯关 (H5)', desc:'将枯燥的文言文背诵转化为互动文字游戏，学生扫码即可在手机上游玩。', author:'李素芬', avatar:'李', avatarColor:'#81628f', badge:'本校', usage:'842', favorites:189, icon:'gamepad-2', grad:2, cat:['school','subject'] },
+    { id:'notify', title:'家长会通知生成器', desc:'输入开会时间和重点，自动生成得体、专业的家长会邀请函及群通知。', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', badge:'精选', usage:'3.2w', favorites:276, icon:'mail', grad:3, cat:['global','tool'] },
+    { id:'lesson-plan', title:'智能教案排版', desc:'输入教学目标和知识点，一键生成符合学校标准格式的 Word 教案。', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', badge:'精选', usage:'8.9w', favorites:345, icon:'file-text', grad:4, cat:['global','tool'] },
+    { id:'finance', title:'班费记账本 (Web App)', desc:'轻量级班费管理工具，支持扫码记账、自动生成月度收支图表。', author:'王建华', avatar:'王', avatarColor:'#4a755b', badge:'本校', usage:'156', favorites:31, icon:'pie-chart', grad:5, cat:['school','tool'] },
+    { id:'speaking', title:'英语口语对练 Agent', desc:'模拟真实对话场景，支持语音输入，自动纠正语法和发音错误。', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', badge:'精选', usage:'21.3w', favorites:1120, icon:'mic', grad:6, cat:['global','subject'] },
+    { id:'sports-signup', title:'运动会报名收集', desc:'快速生成报名表单，自动校验每人限报项目数，一键导出 Excel。', author:'飞象老师精选', avatar:'精', avatarColor:'#53759e', badge:'精选', usage:'1.1w', favorites:203, icon:'clipboard-list', grad:7, cat:['global','tool'] },
+    { id:'chemistry-lab', title:'化学实验模拟器', desc:'H5 互动小应用，拖拽烧杯和试剂，安全模拟危险化学反应现象。', author:'赵明杰', avatar:'赵', avatarColor:'#a8626c', badge:'本校', usage:'420', favorites:88, icon:'flask-conical', grad:8, cat:['school','subject'] }
+  ];
+
+  const ICON_SVG = {
+    'bar-chart-2':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    'gamepad-2':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258A4 4 0 0 0 17.32 5z"/></svg>',
+    'mail':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+    'presentation':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></svg>',
+    'file-stack':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 2H8a2 2 0 0 0-2 2v12"/><path d="M18 6H10a2 2 0 0 0-2 2v12"/><path d="M12 10h8v12h-8z"/><path d="M15 14h2"/><path d="M15 18h2"/></svg>',
+    'scan-search':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="11" cy="11" r="3"/><path d="m16 16-2.2-2.2"/></svg>',
+    'file-text':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+    'pie-chart':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>',
+    'mic':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>',
+    'clipboard-list':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>',
+    'flask-conical':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>'
+  };
+
+  let currentCat = 'official';
+  let keyword = '';
+
+  function escHtml(value){
+    return String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  function renderCards(){
+    const grid = document.getElementById('grid');
+    const q = keyword.trim().toLowerCase();
+    const list = APPS.filter(app => {
+      if(!app.cat.includes(currentCat)) return false;
+      if(q && !(app.title + app.desc + app.author).toLowerCase().includes(q)) return false;
+      return true;
+    });
+
+    if(!list.length){
+      grid.innerHTML = '<div class="empty">没有匹配的应用</div>';
+      return;
+    }
+
+    grid.innerHTML = list.map(app => {
+      const isOfficial = app.cat.includes('official');
+      const isLocked = isOfficial && app.contract === 'locked';
+      const href = isLocked ? app.landingUrl : (app.url || `app-detail.html?app=${encodeURIComponent(app.id)}`);
+      const coverTag = isLocked
+        ? '<span class="app-tag locked">未开通</span>'
+        : (isOfficial ? '' : `<span class="app-tag ${app.badge === '官方' ? 'gold' : ''}">${escHtml(app.badge || '热门')}</span>`);
+	      const target = ' target="_blank" rel="noopener"';
+      const statsHtml = isOfficial ? '' : `
+          <span class="app-stats">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            ${escHtml(app.usage)}
+          </span>`;
+      const favoriteHtml = `
+            <span class="app-favorite" role="button" tabindex="0" data-favorite data-count="${Number(app.favorites) || 0}" title="收藏">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 10 17 15 18 22 12 18 6 22 7 15 2 10 9 9 12 2"/></svg>
+              <span>${Number(app.favorites) || 0}</span>
+            </span>`;
+      return `
+      <a class="app-card ${isLocked ? 'is-locked' : ''}" href="${escHtml(href)}"${target} data-track="/click/feixiangCampusAppSquarePage/openApp | 打开应用 | appSource#STRING">
+        <div class="app-cover bg-grad-${app.grad}">
+          ${coverTag}
+          <div class="app-cover-icon">${ICON_SVG[app.icon] || ''}</div>
+          ${statsHtml}
+        </div>
+        <div class="app-body">
+          <div class="app-title" title="${escHtml(app.title)}">${escHtml(app.title)}</div>
+          <div class="app-author">
+            <div class="author-avatar" style="background:${escHtml(app.avatarColor)}">${escHtml(app.avatar)}</div>
+            <span class="app-author-name">${escHtml(app.author)}</span>
+            ${favoriteHtml}
+          </div>
+        </div>
+      </a>
+    `}).join('');
+    bindFavoriteButtons(grid);
+  }
+
+  function bindFavoriteButtons(scope){
+    scope.querySelectorAll('[data-favorite]').forEach(btn => {
+      btn.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const on = btn.classList.toggle('is-on');
+        const base = Number(btn.dataset.count) || 0;
+        btn.querySelector('span').textContent = String(base + (on ? 1 : 0));
+      });
+    });
+  }
+
+  document.querySelectorAll('.subject-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.subject-tab').forEach(item => item.classList.remove('active'));
+      tab.classList.add('active');
+      currentCat = tab.dataset.cat || 'official';
+      renderCards();
+    });
+  });
+
+  const searchInput = document.getElementById('app-search');
+  const searchShell = document.getElementById('app-search-shell');
+  const searchSubmit = document.getElementById('app-search-submit');
+  function updateSearchState(){
+    if(!searchShell || !searchInput) return;
+    searchShell.classList.toggle('has-value', !!searchInput.value.trim());
+  }
+  function goSearch(){
+    if(!searchInput) return;
+    const q = searchInput.value.trim();
+    if(!q){
+      searchInput.focus();
+      return;
+    }
+    const params = new URLSearchParams({ q, tab: currentCat });
+    window.location.href = `app-search.html?${params.toString()}`;
+  }
+  if(searchInput){
+    searchInput.addEventListener('input', event => {
+      updateSearchState();
+    });
+    searchInput.addEventListener('keydown', event => {
+      if(event.key === 'Enter' && !event.isComposing){
+        event.preventDefault();
+        goSearch();
+      }
+    });
+  }
+  if(searchSubmit) searchSubmit.addEventListener('click', goSearch);
+
+  renderCards();
+  updateSearchState();
+  if(window.lucide) lucide.createIcons();
+</script>
+<template id="review-template">
+{
+  "title": "应用广场 · 学校可用 AI 能力入口",
+  "summary": "应用广场展示学校可用的 AI 应用，帮助老师发现、筛选、收藏并进入应用详情或直接使用。",
+  "sections": [
+    {
+      "id": "app-square-list",
+      "title": "1. 应用列表",
+      "body": "应用列表以卡片呈现官方、学校和个人可见应用，突出用途、适用场景、来源和使用入口。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：寻找教学应用的老师。",
+            "用途：浏览官方、学校和个人可见应用。",
+            "展示项：用途、适用场景、来源和使用入口。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "浏览应用",
+              "text": "老师进入应用广场后看到推荐应用和分类列表。"
+            },
+            {
+              "label": "查看卡片",
+              "text": "卡片展示应用名称、简介、来源、适用学科或场景、收藏状态。"
+            },
+            {
+              "label": "进入详情",
+              "text": "点击卡片主体进入对应入口；飞象官方应用按学校合约状态分流，其他来源进入应用详情。"
+            },
+            {
+              "label": "直接使用",
+              "text": "飞象官方已签约应用在新页面打开产品首页；未签约应用在新页面打开能力介绍页，老师可查看能力说明。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "应用来源只区分飞象官方、飞象老师精选、本校应用。飞象官方应用固定为 AI 校本题库、AI 录题、飞象 AI 作文星、飞象智能作业、飞象人工智能通识课。",
+            "飞象官方标签页 已表达来源，官方应用卡片不再展示“官方”角标；作者统一展示为“飞象星球”；未开通应用展示“未开通”标识。",
+            "飞象官方应用按学校合约分流：有合约的应用在新页面打开产品首页；没有合约的应用在新页面打开能力介绍页，不直接打开产品首页。",
+            "飞象老师精选标签页 下的展示、排序、筛选和详情逻辑与飞象老师个人版保持一致。",
+            "飞象老师精选应用在校园版内复制、改编或发布时遵循校园版发布规则：生成老师个人副本，发布后进入本校应用或我的应用，仅按学校权限可见，不回流个人版社区。",
+            "通过校园版创建的应用进入本校应用后，卡片作者/创建者展示校园版老师身份信息，不展示个人版创作者身份信息。",
+            "不可用应用可展示但主按钮置灰并说明原因。",
+            "应用卡片的收藏状态与我的应用保持一致。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "应用卡片展示应用名称、简介、来源、作者或创建者、开通状态、分类、收藏状态和点击去向。",
+            "飞象官方应用不展示浏览数据；本校应用作者展示校园版老师身份信息。",
+            "飞象官方应用需要区分已开通后的产品首页和未开通时的能力介绍页。",
+            "飞象老师精选应用复用个人版广场内容，但校园版发布结果写入学校空间。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "应用无权限",
+              "处理方式": "卡片展示权限说明，不能直接使用。"
+            },
+            {
+              "场景": "飞象官方应用无合约",
+              "处理方式": "点击卡片在新页面打开能力介绍页，不直接打开产品首页。"
+            },
+            {
+              "场景": "应用下架",
+              "处理方式": "弱化展示或隐藏，并在详情页说明不可用。"
+            },
+            {
+              "场景": "列表加载为空",
+              "处理方式": "展示空状态和清空筛选入口。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "app-detail.html",
+              "说明": "应用卡片进入详情页。"
+            },
+            {
+              "关联对象": "my-apps.html",
+              "说明": "收藏后的应用进入校园版我的收藏。"
+            },
+            {
+              "关联对象": "chat.html",
+              "说明": "直接使用类应用可带能力进入新对话。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "来源分类和作者展示清晰，飞象官方应用作者为飞象星球。",
+            "有合约的飞象官方应用新页面打开产品首页。",
+            "无合约的飞象官方应用新页面打开能力介绍页。",
+            "飞象老师精选应用复制或发布后遵循校园版本校应用规则。",
+            "收藏后校园版我的收藏同步出现。",
+            "卡片不出现代码名或内部标识。"
+          ]
+        },
+        {
+          "title": "内容来源与数据归属",
+          "type": "table",
+          "columns": [
+            "内容类型",
+            "校园版可见",
+            "个人版可见",
+            "收藏状态",
+            "创建/复制/发布归属"
+          ],
+          "rows": [
+            {
+              "内容类型": "飞象老师精选应用/资源",
+              "校园版可见": "可见",
+              "个人版可见": "可见",
+              "收藏状态": "双端同步",
+              "创建/复制/发布归属": "复制或改编后按当前空间生成副本"
+            },
+            {
+              "内容类型": "飞象官方应用",
+              "校园版可见": "可见",
+              "个人版可见": "不可见",
+              "收藏状态": "仅校园版",
+              "创建/复制/发布归属": "不进入个人版"
+            },
+            {
+              "内容类型": "本校应用/资源",
+              "校园版可见": "可见",
+              "个人版可见": "不可见",
+              "收藏状态": "仅校园版",
+              "创建/复制/发布归属": "属于学校空间或校园版个人工作区"
+            },
+            {
+              "内容类型": "校园版自创应用/资源",
+              "校园版可见": "按学校权限可见",
+              "个人版可见": "不可见",
+              "收藏状态": "仅校园版",
+              "创建/复制/发布归属": "属于校园版"
+            },
+            {
+              "内容类型": "个人版自创应用/资源",
+              "校园版可见": "不自动进入",
+              "个人版可见": "可见",
+              "收藏状态": "仅个人版",
+              "创建/复制/发布归属": "属于个人版"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "app-square-filter",
+      "title": "2. 分类与搜索",
+      "body": "来源分类帮助老师在应用广场内切换飞象官方、飞象老师精选、本校应用；搜索输入关键词后进入应用搜索页，并保留当前来源分类。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要定位应用的老师。",
+            "用途：按来源分类或关键词查找应用。",
+            "产出：来源分类、搜索词和应用搜索页上下文。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "输入搜索",
+              "text": "老师输入应用名、场景或能力关键词，搜索按钮在输入态展示。"
+            },
+            {
+              "label": "切换分类",
+              "text": "点击分类选项，列表只展示该分类应用。"
+            },
+            {
+              "label": "发起搜索",
+              "text": "点击搜索或按 Enter，进入 app-search.html，在当前来源分类 下展示结果。"
+            },
+            {
+              "label": "搜索页切换",
+              "text": "搜索页保留与应用广场一致的来源分类，老师可继续切换飞象官方、飞象老师精选、本校应用。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "分类筛选只影响广场列表，不改变我的应用。",
+            "搜索关键词为空时不跳转，光标回到搜索框。",
+            "来源分类只保留飞象官方、飞象老师精选、本校应用，不再提供全部、学科工具、效率工具标签页。",
+            "飞象老师精选标签页 的筛选逻辑与飞象老师个人版一致；校园版只在发布、复制和可见范围上使用学校规则。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "分类状态包含来源分类、分类选项、关键词、应用列表、开通状态和收藏状态。",
+            "飞象官方、飞象老师精选、本校应用三类来源不能混排到错误分类。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "无搜索结果",
+              "处理方式": "展示无结果文案和清空入口。"
+            },
+            {
+              "场景": "分类无应用",
+              "处理方式": "展示该分类暂无应用，并允许切换到其他来源分类。"
+            },
+            {
+              "场景": "关键词过短",
+              "处理方式": "仍可搜索，但不触发错误提示。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "my-apps.html",
+              "说明": "已收藏应用可在校园版我的收藏或我的作品中查看。"
+            },
+            {
+              "关联对象": "index.html",
+              "说明": "常用应用可来自收藏或最近使用。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "切换来源后列表内容同步变化。",
+            "搜索进入 app-search.html 并保留关键词。",
+            "未开通官方应用有明确标识。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "app-favorite",
+      "title": "3. 收藏应用",
+      "body": "收藏用于把常用应用沉淀到校园版我的收藏，减少下次查找成本。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要沉淀常用应用的老师。",
+            "用途：把常用应用加入校园版我的收藏。",
+            "产出：收藏状态、收藏时间和后续入口。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "点击收藏",
+              "text": "老师点击卡片或详情页的收藏图标。"
+            },
+            {
+              "label": "状态反馈",
+              "text": "图标变为已收藏，并提示已加入校园版我的收藏。"
+            },
+            {
+              "label": "取消收藏",
+              "text": "再次点击取消收藏，应用从校园版我的收藏中移除或取消置顶。"
+            },
+            {
+              "label": "继续使用",
+              "text": "收藏不影响立即使用，老师可继续进入应用。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "收藏是个人行为，不改变学校应用资产。",
+            "校园版老师收藏飞象官方应用、飞象老师精选应用或本校应用后，都进入校园版我的收藏。",
+            "飞象老师精选应用的收藏状态在校园版和个人版双端同步；飞象官方应用和本校应用只在校园版展示和收藏。",
+            "无权限应用可以收藏用于关注，但仍不能使用，需保留不可用说明。",
+            "同一应用重复收藏不会出现多个副本。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "收藏状态需要记录当前老师、应用来源、当前空间和收藏结果。",
+            "飞象老师精选应用收藏状态与个人版同步；飞象官方和本校应用只影响校园版空间。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "收藏失败",
+              "处理方式": "图标回到原状态并提示稍后重试。"
+            },
+            {
+              "场景": "应用已下架",
+              "处理方式": "校园版我的收藏保留灰态或移除，并说明下架。"
+            },
+            {
+              "场景": "重复点击",
+              "处理方式": "以最后一次状态为准，不产生重复卡片。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "my-apps.html",
+              "说明": "展示老师在校园版收藏或创建的应用。"
+            },
+            {
+              "关联对象": "index.html",
+              "说明": "高频收藏应用可进入首页常用应用。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "收藏后我的作品可见。",
+            "取消收藏后广场原应用仍存在。",
+            "飞象老师精选收藏与个人版同步。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'app-square.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+</body>
+</html>

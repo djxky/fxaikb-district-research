@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞象老师校园版 · 工作动态</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/v28.css?v=20260521d" />
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/page-header.css" />
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wf-page {
+    padding: 24px 40px 64px;
+  }
+  .wf-container {
+    width: min(1080px, 100%);
+    margin: 0 auto;
+  }
+  .wf-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .wf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .wf-item {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color .16s, box-shadow .16s, transform .16s;
+  }
+  .wf-item:hover {
+    border-color: var(--line-strong);
+    box-shadow: 0 12px 28px rgba(0,0,0,.05);
+    transform: translateY(-1px);
+  }
+  .wf-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    color: var(--gold);
+    background: var(--gold-bg);
+  }
+  .wf-icon i { width: 19px; height: 19px; }
+  .wf-icon.rose { color: #B85F73; background: #F9EEF1; }
+  .wf-icon.green { color: #4D8B69; background: #EAF5EF; }
+  .wf-icon.blue { color: #53759E; background: #EEF5FB; }
+  .wf-icon.purple { color: #815995; background: #F4EEF7; }
+  .wf-main { min-width: 0; }
+  .wf-title {
+    color: var(--text-1);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .wf-meta {
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+  .wf-arrow {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    background: transparent;
+  }
+  .wf-arrow i { width: 15px; height: 15px; }
+  .wf-empty {
+    display: none;
+    padding: 54px 16px;
+    border: 1px dashed var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,.72);
+    text-align: center;
+  }
+  .wf-empty-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-1);
+  }
+  .wf-empty-desc {
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .wf-list.is-empty { display: none; }
+  .wf-empty.is-show { display: block; }
+
+  @media (max-width: 900px) {
+    .wf-page { padding: 18px 18px 48px; }
+    .wf-item { grid-template-columns: 36px minmax(0, 1fr) auto; padding: 13px; }
+    .wf-icon { width: 36px; height: 36px; }
+  }
+</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="work-feed">
+
+<div class="app" id="app" data-view="wiki" data-chat="closed">
+  <aside class="sidebar-left" id="feixiang-sidebar"></aside>
+
+  <main class="workspace">
+    <header class="page-header" data-page-header="work-feed">
+      <div class="ph-left">
+        <i class="ph-icon" data-lucide="list-checks"></i>
+        <h1 class="ph-title">工作动态</h1>
+        <span class="ph-subtitle">聚合待处理任务、通知结果和应用动态</span>
+      </div>
+    </header>
+
+    <div class="workspace-scroll">
+      <section class="wf-page">
+        <div class="wf-container">
+          <div class="wf-summary">
+            <span id="wf-count">共 0 条动态</span>
+          </div>
+
+          <div class="wf-list" id="wf-list"></div>
+          <div class="wf-empty" id="wf-empty">
+            <div class="wf-empty-title">暂无工作动态</div>
+            <div class="wf-empty-desc">有新的待处理任务或重要通知后会显示在这里</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="sidebar-right"></aside>
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('');</script>
+<script src="assets/v28-shell.js?v=20260522b"></script>
+<script src="assets/v28.js?v=20260522e"></script>
+<script src="assets/page-header.js"></script>
+<script>
+  const WORK_FEED_ITEMS = [
+    { id: 'homework-scan', title: '八 数据的表示和分析 第4课时 平均数的再认识', desc: '五年级8班 · 提交 15/42', url: 'homework-insight.html', icon: 'book-open', color: 'rose', priority: 1 },
+    { id: 'essay-scan', title: '成长路上，请以《你是美好的代名词》为题', desc: '3 个班 · 126 篇待确认', url: 'essay-insight.html', icon: 'square-pen', color: 'green', priority: 3 },
+    { id: 'essay-review', title: '如果那一天可以重来，你会停留、回头还是前行？', desc: '9 个班 · 76 份批改待确认', url: 'essay-insight.html', icon: 'square-pen', color: 'green', priority: 4 },
+    { id: 'record-confirm', title: '《期中模拟卷》', desc: 'AI 录题 · 解析完成 · 共 36 题', url: 'ai-review.html', icon: 'scan-line', color: 'purple', priority: 5 },
+    { id: 'record-failed', title: '《函数单元练习》', desc: 'AI 录题 · 解析失败', url: 'ai-record-jobs.html', icon: 'scan-line', color: 'purple', priority: 6 }
+  ];
+
+  function renderWorkFeed() {
+    const list = document.getElementById('wf-list');
+    const empty = document.getElementById('wf-empty');
+    const count = document.getElementById('wf-count');
+    const items = WORK_FEED_ITEMS
+      .sort((a, b) => a.priority - b.priority);
+
+    count.textContent = `共 ${items.length} 条动态`;
+    list.classList.toggle('is-empty', items.length === 0);
+    empty.classList.toggle('is-show', items.length === 0);
+    list.innerHTML = items.map((item) => `
+      <button class="wf-item" onclick="window.location.href='${item.url}'" data-track="/click/feixiangCampusWorkFeedPage/openFeedItem | 打开工作动态 | targetPage#STRING">
+        <span class="wf-icon ${item.color}"><i data-lucide="${item.icon}"></i></span>
+        <span class="wf-main">
+          <span class="wf-title">${item.title}</span>
+          <span class="wf-meta">
+            <span>${item.desc}</span>
+          </span>
+        </span>
+        <span class="wf-arrow"><i data-lucide="chevron-right"></i></span>
+      </button>
+    `).join('');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  document.addEventListener('DOMContentLoaded', renderWorkFeed);
+</script>
+
+<template id="review-template">
+{
+  "title": "工作动态 · 全部列表",
+  "summary": "工作动态页展示首页工作动态的完整列表。第一版只承接飞象作业、飞象作文、AI 录题三类事项；知识库文件处理不进入工作动态。",
+  "sections": [
+    {
+      "id": "work-feed-list",
+      "title": "1. 工作动态列表",
+      "body": "工作动态列表展示老师需要查看、确认或继续处理的事项，点击后进入对应业务页。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "工作动态列表展示老师需要查看、确认或继续处理的事项，第一版只接入飞象作业、飞象作文、AI 录题。",
+            "列表卡片与首页保持同一展示口径：标题展示业务对象名称，副标题展示班级、数量和状态。",
+            "飞象作业：标题=作业/试卷名称；副标题=班级 + 提交数，可追加待确认数量。",
+            "飞象作文：标题=作文题目或题干摘要；副标题=覆盖班级数 + 待确认/待批改篇数；同一作文题目聚合为一条动态。",
+            "AI 录题：标题=录题文件名或试卷名；副标题=AI 录题 + 解析状态 + 题目数量；解析失败不展示题目数量。",
+            "知识库文件处理不进入工作动态列表，统一使用知识库红点和知识库页面内状态承接。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "进入页面",
+              "text": "老师从首页“工作动态”的“全部”进入 work-feed.html。"
+            },
+            {
+              "label": "浏览动态",
+              "text": "列表展示三类工作动态，包含标题、类型图标、说明和目标入口；时间进入业务详情页查看。"
+            },
+            {
+              "label": "继续处理",
+              "text": "点击动态主体进入对应页面，例如班级作业学情、作文学情或 AI 录题文件对照。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "动态只展示老师有权访问的事件。",
+            "第一版只展示三类接入范围内的事项，不展示普通内容更新、错因报告、知识库文件处理或系统消息。",
+            "卡片标题统一只展示对象名称：作业题目、作文题目、AI 录题文件题目；解析完成、待确认、解析失败等状态不写进标题。",
+            "全部列表不额外展示独立状态标签；作业和作文类型由 icon 区分，AI 录题在副标题前保留功能标识。",
+            "待处理、待确认、报告已生成、处理完成等状态必须使用老师能理解的业务表达。",
+            "作文动态按作文题目聚合展示，不按班级拆成多条；卡片标题使用真实作文题目或题干摘要，长题目一行省略；作业动态仍按班级任务展示。",
+            "AI 录题动态按文件事件逐条展示；如果同一文件状态更新，复用同一条动态，不重复堆叠。",
+            "知识库文件处理不进入工作动态；知识库更新、处理完成和解析失败由知识库红点和知识库页面内状态提示承接。",
+            "AI 录题解析完成动态进入文件对照页；AI 录题解析失败动态进入 AI 录题列表页。",
+            "列表页不展示扫描、布置、完成等业务时间；如果目标业务页展示时间，使用固定数值时间，不使用“2 分钟前 / 1 小时前”等相对时间。",
+            "删除或失效的目标不能跳空白页，需要给出状态说明。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "动态卡片展示动态类型、业务对象标题、副标题、处理状态、点击去向和可访问范围。",
+            "作业动态副标题展示班级名称、提交人数、应提交人数和待确认数量。",
+            "作文动态副标题展示覆盖班级、待处理作文篇数和当前状态。",
+            "AI 录题动态副标题展示 AI 录题、解析状态和题目数量；解析失败不展示题目数量。",
+            "工作动态只展示可处理或可查看的事项，不承载完整业务详情。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "动态目标已失效",
+              "处理方式": "提示事项不可用并留在列表。"
+            },
+            {
+              "场景": "无动态",
+              "处理方式": "展示空状态。"
+            },
+            {
+              "场景": "无权限处理",
+              "处理方式": "提示无权限，不进入目标页。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "index.html",
+              "说明": "首页展示工作动态摘要。"
+            },
+            {
+              "关联对象": "homework-insight.html / essay-insight.html",
+              "说明": "承接作业和作文学情动态。"
+            },
+            {
+              "关联对象": "ai-record-jobs.html",
+              "说明": "承接 AI 录题解析失败后的列表页。"
+            },
+            {
+              "关联对象": "ai-review.html",
+              "说明": "承接 AI 录题解析成功后的文件对照页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "点击动态进入正确目标页。",
+            "作业、作文、AI 录题三类动态的标题和副标题口径与首页一致。",
+            "已处理、待确认、解析完成、解析失败等状态可区分。",
+            "无动态时页面不空白。",
+            "目标失效时不跳转到错误页面。"
+          ]
+        },
+        {
+          "title": "第一版接入范围",
+          "items": [
+            "飞象作业：高扫扫描作业完成，老师需要查看或继续批改。",
+            "飞象作文：高扫扫描作文完成，老师需要确认批改；一个作文题目聚合为一条动态，可覆盖多个班，动态卡片展示真实作文题目或题干摘要。",
+            "AI 录题：题目录入处理完成后，解析成功进入文件对照页，解析失败进入列表页。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>

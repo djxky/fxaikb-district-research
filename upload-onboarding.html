@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飞象 AI · 上传文件</title>
+  <script src="assets/lucide-loader.js"></script>
+  <link rel="stylesheet" href="assets/v28.css?v=20260617upload" />
+  <link rel="stylesheet" href="assets/shared/v28-modals.css?v=20260521g" />
+  <link rel="stylesheet" href="assets/feixiang-shell.css" />
+  <link rel="stylesheet" href="assets/page-header.css" />
+  <style>
+    .onb-page{
+      width:min(980px, 100%);
+      margin:0 auto;
+      padding:28px 22px 72px;
+    }
+    .onb-head{
+      margin-bottom:16px;
+    }
+    .onb-title{
+      font-size:28px;
+      font-weight:700;
+      color:#1A1A1A;
+      letter-spacing:-0.01em;
+    }
+    .onb-sub{
+      margin-top:6px;
+      font-size:13px;
+      color:#7A766F;
+      line-height:1.6;
+    }
+    .onb-card{
+      background:#FFFFFF;
+      border:1px solid #ECE9E2;
+      border-radius:12px;
+      padding:22px;
+    }
+    .onb-state{ display:none; }
+    .onb-state.active{ display:block; }
+    .scan-stats{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+      color:#3A3A3A;
+      font-size:13px;
+    }
+    .scan-stats b{ font-size:20px;color:#1A1A1A; }
+    .scan-tree{
+      border:1px solid #ECE9E2;
+      border-radius:10px;
+      background:#FAFAF8;
+      padding:14px 14px 8px;
+      margin-bottom:14px;
+    }
+    .scan-tree .row{
+      display:flex;align-items:center;gap:8px;
+      font-size:12.5px;color:#4A4642;line-height:1.8;
+    }
+    .scan-tree .meta{
+      margin-left:auto;color:#9A968F;font-size:11.5px;
+      font-variant-numeric:tabular-nums;
+    }
+    .scan-notice{
+      display:flex;align-items:center;gap:6px;
+      font-size:12px;color:#8A847C;margin-bottom:16px;
+    }
+    .scan-notice [data-lucide]{ width:13px;height:13px;color:#A8A39B; }
+    .onb-actions{
+      display:flex;justify-content:flex-end;gap:8px;
+    }
+    .onb-btn{
+      height:34px;padding:0 14px;border-radius:8px;
+      border:1px solid transparent;cursor:pointer;
+      font-size:12.5px;font-weight:500;
+      display:inline-flex;align-items:center;gap:5px;
+    }
+    .onb-btn.ghost{ background:#fff;border-color:#D8D3C9;color:#5A5550; }
+    .onb-btn.ghost:hover{ background:#F5F1EB; }
+    .onb-btn.primary{ background:#1A1A1A;color:#FAFAF8; }
+    .onb-btn.primary:hover{ background:#333; }
+    .prog-head{
+      display:flex;align-items:baseline;gap:6px;margin-bottom:8px;
+    }
+    .prog-pct{ font-size:36px;font-weight:700;color:#1A1A1A; }
+    .prog-label{ font-size:17px;color:#5A5550; }
+    .prog-eta{ margin-left:auto;font-size:12.5px;color:#8A847C; }
+    .prog-bar{
+      height:8px;border-radius:999px;background:#EFEAE0;overflow:hidden;margin-bottom:14px;
+    }
+    .prog-bar-fill{
+      height:100%;width:0;background:linear-gradient(90deg,#C9A76E,#A87E2C);
+      transition:width .35s ease;
+    }
+    .step{
+      display:flex;align-items:flex-start;gap:10px;
+      border:1px solid #ECE9E2;border-radius:9px;padding:10px 12px;
+      background:#fff;margin-bottom:8px;
+    }
+    .step.no{ width:20px;height:20px;border-radius:50%;background:#F0EDE7;color:#7A766F;
+      display:grid;place-items:center;font-size:11px;flex-shrink:0; }
+    .step.doing .no{ background:#FBF4E4;color:#A87E2C; }
+    .step.done .no{ background:#E7F6EA;color:#2E7D32; }
+    .step .tx{ flex:1; }
+    .step .tx b{ display:block;font-size:12.8px;color:#1A1A1A; }
+    .step .tx span{ display:block;font-size:11.5px;color:#8A847C;margin-top:2px; }
+    .step .st{ font-size:11.5px;color:#8A847C; }
+    .done-wrap{
+      text-align:center;padding:26px 16px 8px;
+    }
+    .done-icon{
+      width:56px;height:56px;border-radius:50%;
+      margin:0 auto 14px;display:grid;place-items:center;
+      background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;
+      box-shadow:0 4px 16px rgba(46,125,50,.25);
+    }
+    .done-icon [data-lucide]{ width:24px;height:24px; }
+    .done-wrap h2{ font-size:21px;color:#1A1A1A;letter-spacing:-0.01em; }
+    .done-wrap p{ margin-top:10px;color:#6E6A63;font-size:13px;line-height:1.65; }
+    .done-wrap .onb-actions{ justify-content:center;margin-top:18px; }
+  </style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="upload-onboarding">
+
+<div class="app" id="app" data-view="wiki" data-chat="closed">
+  <aside class="sidebar-left" id="feixiang-sidebar"></aside>
+
+  <main class="workspace">
+    <!-- 统一页面顶栏 · page-header -->
+    <header class="page-header" data-page-header="upload-onboarding">
+      <div class="ph-left">
+        <i class="ph-icon" data-lucide="upload-cloud"></i>
+        <h1 class="ph-title">上传文件</h1>
+        <span class="ph-subtitle">上传后，AI 会自动整理并生成 Wiki 内容。</span>
+      </div>
+      <div class="ph-right">
+        <button class="ph-action" onclick="goBack()">
+          <i data-lucide="x"></i><span>取消</span>
+        </button>
+      </div>
+    </header>
+    <div class="workspace-scroll">
+      <section class="onb-page">
+
+        <div class="onb-card">
+          <div class="onb-state active" id="state-scan">
+            <div class="scan-stats">
+              <span><b>247</b> 个文件</span>
+              <span>·</span>
+              <span><b>12</b> 个文件夹</span>
+              <span>·</span>
+              <span><b>528</b> MB</span>
+            </div>
+            <div class="scan-tree">
+              <div class="row"><i data-lucide="folder-tree"></i><span>张老师的教学资料</span><span class="meta">247 个</span></div>
+              <div class="row" style="padding-left:22px;"><i data-lucide="folder"></i><span>数学</span><span class="meta">186 个</span></div>
+              <div class="row" style="padding-left:44px;"><i data-lucide="folder"></i><span>八下·二次函数</span><span class="meta">28 个</span></div>
+              <div class="row" style="padding-left:44px;"><i data-lucide="folder"></i><span>月考与中考</span><span class="meta">35 个</span></div>
+              <div class="row" style="padding-left:22px;"><i data-lucide="folder"></i><span>语文</span><span class="meta">38 个</span></div>
+              <div class="row" style="padding-left:22px;"><i data-lucide="folder"></i><span>英语</span><span class="meta">23 个</span></div>
+            </div>
+            <div class="scan-notice"><i data-lucide="info"></i><span>3 个 .mp4 自动跳过 · 5 个重名文件全部保留 · 学生姓名仅你可见</span></div>
+            <div class="onb-actions">
+              <button class="onb-btn ghost" onclick="goBack()">取消</button>
+              <button class="onb-btn primary" onclick="startImport()" data-track="/click/feixiangCampusUploadPage/startUpload | 开始上传文件 | kbScope#STRING,fileCount#INT32">开始上传<i data-lucide="arrow-right"></i></button>
+            </div>
+          </div>
+
+          <div class="onb-state" id="state-progress">
+            <div class="prog-head">
+              <span class="prog-pct" id="prog-pct">0</span>
+              <span class="prog-label">%</span>
+              <span class="prog-eta">预计还需 <b id="prog-eta">2 分 14 秒</b></span>
+            </div>
+            <div class="prog-bar"><div class="prog-bar-fill" id="prog-fill"></div></div>
+            <div class="step doing"><span class="no">1</span><div class="tx"><b>读取文件并保留原结构</b><span id="step-1-detail">已读取 0 / 247 个文件…</span></div><span class="st">进行中</span></div>
+            <div class="step" id="step-2"><span class="no">2</span><div class="tx"><b>AI 自动打标签</b><span>基于文件名、内容关键词识别学科/章节</span></div><span class="st">等待中</span></div>
+            <div class="step" id="step-3"><span class="no">3</span><div class="tx"><b>抽取知识点 + 生成摘要</b><span>PDF/PPT 抽目录，图片做 OCR</span></div><span class="st">等待中</span></div>
+            <div class="step" id="step-4"><span class="no">4</span><div class="tx"><b>建立关联与图谱</b><span>同主题文件互相关联，准备好关联推荐</span></div><span class="st">等待中</span></div>
+          </div>
+
+          <div class="onb-state" id="state-done">
+            <div class="done-wrap">
+              <div class="done-icon"><i data-lucide="check-circle-2"></i></div>
+              <h2>上传完成，文件已入库</h2>
+              <p><b>247</b> 份素材已按原结构归位。AI 正在后台整理标签和题库，完成后右上角会通知你。</p>
+              <div class="onb-actions">
+                <button class="onb-btn primary" onclick="finishImport()">返回工作台<i data-lucide="arrow-right"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="sidebar-right"></aside>
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('');</script>
+<script src="assets/v28-shell.js?v=20260617upload"></script>
+<script src="assets/v28.js?v=20260617upload"></script>
+<script src="assets/page-header.js"></script>
+<script>
+  const _from = new URLSearchParams(location.search).get('from') || 'team';
+  let _timer = null;
+
+  function showState(id){
+    document.querySelectorAll('.onb-state').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById(id);
+    if(target) target.classList.add('active');
+  }
+
+  function getReturnUrl(withImported){
+    const suffix = withImported ? '?imported=1' : '';
+    if(_from === 'personal') return 'my-wiki.html' + suffix;
+    if(_from === 'folder') return 'wiki-entry.html?view=folder' + (withImported ? '&imported=1' : '');
+    return 'school-wiki.html' + suffix;
+  }
+
+  function goBack(){
+    window.location.href = getReturnUrl(false);
+  }
+
+  function startImport(){
+    showState('state-progress');
+    let pct = 0;
+    const pctEl = document.getElementById('prog-pct');
+    const fillEl = document.getElementById('prog-fill');
+    const etaEl = document.getElementById('prog-eta');
+    const step1 = document.getElementById('step-1-detail');
+    const step2 = document.getElementById('step-2');
+    const step3 = document.getElementById('step-3');
+    const step4 = document.getElementById('step-4');
+
+    _timer = setInterval(() => {
+      pct += 4 + Math.floor(Math.random() * 5);
+      if(pct > 100) pct = 100;
+      pctEl.textContent = String(pct);
+      fillEl.style.width = pct + '%';
+      const done = Math.floor(247 * pct / 100);
+      step1.textContent = `已读取 ${done} / 247 个文件…`;
+      const sec = Math.max(8, Math.floor((100 - pct) * 1.2));
+      etaEl.textContent = sec > 60 ? `${Math.floor(sec/60)} 分 ${sec % 60} 秒` : `${sec} 秒`;
+
+      if(pct >= 35) step2.classList.add('doing');
+      if(pct >= 58) { step2.classList.remove('doing'); step2.classList.add('done'); step3.classList.add('doing'); }
+      if(pct >= 80) { step3.classList.remove('doing'); step3.classList.add('done'); step4.classList.add('doing'); }
+      if(pct >= 100){
+        clearInterval(_timer);
+        step4.classList.remove('doing');
+        step4.classList.add('done');
+        setTimeout(() => showState('state-done'), 420);
+      }
+    }, 360);
+  }
+
+  function finishImport(){
+    window.location.href = getReturnUrl(true);
+  }
+</script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'upload-onboarding.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+<template id="review-template">
+{
+  "title": "上传文件 · 把资料交给飞象整理",
+  "summary": "上传文件页让老师把资料交给飞象整理，说明上传、归属、解析中、成功反馈和返回知识库的完整链路。",
+  "sections": [
+    {
+      "id": "upload-dropzone",
+      "title": "1. 上传入口",
+      "body": "上传入口支持老师拖拽或选择文件，并确认资料进入个人知识库还是学校知识库。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要上传资料的老师。",
+            "用途：选择文件，并确认资料进入个人知识库还是学校知识库。",
+            "产出：上传任务、资料归属和处理状态。"
+          ]
+        },
+        {
+          "title": "本次新增 / 调整",
+          "items": [
+            "【新增】上传文件或文件夹时展示“允许文件中的题目进入 AI 校本题库”勾选项，默认不勾选。",
+            "【新增】勾选后，AI 会自动分析符合条件的图片、PDF、Word，进入 AI 录题处理。",
+            "【新增】该勾选项只影响文件中的题目是否进入 AI 录题处理，不改变资料进入个人知识库或学校知识库的归属。",
+            "【不变】PPT、表格、多张图片批量、视频、音频等资料仍只进入知识库，不进入 AI 录题。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "选择文件",
+              "text": "老师点击上传区或拖拽文件进入页面。"
+            },
+            {
+              "label": "下一步预览",
+              "text": "选择一个或多个文件后，点击下一步查看可上传文件和不支持文件。"
+            },
+            {
+              "label": "选择题目入库",
+              "text": "老师可勾选“允许文件中的题目进入 AI 校本题库”；未勾选时，文件只进入知识库。"
+            },
+            {
+              "label": "开始上传",
+              "text": "点击开始上传后进入上传/整理中状态。"
+            },
+            {
+              "label": "取消上传",
+              "text": "上传前可取消，上传中取消需提示可能中断。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "资料归属必须明确，不能默认把个人资料公开到学校。",
+            "学校知识库上传受角色权限限制。",
+            "仅支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX、JPG、PNG 格式文件。",
+            "单个文件不超过 100M，超过后不进入上传队列。",
+            "不支持压缩包、音频、视频等格式。",
+            "允许文件中的题目进入 AI 校本题库默认不勾选，老师主动勾选后才创建 AI 录题处理任务。",
+            "勾选后仅对 PDF、Word、单张图片等支持文件生效；不支持文件只进入知识库。",
+            "上传成功不等于 AI 整理完成，需要展示后续状态。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "上传项包含文件名、类型、大小、上传进度和目标知识库范围。",
+            "目标范围区分个人知识库和学校知识库。",
+            "AI 校本题库勾选状态需要随本次上传任务提交，用于判断是否创建 AI 录题任务。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "格式不支持",
+              "处理方式": "提示仅支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX、JPG、PNG 格式文件，单个文件不超过 100M。"
+            },
+            {
+              "场景": "文件过大",
+              "处理方式": "提示单个文件不超过 100M，不进入上传队列。"
+            },
+            {
+              "场景": "无学校上传权限",
+              "处理方式": "禁用学校归属，提示联系管理员。"
+            },
+            {
+              "场景": "重复文件",
+              "处理方式": "提示已有相似资料，允许继续或查看原文件。"
+            },
+            {
+              "场景": "老师未勾选题目入库",
+              "处理方式": "文件只进入知识库，不调用 AI 录题，不在完成反馈中展示 AI 录题进度提示。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "从学校知识库上传时归属学校。"
+            },
+            {
+              "关联对象": "my-wiki.html",
+              "说明": "从个人知识库上传时归属个人。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "可拖拽或选择文件。",
+            "上传前能确认资料归属范围。",
+            "无学校权限时不能选择学校知识库。",
+            "题目入库勾选项默认不勾选，勾选态和未勾选态清晰可见。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "upload-result",
+      "title": "2. 上传完成反馈",
+      "body": "上传完成反馈告诉老师资料已接收、正在整理或已整理完成，并提供返回知识库或继续上传。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：完成上传后的老师。",
+            "用途：反馈资料已接收、整理中或整理完成。",
+            "产出：处理状态、返回知识库入口和继续上传入口。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "上传成功",
+              "text": "展示成功状态、文件数量和整理进度。"
+            },
+            {
+              "label": "返回知识库",
+              "text": "整理完成后回到对应个人/学校知识库，在知识库中查看整理状态和生成内容。"
+            },
+            {
+              "label": "返回知识库",
+              "text": "点击返回进入对应个人/学校知识库。"
+            },
+            {
+              "label": "继续上传",
+              "text": "老师可继续上传下一批资料。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "上传成功但整理未完成时，知识库中应显示解析中状态。",
+            "返回入口必须按资料归属进入正确知识库。",
+            "仅当老师勾选“允许文件中的题目进入 AI 校本题库”时，上传完成反馈才展示 AI 录题进度查看提示。",
+            "不支持文件需要逐项展示原因标签，如格式不支持、超过 100M。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "完成反馈展示文件名、处理状态、整理结果和下一步入口。",
+            "处理状态包括已接收、整理中、整理完成和失败。",
+            "勾选题目入库且存在符合条件文件时，完成反馈展示“符合条件的题目录入进度，可在「应用广场 - AI 录题」页面查看”。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "部分失败",
+              "处理方式": "展示成功和失败明细，允许重试失败文件。"
+            },
+            {
+              "场景": "整理失败",
+              "处理方式": "文件保留但标记整理失败，允许重新整理。"
+            },
+            {
+              "场景": "返回时无归属",
+              "处理方式": "提示选择个人或学校知识库。"
+            },
+            {
+              "场景": "勾选后没有符合条件文件",
+              "处理方式": "文件照常进入知识库，不展示 AI 录题进度提示。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "学校资料返回学校知识库。"
+            },
+            {
+              "关联对象": "my-wiki.html",
+              "说明": "个人资料返回个人知识库。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "上传完成后有明确反馈。",
+            "整理中状态可返回知识库或继续上传。",
+            "失败时允许重试或重新选择文件。",
+            "只有勾选题目入库且存在符合条件文件时，完成反馈才展示 AI 录题进度提示。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>

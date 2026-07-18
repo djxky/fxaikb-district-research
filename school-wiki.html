@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>飞象 AI · 学校知识库</title>
+<script src="assets/lucide-loader.js"></script>
+<link rel="stylesheet" href="assets/v28.css?v=20260708uploadcheckbox" />
+<link rel="stylesheet" href="assets/shared/v28-modals.css?v=20260521g" />
+<link rel="stylesheet" href="assets/feixiang-shell.css" />
+<link rel="stylesheet" href="assets/page-header.css?v=20260708uploadcheckbox" />
+<style>
+	  .kb-home-section{ animation:fade-up .55s .14s var(--ease) both; }
+	  .kb-section-intro{
+	    margin:-4px 0 14px;
+	    color:var(--text-2);
+	    font-size:13px;
+	    line-height:1.65;
+	  }
+	  .kb-overview-groups{
+	    display:grid;
+	    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+	    gap:10px;
+	    margin-top:16px;
+	  }
+	  .kb-overview-group{
+	    display:block;
+	    width:100%;
+	    text-align:left;
+	    padding:11px 12px;
+	    border:1px solid var(--border);
+	    border-radius:8px;
+	    background:rgba(255,255,255,.72);
+	    color:inherit;
+	    cursor:pointer;
+	    transition:border-color .15s var(--ease), box-shadow .15s var(--ease), transform .15s var(--ease);
+	  }
+	  .kb-overview-group:hover{
+	    border-color:rgba(168,126,44,.32);
+	    box-shadow:0 6px 18px rgba(30,24,14,.07);
+	    transform:translateY(-1px);
+	  }
+	  .kb-overview-label{
+	    display:flex;
+	    align-items:center;
+	    gap:6px;
+	    color:var(--text);
+	    font-size:12.8px;
+	    font-weight:700;
+	    margin-bottom:5px;
+	  }
+	  .kb-overview-label [data-lucide]{ width:14px;height:14px;color:var(--gold); }
+	  .kb-overview-label .kb-overview-arrow{
+	    margin-left:auto;
+	    color:var(--text-3);
+	  }
+	  .kb-overview-text{
+	    color:var(--text-2);
+	    font-size:12.5px;
+	    line-height:1.55;
+	  }
+	  .kb-search-panel{
+	    padding:16px;
+	    border:1px solid rgba(168,126,44,.22);
+	    border-radius:8px;
+	    background:#FFFEFA;
+	  }
+	  .kb-search-box{
+	    display:grid;
+	    grid-template-columns:auto 1fr auto;
+	    gap:10px;
+	    align-items:center;
+	    min-height:44px;
+	    padding:0 12px;
+	    border:1px solid var(--border);
+	    border-radius:8px;
+	    background:#fff;
+	    color:var(--text-2);
+	    cursor:pointer;
+	  }
+	  .kb-search-box [data-lucide]{ width:17px;height:17px;color:var(--gold); }
+	  .kb-search-placeholder{
+	    min-width:0;
+	    color:var(--text-2);
+	    font-size:13px;
+	  }
+	  .kb-search-submit{
+	    height:28px;
+	    padding:0 10px;
+	    border-radius:6px;
+	    background:var(--gold-bg);
+	    color:var(--gold-deep);
+	    font-size:12px;
+	    font-weight:700;
+	    line-height:28px;
+	    white-space:nowrap;
+	  }
+	  .kb-card-grid{
+	    display:grid;
+	    grid-template-columns:repeat(4, minmax(0, 1fr));
+	    gap:10px;
+	  }
+	  .kb-entry-card{
+	    display:flex;
+	    flex-direction:column;
+	    justify-content:center;
+	    align-items:flex-start;
+	    row-gap:5px;
+	    min-height:92px;
+	    padding:13px 14px;
+	    border:1px solid var(--border);
+	    border-radius:8px;
+	    background:#fff;
+	    color:var(--text-2);
+	    cursor:pointer;
+	    text-align:left;
+	    transition:border-color .15s var(--ease), box-shadow .15s var(--ease), transform .15s var(--ease);
+	  }
+	  .kb-entry-card:hover{
+	    border-color:rgba(168,126,44,.32);
+	    box-shadow:0 4px 14px rgba(30,24,14,.06);
+	    transform:translateY(-1px);
+	  }
+	  .kb-entry-title{
+	    display:flex;
+	    align-items:center;
+	    gap:7px;
+	    width:100%;
+	    min-width:0;
+	    font-size:14px;
+	    font-weight:700;
+	    color:var(--text);
+	  }
+	  .kb-entry-title [data-lucide]{
+	    width:15px;
+	    height:15px;
+	    color:var(--gold);
+	    flex-shrink:0;
+	  }
+	  .kb-status{
+	    height:22px;
+	    padding:0 8px;
+	    border-radius:999px;
+	    border:1px solid var(--border);
+	    background:var(--surface-2);
+	    color:var(--text-3);
+	    font-size:11px;
+	    line-height:20px;
+	    white-space:nowrap;
+	  }
+	  .kb-status.rich{
+	    border-color:rgba(72,122,76,.22);
+	    background:rgba(72,122,76,.08);
+	    color:#3D6F46;
+	  }
+	  .kb-status.medium{
+	    border-color:rgba(168,126,44,.24);
+	    background:var(--gold-bg);
+	    color:var(--gold-deep);
+	  }
+	  .kb-entry-card p{
+	    margin:0;
+	    width:100%;
+	    font-size:12.5px;
+	    line-height:1.45;
+	    color:var(--text-2);
+	  }
+	  .kb-entry-card strong{ color:var(--text);font-weight:700; }
+	  .kb-entry-meta{
+	    display:flex;
+	    flex-wrap:wrap;
+	    gap:4px;
+	    width:100%;
+	    font-size:11.5px;
+	    color:var(--text-3);
+	  }
+	  .kb-entry-meta span{
+	    display:inline-flex;
+	    align-items:center;
+	    gap:4px;
+	  }
+	  .kb-card-actions{
+	    display:flex;
+	    flex-wrap:wrap;
+	    gap:6px;
+	    margin-top:2px;
+	  }
+	  .kb-action-chip{
+	    height:23px;
+	    padding:0 8px;
+	    border-radius:6px;
+	    background:var(--surface-2);
+	    border:1px solid var(--border);
+	    color:var(--text-2);
+	    font-size:11.5px;
+	    line-height:21px;
+	    white-space:nowrap;
+	  }
+	  .kb-ask-panel{
+	    padding:16px 16px 14px;
+	    border:1px solid rgba(168,126,44,.2);
+	    border-radius:8px;
+	    background:#FFFEFA;
+	  }
+	  .kb-ask-head{
+	    display:flex;
+	    align-items:flex-start;
+	    gap:10px;
+	    margin-bottom:12px;
+	  }
+	  .kb-ask-icon{
+	    width:30px;
+	    height:30px;
+	    border-radius:8px;
+	    display:grid;
+	    place-items:center;
+	    background:var(--gold-bg);
+	    color:var(--gold-deep);
+	    flex-shrink:0;
+	  }
+	  .kb-ask-icon [data-lucide]{ width:16px;height:16px; }
+	  .kb-ask-title{
+	    margin:0 0 3px;
+	    color:var(--text);
+	    font-size:15px;
+	    font-weight:800;
+	  }
+	  .kb-ask-sub{
+	    margin:0;
+	    color:var(--text-2);
+	    font-size:12.5px;
+	    line-height:1.55;
+	  }
+	  .kb-topic-list,
+	  .kb-source-list{
+	    list-style:none;
+	    padding:0;
+	    margin:0;
+	  }
+	  .kb-topic-list li,
+	  .kb-source-list li{
+	    display:grid;
+	    grid-template-columns:minmax(0, 1fr) auto;
+	    gap:12px;
+	    padding:12px 0;
+	    border-bottom:1px dashed var(--border-3);
+	  }
+	  .kb-topic-list li:last-child,
+	  .kb-source-list li:last-child{ border-bottom:0; }
+	  .kb-topic-title{
+	    font-size:14px;
+	    font-weight:700;
+	    color:var(--gold-deep);
+	    cursor:pointer;
+	  }
+	  .kb-topic-desc{
+	    margin-top:4px;
+	    font-size:12.8px;
+	    line-height:1.62;
+	    color:var(--text-2);
+	  }
+	  .kb-topic-meta{
+	    font-size:11.5px;
+	    color:var(--text-3);
+	    white-space:nowrap;
+	  }
+	  .kb-section-action{
+	    display:inline-flex;
+	    align-items:center;
+	    gap:5px;
+	    margin-top:12px;
+	    padding:0;
+	    border:0;
+	    background:transparent;
+	    color:var(--gold-deep);
+	    font-size:12.5px;
+	    font-weight:700;
+	    cursor:pointer;
+	  }
+	  .kb-section-action [data-lucide]{ width:14px;height:14px; }
+	  .kb-full-directory{
+	    margin-top:16px;
+	  }
+	  .kb-subject-head{
+	    display:flex;
+	    align-items:baseline;
+	    justify-content:space-between;
+	    gap:12px;
+	    padding:8px 0 4px;
+	    border-bottom:1px solid var(--border-3);
+	  }
+	  .kb-subject-title{
+	    margin:0;
+	    font-size:15px;
+	    font-weight:700;
+	    color:var(--text);
+	    font-family:Georgia,'Songti SC','PingFang SC',serif;
+	  }
+	  .kb-subject-meta{
+	    color:var(--text-3);
+	    font-size:12px;
+	    white-space:nowrap;
+	  }
+	  .kb-subject-block{
+	    padding:14px 0 18px;
+	    border-bottom:1px solid var(--border-3);
+	  }
+	  .kb-subject-block:last-child{
+	    border-bottom:0;
+	  }
+	  .kb-subject-summary{
+	    margin:8px 0 10px;
+	    color:var(--text-2);
+	    font-size:13px;
+	    line-height:1.65;
+	  }
+	  .kb-directory-line{
+	    display:grid;
+	    grid-template-columns:72px minmax(0, 1fr);
+	    gap:12px;
+	    align-items:start;
+	    margin-top:8px;
+	  }
+	  .kb-directory-label{
+	    color:var(--text-3);
+	    font-size:12px;
+	    line-height:1.8;
+	    white-space:nowrap;
+	  }
+	  .kb-directory-links{
+	    margin:0;
+	    color:var(--text-3);
+	    font-size:13px;
+	    line-height:1.8;
+	  }
+	  .kb-directory-note{
+	    margin:0 0 16px;
+	    color:var(--text-2);
+	    font-size:12.8px;
+	    line-height:1.65;
+	  }
+	  .kb-directory-more[hidden]{
+	    display:none;
+	  }
+	  .kb-directory-toggle{
+	    display:inline-flex;
+	    align-items:center;
+	    gap:5px;
+	    margin:8px 0 18px;
+	    padding:0;
+	    border:0;
+	    background:transparent;
+	    color:var(--gold-deep);
+	    font-size:12.5px;
+	    font-weight:700;
+	    cursor:pointer;
+	  }
+	  .kb-directory-toggle [data-lucide]{
+	    width:14px;
+	    height:14px;
+	  }
+	  .kb-question-list{
+	    display:grid;
+	    grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+	    gap:10px;
+	  }
+	  .kb-question{
+	    display:grid;
+	    grid-template-columns:1fr auto;
+	    gap:12px;
+	    align-items:start;
+	    padding:13px 14px;
+	    border:1px solid var(--border);
+	    border-radius:8px;
+	    background:var(--surface);
+	    cursor:pointer;
+	    transition:background .15s, border-color .15s;
+	  }
+	  .kb-question:hover{
+	    background:var(--surface-2);
+	    border-color:rgba(168,126,44,.3);
+	  }
+	  .kb-question b{
+	    display:block;
+	    margin-bottom:4px;
+	    font-size:13.5px;
+	    color:var(--text);
+	  }
+	  .kb-question span{
+	    font-size:12.5px;
+	    line-height:1.55;
+	    color:var(--text-2);
+	  }
+	  .kb-question .kb-question-cta{
+	    display:inline-flex;
+	    margin-top:8px;
+	    color:var(--gold-deep);
+	    font-size:12px;
+	    font-weight:700;
+	  }
+	  .kb-question [data-lucide]{
+	    width:15px;
+	    height:15px;
+	    color:var(--gold);
+	    margin-top:2px;
+	  }
+	  .kb-path{
+	    padding:14px 15px;
+	    border:1px solid var(--border);
+	    border-radius:8px;
+	    background:#fff;
+	    cursor:pointer;
+	  }
+	  .kb-path-grid{
+	    display:grid;
+	    grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+	    gap:10px;
+	  }
+	  .kb-path-head{
+	    display:flex;
+	    align-items:baseline;
+	    justify-content:space-between;
+	    gap:12px;
+	    margin-bottom:8px;
+	  }
+	  .kb-path-name{
+	    font-size:14px;
+	    font-weight:700;
+	    color:var(--text);
+	  }
+	  .kb-path-time{
+	    font-size:11.5px;
+	    color:var(--text-3);
+	    white-space:nowrap;
+	  }
+	  .kb-path-steps{
+	    margin:0;
+	    padding-left:18px;
+	    color:var(--text-2);
+	    font-size:12.8px;
+	    line-height:1.7;
+	  }
+	  .kb-update-list{
+	    list-style:none;
+	    padding:0;
+	    margin:0;
+	  }
+	  .kb-update-list li{
+	    margin:0;
+	  }
+	  .kb-update-row{
+	    width:100%;
+	    display:grid;
+	    grid-template-columns:minmax(0, 1fr) auto;
+	    gap:12px;
+	    align-items:center;
+	    padding:11px 0;
+	    border-bottom:1px dashed var(--border-3);
+	    border-left:0;
+	    border-right:0;
+	    border-top:0;
+	    background:transparent;
+	    text-align:left;
+	    cursor:pointer;
+	  }
+	  .kb-update-list li:last-child .kb-update-row{ border-bottom:0; }
+	  .kb-update-row:hover .kb-update-title{ color:var(--gold-deep); }
+	  .kb-update-row:hover .kb-update-desc{ color:var(--text); }
+	  .kb-update-title{
+	    color:var(--text);
+	    font-size:13px;
+	    font-weight:700;
+	  }
+	  .kb-update-desc{
+	    margin-top:3px;
+	    color:var(--text-2);
+	    font-size:12.5px;
+	    line-height:1.55;
+	  }
+	  .kb-update-time{
+	    color:var(--text-3);
+	    font-size:11.5px;
+	    white-space:nowrap;
+	  }
+	  body[data-page="wiki-home"] .kb-fixed-scope{
+	    cursor:default;
+	  }
+	  body[data-page="wiki-home"] .kb-fixed-scope .chev{
+	    display:none;
+	  }
+	  body[data-page="wiki-home"] .bb-wrap:focus-within .bb-input textarea{
+	    min-height:44px;
+	  }
+	  @media (max-width: 1180px){
+	    .kb-card-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+	  }
+	  @media (max-width: 860px){
+	    .kb-card-grid{ grid-template-columns:1fr; }
+	    .kb-topic-list li,
+	    .kb-source-list li{ grid-template-columns:1fr; }
+	    .kb-directory-line{ grid-template-columns:1fr;gap:2px; }
+	  }
+	</style>
+<link rel="stylesheet" href="assets/review.css" />
+</head>
+<body data-page="wiki-home">
+
+<div class="app" id="app" data-view="wiki" data-chat="closed">
+
+  <!-- ════════════ 左栏 · 飞象老师校园版统一侧边栏 ════════════ -->
+  <aside class="sidebar-left" id="feixiang-sidebar"></aside>
+
+  <!-- ════════════ 中栏 · 工作区 ════════════ -->
+  <main class="workspace">
+
+    <!-- 统一页面顶栏 · page-header -->
+    <header class="page-header" data-page-header="school-wiki">
+      <div class="ph-left">
+        <nav class="ph-crumb knowledge-header-crumb" aria-label="面包屑" data-root-name="学校知识库" data-root-icon="library">
+          <span class="ph-crumb-current"><i data-lucide="library"></i><span>学校知识库</span></span>
+          <span class="ph-crumb-sep" aria-hidden="true"><i data-lucide="chevron-right"></i></span>
+          <span class="ph-crumb-current"><span>Wiki 首页</span></span>
+        </nav>
+      </div>
+      <div class="ph-right">
+        <div class="ph-view-switcher" role="tablist" aria-label="视图切换">
+          <button class="ph-vs-btn vs-btn active" data-view="wiki" onclick="switchView('wiki')" role="tab" aria-selected="true" data-track="/click/feixiangCampusSchoolWikiPage/switchView | 切换知识库视图 | viewType#STRING,kbScope#STRING"><i data-lucide="book-open"></i><span>Wiki</span></button>
+          <button class="ph-vs-btn vs-btn" data-view="graph" onclick="switchView('graph')" role="tab" aria-selected="false" data-track="/click/feixiangCampusSchoolWikiPage/switchView | 切换知识库视图 | viewType#STRING,kbScope#STRING"><i data-lucide="git-branch"></i><span>知识图谱</span></button>
+          <button class="ph-vs-btn vs-btn" data-view="folder" onclick="switchView('folder')" role="tab" aria-selected="false" data-track="/click/feixiangCampusSchoolWikiPage/switchView | 切换知识库视图 | viewType#STRING,kbScope#STRING"><i data-lucide="folder"></i><span>文件夹</span></button>
+        </div>
+        <div class="knowledge-header-actions wiki-header-actions">
+          <button class="ph-action ph-action-icon tb-search" onclick="toggleTopSearch(event)" title="搜索学校知识库" aria-expanded="false" data-track="/click/feixiangCampusSchoolWikiPage/search | 搜索知识库 | kbScope#STRING">
+            <i data-lucide="search"></i>
+          </button>
+          <span class="ph-action-sep" aria-hidden="true"></span>
+          <button class="ph-action" data-doc="share-btn-wiki-home" onclick="V28ShareDialog.open({ context:'wiki-home', kbName:'学校知识库' })" title="分享">
+            <i data-lucide="share-2"></i><span>分享</span>
+          </button>
+        </div>
+        <div class="knowledge-header-actions folder-header-actions">
+          <button class="ph-action ph-action-icon tb-search" onclick="toggleTopSearch(event)" title="搜索学校知识库文件" aria-expanded="false">
+            <i data-lucide="search"></i>
+          </button>
+          <span class="ph-action-sep" aria-hidden="true"></span>
+          <button class="ph-action" onclick="openCreateFolderPop(event)" title="新建文件夹">
+            <i data-lucide="folder-plus"></i><span>新建文件夹</span>
+          </button>
+          <button class="ph-action is-primary" onclick="openKbUploadModal()" title="上传文件">
+            <i data-lucide="upload"></i><span>上传文件</span>
+          </button>
+          <button class="ph-action folder-sort-action" onclick="showToast('按上传时间 / 名称 / 大小排序')" title="排序">
+            <i data-lucide="arrow-up-down"></i><span>排序</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主滚动区 -->
+    <div class="workspace-scroll">
+      <article class="wiki-page" id="view-wiki">
+
+	        <!-- ───── Hero · 知识库概览 ───── -->
+	        <header class="wiki-hero">
+	          <div class="wiki-hero-badge">
+	            <i data-lucide="sparkles"></i>
+		            知识库概览
+	          </div>
+	          <h1 class="wiki-hero-title" id="hero-title">北京市实验中学 · <em>学校知识库</em></h1>
+	          <p class="wiki-hero-sub" id="hero-sub">
+	            本知识库汇总学校上传的 <b>925 份教学资料</b>，并整理为 <b>64 个主题</b>。
+	            当前覆盖 <b>数学、语文、英语、物理、化学</b> 等学科，以及七至九年级的备课、授课、作业评价和复习备考资料。
+	            数学、语文和英语资料相对完整，物理和化学已形成实验探究、单元复习等稳定主题。
+	          </p>
+		          <div class="wiki-hero-meta">
+		            <span class="item"><b id="hero-count">925</b> 份资料</span>
+		            <span class="sep">·</span>
+		            <span class="item"><b>64</b> 个主题</span>
+		            <span class="sep">·</span>
+		            <span class="item">上次更新 <b>今天 09:14</b></span>
+		          </div>
+	        </header>
+
+	        <section class="kb-home-section">
+	          <h2 class="wiki-h2">
+		            知识目录
+		            <span class="h2-note">64 个主题</span>
+	          </h2>
+			          <p class="kb-section-intro">按学科概览资料覆盖。目录 Wiki 用于继续浏览某个年级、专题或场景；重点主题进入具体词条。</p>
+	          <div class="kb-full-directory" id="kb-full-directory">
+	            <div class="kb-subject-block">
+	              <div class="kb-subject-head">
+	                <h3 class="kb-subject-title">数学</h3>
+	                <span class="kb-subject-meta">24 个主题</span>
+	              </div>
+	              <p class="kb-subject-summary">覆盖七至九年级数学资料，九年级复习、函数与几何专题和中考压轴资料较完整。</p>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">目录 Wiki</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('七年级数学')">七年级数学</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('八年级数学')">八年级数学</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('九年级数学')">九年级数学</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('中考数学专题')">中考数学专题</a>
+	                </p>
+	              </div>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">重点主题</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('二次函数图像与性质')">二次函数图像与性质</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('函数图像变换')">函数图像变换</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('相似三角形判定与性质')">相似三角形判定与性质</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('中考压轴·函数综合')">中考压轴 · 函数综合</a>
+	                </p>
+	              </div>
+	            </div>
+
+	            <div class="kb-subject-block">
+	              <div class="kb-subject-head">
+	                <h3 class="kb-subject-title">语文</h3>
+	                <span class="kb-subject-meta">14 个主题</span>
+	              </div>
+	              <p class="kb-subject-summary">覆盖七至九年级阅读、作文、古诗文和单元教学资料，九年级阅读复习和作文讲评资料较多。</p>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">目录 Wiki</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('七年级语文')">七年级语文</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('八年级语文')">八年级语文</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('九年级语文')">九年级语文</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('作文教学')">作文教学</a>
+	                </p>
+	              </div>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">重点主题</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('记叙文写作')">记叙文写作</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('古诗文阅读')">古诗文阅读</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('名著导读')">名著导读</a>
+	                </p>
+	              </div>
+	            </div>
+
+	            <div class="kb-subject-block">
+	              <div class="kb-subject-head">
+	                <h3 class="kb-subject-title">英语</h3>
+	                <span class="kb-subject-meta">12 个主题</span>
+	              </div>
+	              <p class="kb-subject-summary">覆盖七至九年级词汇、阅读、听说和单元复习资料，九年级阅读理解和语法复习资料较集中。</p>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">目录 Wiki</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('七年级英语')">七年级英语</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('八年级英语')">八年级英语</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('九年级英语')">九年级英语</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('中考英语复习')">中考英语复习</a>
+	                </p>
+	              </div>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">重点主题</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('阅读理解')">阅读理解</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('完形填空')">完形填空</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('语法复习')">语法复习</a>
+	                </p>
+	              </div>
+	            </div>
+
+	            <div class="kb-subject-block">
+	              <div class="kb-subject-head">
+	                <h3 class="kb-subject-title">物理</h3>
+	                <span class="kb-subject-meta">8 个主题</span>
+	              </div>
+	              <p class="kb-subject-summary">覆盖八至九年级物理资料，电学、力学和实验探究内容较完整，适合新课导入、实验课和单元复习。</p>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">目录 Wiki</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('八年级物理')">八年级物理</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('九年级物理')">九年级物理</a>
+	                </p>
+	              </div>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">重点主题</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('电学实验')">电学实验</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('力学复习')">力学复习</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('实验探究题')">实验探究题</a>
+	                </p>
+	              </div>
+	            </div>
+
+	            <div class="kb-subject-block">
+	              <div class="kb-subject-head">
+	                <h3 class="kb-subject-title">化学</h3>
+	                <span class="kb-subject-meta">6 个主题</span>
+	              </div>
+	              <p class="kb-subject-summary">以九年级化学资料为主，覆盖实验基础、物质性质、方程式和单元复习。</p>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">目录 Wiki</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('九年级化学')">九年级化学</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('化学实验')">化学实验</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('中考化学复习')">中考化学复习</a>
+	                </p>
+	              </div>
+	              <div class="kb-directory-line">
+	                <span class="kb-directory-label">重点主题</span>
+	                <p class="kb-directory-links">
+	                  <a class="wlink" onclick="openWiki('化学方程式')">化学方程式</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('酸碱盐复习')">酸碱盐复习</a>
+	                  <span class="sep">·</span>
+	                  <a class="wlink" onclick="openWiki('实验现象与结论')">实验现象与结论</a>
+	                </p>
+	              </div>
+	            </div>
+	          </div>
+	        </section>
+
+	        <section class="kb-home-section" id="kb-workflows">
+	          <h2 class="wiki-h2">教学场景</h2>
+	          <p class="kb-section-intro">围绕备课、授课、作业评价和复习备考组织相关资料。</p>
+	          <div class="kb-card-grid">
+	            <button class="kb-entry-card" onclick="openWiki('备课资源')">
+	              <span class="kb-entry-title"><i data-lucide="book-open"></i>备课资源</span>
+	              <p>教案、课件、导入活动</p>
+	              <div class="kb-entry-meta"><span>214 份资料</span><span>·</span><span>12 个主题</span></div>
+	            </button>
+	            <button class="kb-entry-card" onclick="openWiki('课堂教学')">
+	              <span class="kb-entry-title"><i data-lucide="presentation"></i>课堂教学</span>
+	              <p>板书、追问、公开课案例</p>
+	              <div class="kb-entry-meta"><span>186 份资料</span><span>·</span><span>9 个主题</span></div>
+	            </button>
+	            <button class="kb-entry-card" onclick="openWiki('作业与测评')">
+	              <span class="kb-entry-title"><i data-lucide="clipboard-check"></i>作业与测评</span>
+	              <p>练习、测验、错题分析</p>
+	              <div class="kb-entry-meta"><span>132 份资料</span><span>·</span><span>7 个主题</span></div>
+	            </button>
+	            <button class="kb-entry-card" onclick="openWiki('中考复习')">
+	              <span class="kb-entry-title"><i data-lucide="target"></i>中考复习</span>
+	              <p>函数综合、几何压轴、一模二模</p>
+	              <div class="kb-entry-meta"><span>280 份资料</span><span>·</span><span>14 个主题</span></div>
+	            </button>
+	          </div>
+	        </section>
+
+	        <section class="kb-home-section">
+	          <h2 class="wiki-h2">
+	            近期更新
+	            <span class="h2-note">最近 20 条</span>
+	          </h2>
+	          <p class="kb-section-intro">按时间展示近期新增资料、主题更新和题型归类情况，点击记录可进入对应主题。</p>
+	          <ul class="kb-update-list">
+	            <li>
+	              <button class="kb-update-row" onclick="openWiki('全等三角形判定')">
+	                <div>
+	                  <div class="kb-update-title">全等三角形公开课资料已归入主题</div>
+	                  <div class="kb-update-desc">新增板书照片、课堂追问和分层练习。</div>
+	                </div>
+	                <span class="kb-update-time">今天 09:14</span>
+	              </button>
+	            </li>
+	            <li>
+	              <button class="kb-update-row" onclick="openWiki('海淀一模函数题型')">
+	                <div>
+	                  <div class="kb-update-title">海淀一模试卷已完成题型归类</div>
+	                  <div class="kb-update-desc">函数综合、几何压轴和新定义题已关联到对应主题。</div>
+	                </div>
+	                <span class="kb-update-time">昨天</span>
+	              </button>
+	            </li>
+	            <li>
+	              <button class="kb-update-row" onclick="openWiki('中考压轴·函数综合')">
+	                <div>
+	                  <div class="kb-update-title">中考压轴题型目录更新</div>
+	                  <div class="kb-update-desc">补充动点、最值和存在性问题的来源材料。</div>
+	                </div>
+	                <span class="kb-update-time">本周</span>
+	              </button>
+	            </li>
+	            <li>
+	              <button class="kb-update-row" onclick="openWiki('函数图像变换')">
+	                <div>
+	                  <div class="kb-update-title">函数图像变换主题补充课堂活动</div>
+	                  <div class="kb-update-desc">新增图像平移、对称变换和课堂追问材料。</div>
+	                </div>
+	                <span class="kb-update-time">本周</span>
+	              </button>
+	            </li>
+	            <li>
+	              <button class="kb-update-row" onclick="openWiki('错题归因模板')">
+	                <div>
+	                  <div class="kb-update-title">错题归因模板更新评价维度</div>
+	                  <div class="kb-update-desc">补充知识理解、审题习惯和表达规范三个维度。</div>
+	                </div>
+	                <span class="kb-update-time">本周</span>
+	              </button>
+	            </li>
+	            <li data-update-extra hidden>
+	              <button class="kb-update-row" onclick="openWiki('分层练习设计')">
+	                <div>
+	                  <div class="kb-update-title">分层练习设计新增 A/B/C 样例</div>
+	                  <div class="kb-update-desc">关联二次函数、相似三角形和综合题训练材料。</div>
+	                </div>
+	                <span class="kb-update-time">本周</span>
+	              </button>
+	            </li>
+	            <li data-update-extra hidden>
+	              <button class="kb-update-row" onclick="openWiki('复习课教学设计')">
+	                <div>
+	                  <div class="kb-update-title">复习课教学设计补充单元目标</div>
+	                  <div class="kb-update-desc">新增复习目标、重点问题和课堂练习安排。</div>
+	                </div>
+	                <span class="kb-update-time">本周</span>
+	              </button>
+	            </li>
+	          </ul>
+	          <button class="kb-directory-toggle" data-recent-toggle data-collapsed-label="展开更多" data-expanded-label="收起" onclick="toggleRecentUpdates(this)">展开更多 <i data-lucide="chevron-down"></i></button>
+	        </section>
+
+      </article>
+
+    </div>
+
+    <!-- 学校知识库文件夹视图：由 assets/v28.js 的 renderPersonalFolderView 渲染 -->
+    <section class="folder-view" id="view-folder">
+      <aside class="fv-tree">
+        <div class="fv-tree-head">
+          <i data-lucide="library"></i>
+          <span class="ft-name">学校知识库</span>
+          <span class="ft-count">925</span>
+        </div>
+
+        <ul class="fv-tree-list">
+          <li>
+            <div class="fv-tree-item" data-level="1" onclick="toggleFolder(this)">
+              <i data-lucide="chevron-right" class="ti-caret"></i>
+              <i data-lucide="folder" class="ti-icon"></i>
+              <span class="ti-name">七年级</span>
+              <span class="ti-count">156</span>
+            </div>
+          </li>
+
+          <li>
+            <div class="fv-tree-item" data-level="1" onclick="toggleFolder(this)">
+              <i data-lucide="chevron-right" class="ti-caret"></i>
+              <i data-lucide="folder" class="ti-icon"></i>
+              <span class="ti-name">八年级</span>
+              <span class="ti-count">245</span>
+            </div>
+          </li>
+
+          <li class="open">
+            <div class="fv-tree-item" data-level="1" onclick="toggleFolder(this)">
+              <i data-lucide="chevron-down" class="ti-caret"></i>
+              <i data-lucide="folder-open" class="ti-icon"></i>
+              <span class="ti-name">九年级</span>
+              <span class="ti-count">412</span>
+            </div>
+            <ul class="fv-tree-sub">
+              <li class="open">
+                <div class="fv-tree-item" data-level="2" onclick="toggleFolder(this)">
+                  <i data-lucide="chevron-down" class="ti-caret"></i>
+                  <i data-lucide="folder-open" class="ti-icon"></i>
+                  <span class="ti-name">数学</span>
+                  <span class="ti-count">358</span>
+                </div>
+                <ul class="fv-tree-sub">
+                  <li class="active">
+                    <div class="fv-tree-item" data-level="3" onclick="openFolder('quadratic')">
+                      <i data-lucide="circle" class="ti-caret hide"></i>
+                      <i data-lucide="folder" class="ti-icon"></i>
+                      <span class="ti-name">二次函数</span>
+                      <span class="ti-count">38</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="fv-tree-item" data-level="3" onclick="openFolder('quadratic-eq')">
+                      <i data-lucide="circle" class="ti-caret hide"></i>
+                      <i data-lucide="folder" class="ti-icon"></i>
+                      <span class="ti-name">一元二次方程</span>
+                      <span class="ti-count">32</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="fv-tree-item" data-level="3" onclick="openFolder('similar')">
+                      <i data-lucide="circle" class="ti-caret hide"></i>
+                      <i data-lucide="folder" class="ti-icon"></i>
+                      <span class="ti-name">相似三角形</span>
+                      <span class="ti-count">29</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="fv-tree-item" data-level="3" onclick="openFolder('circle')">
+                      <i data-lucide="circle" class="ti-caret hide"></i>
+                      <i data-lucide="folder" class="ti-icon"></i>
+                      <span class="ti-name">圆</span>
+                      <span class="ti-count">45</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="fv-tree-item" data-level="3" onclick="openFolder('trig')">
+                      <i data-lucide="circle" class="ti-caret hide"></i>
+                      <i data-lucide="folder" class="ti-icon"></i>
+                      <span class="ti-name">锐角三角函数</span>
+                      <span class="ti-count">24</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="fv-tree-item more" data-level="3" onclick="showToast('展开剩余 9 个课时')">
+                      <i data-lucide="more-horizontal" class="ti-caret"></i>
+                      <span class="ti-name">…还有 9 个课时</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <div class="fv-tree-item" data-level="2" onclick="toggleFolder(this)">
+                  <i data-lucide="chevron-right" class="ti-caret"></i>
+                  <i data-lucide="folder" class="ti-icon"></i>
+                  <span class="ti-name">公开课/板书</span>
+                  <span class="ti-count">54</span>
+                </div>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <div class="fv-tree-item" data-level="1" onclick="toggleFolder(this)">
+              <i data-lucide="chevron-right" class="ti-caret"></i>
+              <i data-lucide="folder" class="ti-icon"></i>
+              <span class="ti-name">中考专题</span>
+              <span class="ti-count">89</span>
+            </div>
+          </li>
+          <li>
+            <div class="fv-tree-item" data-level="1" onclick="toggleFolder(this)">
+              <i data-lucide="chevron-right" class="ti-caret"></i>
+              <i data-lucide="folder-archive" class="ti-icon"></i>
+              <span class="ti-name">全校共建</span>
+              <span class="ti-count">23</span>
+            </div>
+          </li>
+        </ul>
+      </aside>
+
+      <div class="fv-list">
+        <div class="fv-list-head">
+          <nav class="fv-breadcrumb" aria-label="路径">
+            <a class="fv-bc-item" onclick="showToast('回到根目录')"><i data-lucide="library"></i> 学校知识库</a>
+            <span class="fv-bc-sep">/</span>
+            <a class="fv-bc-item" onclick="showToast('九年级')">九年级</a>
+            <span class="fv-bc-sep">/</span>
+            <a class="fv-bc-item" onclick="showToast('数学')">数学</a>
+            <span class="fv-bc-sep">/</span>
+            <span class="fv-bc-current">二次函数</span>
+            <span class="fv-bc-meta">12 份资料</span>
+          </nav>
+          <div class="fv-tools">
+            <button class="fv-tool" onclick="showToast('按上传时间 / 名称 / 大小排序')">
+              <i data-lucide="arrow-up-down"></i> 排序
+            </button>
+            <button class="fv-tool primary" onclick="openKbUploadModal()">
+              <i data-lucide="upload"></i> 上传文件
+            </button>
+            <button class="fv-tool" onclick="openWiki('二次函数图像与性质')">
+              <i data-lucide="book-open"></i> 查看整理结果
+            </button>
+          </div>
+        </div>
+
+        <div class="fv-wiki-chips">
+          <div class="fwc-label">
+            <i data-lucide="sparkles"></i>
+            <span>飞象把这组资料整理成了 <b>2 个主题</b></span>
+          </div>
+          <div class="fwc-chips">
+            <a class="fwc-chip" onclick="openWiki('二次函数图像与性质')">
+              <i data-lucide="book-open"></i>
+              <span>二次函数图像与性质</span>
+            </a>
+            <a class="fwc-chip" onclick="openWiki('二次函数应用题')">
+              <i data-lucide="book-open"></i>
+              <span>二次函数应用题</span>
+            </a>
+          </div>
+        </div>
+
+        <table class="fv-table">
+          <thead>
+            <tr>
+              <th class="col-name">名称</th>
+              <th class="col-by">上传者</th>
+              <th class="col-time">上传时间</th>
+              <th class="col-size">大小</th>
+              <th class="col-wiki">关联主题</th>
+              <th class="col-qbank">校本题库</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr onclick="openWiki('二次函数图像与性质')">
+              <td class="col-name"><i data-lucide="presentation"></i> 二次函数·导入课件.pptx</td>
+              <td>张老师</td>
+              <td>5 天前</td>
+              <td>2.1 MB</td>
+              <td><a class="wlink" onclick="event.stopPropagation();openWiki('二次函数图像与性质')">二次函数图像与性质</a></td>
+              <td class="col-qbank"><span class="kb-qbank-status is-muted">暂不支持</span></td>
+            </tr>
+            <tr onclick="openWiki('二次函数图像与性质')">
+              <td class="col-name"><i data-lucide="file-text"></i> 教学设计·二次函数.docx</td>
+              <td>张老师</td>
+              <td>5 天前</td>
+              <td>340 KB</td>
+              <td><a class="wlink" onclick="event.stopPropagation();openWiki('二次函数图像与性质')">二次函数图像与性质</a></td>
+              <td class="col-qbank">
+                <span class="kb-qbank-status is-none">未沉淀</span>
+                <button class="kb-qbank-action" onclick="createKbAutoRecordTask(event,{ name:'教学设计·二次函数.docx', type:'docx', size:'340 KB' })">沉淀</button>
+              </td>
+            </tr>
+            <tr onclick="openWiki('二次函数图像与性质')">
+              <td class="col-name"><i data-lucide="book"></i> 八下函数·配套习题汇编.pdf</td>
+              <td>全校共建</td>
+              <td>1 个月前</td>
+              <td>8.4 MB</td>
+              <td><a class="wlink" onclick="event.stopPropagation();openWiki('二次函数图像与性质')">二次函数 · 一次函数</a></td>
+              <td class="col-qbank">
+                <span class="kb-qbank-status is-done">已沉淀 42 题</span>
+                <button class="kb-qbank-action" onclick="goAiRecordFromKb(event,'八下函数·配套习题汇编.pdf','committed',42)">查看结果</button>
+              </td>
+            </tr>
+            <tr onclick="openWiki('二次函数图像与性质')">
+              <td class="col-name"><i data-lucide="file-text"></i> 海淀区 2026 一模卷·数学.pdf</td>
+              <td>李素芬</td>
+              <td>1 周前</td>
+              <td>1.2 MB</td>
+              <td><a class="wlink" onclick="event.stopPropagation();openWiki('二次函数图像与性质')">二次函数 · 圆 · 相似</a></td>
+              <td class="col-qbank">
+                <span class="kb-qbank-status is-doing">处理中</span>
+                <button class="kb-qbank-action" onclick="goAiRecordFromKb(event,'海淀区 2026 一模卷·数学.pdf','parsing',18)">去 AI 录题</button>
+              </td>
+            </tr>
+            <tr onclick="openWiki('二次函数图像与性质')">
+              <td class="col-name"><i data-lucide="image"></i> 王建华·公开课板书.jpg</td>
+              <td>王建华</td>
+              <td>2 周前</td>
+              <td>820 KB</td>
+              <td><a class="wlink" onclick="event.stopPropagation();openWiki('二次函数图像与性质')">二次函数图像与性质</a></td>
+              <td class="col-qbank">
+                <span class="kb-qbank-status is-failed">沉淀失败</span>
+                <button class="kb-qbank-action" onclick="createKbAutoRecordTask(event,{ name:'王建华·公开课板书.jpg', type:'jpg', size:'820 KB' })">重试</button>
+              </td>
+            </tr>
+            <tr onclick="openWiki('二次函数图像与性质')">
+              <td class="col-name"><i data-lucide="file-text"></i> 赵明杰·错题剖析.docx</td>
+              <td>赵明杰</td>
+              <td>2 周前</td>
+              <td>220 KB</td>
+              <td><a class="wlink" onclick="event.stopPropagation();openWiki('二次函数图像与性质')">二次函数 · 一元二次方程</a></td>
+              <td class="col-qbank">
+                <span class="kb-qbank-status is-none">未沉淀</span>
+                <button class="kb-qbank-action" onclick="createKbAutoRecordTask(event,{ name:'赵明杰·错题剖析.docx', type:'docx', size:'220 KB' })">沉淀</button>
+              </td>
+            </tr>
+            <tr onclick="openWiki('二次函数图像与性质')">
+              <td class="col-name"><i data-lucide="clipboard-list"></i> 八(3)班·错题精选.xlsx</td>
+              <td>张老师</td>
+              <td>3 周前</td>
+              <td>180 KB</td>
+              <td><a class="wlink" onclick="event.stopPropagation();openWiki('二次函数图像与性质')">二次函数图像与性质</a></td>
+              <td class="col-qbank"><span class="kb-qbank-status is-muted">暂不支持</span></td>
+            </tr>
+            <tr onclick="openWiki('中考压轴·函数综合')">
+              <td class="col-name"><i data-lucide="folder-archive"></i> 北京中考真题 2021-2025（5 份）</td>
+              <td>学校公共库</td>
+              <td>3 周前</td>
+              <td>12 MB</td>
+              <td><a class="wlink" onclick="event.stopPropagation();openWiki('二次函数图像与性质')">21 个主题</a></td>
+              <td class="col-qbank"><span class="kb-qbank-status is-muted">文件夹</span></td>
+            </tr>
+            <tr class="more" onclick="showToast('展开剩余 4 份资料')">
+              <td class="col-name" colspan="6"><i data-lucide="more-horizontal"></i> …还有 4 份资料</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ════════════ 对话流（chat 态显示） ════════════ -->
+    <div class="chat-stream" id="view-chat">
+      <div class="chat-head">
+        <nav class="ch-breadcrumb" aria-label="面包屑">
+          <button class="bc-item" onclick="backToKnowledgeBase()" title="回到 学校知识库">
+            <i data-lucide="library"></i>
+            <span id="bc-from">学校知识库</span>
+          </button>
+          <span class="bc-sep" aria-hidden="true">
+            <i data-lucide="chevron-right"></i>
+          </span>
+          <span class="bc-current">
+            <i data-lucide="message-square-text"></i>
+            <span id="ch-title">围绕《二次函数》出 5 道分层练习</span>
+          </span>
+        </nav>
+        <div class="ch-spacer"></div>
+        <button class="ch-ctx kb-fixed-scope" title="当前范围：学校知识库">
+          <i data-lucide="library"></i>
+          <span class="ctx-name">学校知识库</span>
+          <i data-lucide="chevron-down"></i>
+        </button>
+      </div>
+
+      <!-- 空对话态：老师自由输入欢迎页 -->
+      <div class="chat-empty" id="chat-empty">
+        <div class="ce-hero">
+          <div class="ce-brand">
+            <span class="ce-brand-dot">飞</span>
+            <span class="ce-brand-name">飞象 AI</span>
+            <span class="ce-brand-sep">·</span>
+            <span class="ce-brand-tag">老师的 AI 助手</span>
+          </div>
+          <h1 class="ce-greet" id="ce-greet">下午好，张老师</h1>
+        </div>
+
+        <div class="ce-composer">
+          <textarea id="ce-input" rows="2"
+            placeholder="想做什么？告诉飞象，或先选一个工具…"
+            oninput="autosize(this);refreshCeSend()"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ceSend()}"></textarea>
+
+          <div class="ce-chips">
+            <button class="ce-chip" data-chip="quiz" onclick="ceToggleChip('quiz')">
+              <i data-lucide="sparkles"></i><span>AI 组题</span>
+            </button>
+            <button class="ce-chip" data-chip="slides" onclick="ceToggleChip('slides')">
+              <i data-lucide="layout"></i><span>多页课件</span>
+            </button>
+            <button class="ce-chip" data-chip="anim" onclick="ceToggleChip('anim')">
+              <i data-lucide="play-circle"></i><span>教学动画</span>
+            </button>
+            <button class="ce-chip" data-chip="game" onclick="ceToggleChip('game')">
+              <i data-lucide="gamepad-2"></i><span>教学游戏</span>
+            </button>
+            <button class="ce-chip more" onclick="showToast('更多工具规划中：教案、学情分析、AI 翻译润色…')">
+              <i data-lucide="more-horizontal"></i>
+            </button>
+          </div>
+
+          <div class="ce-foot">
+            <div class="ce-foot-left">
+	              <button class="ce-icon-btn" title="语音输入" onclick="showToast('语音输入')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+              </button>
+              <span class="ce-divider"></span>
+              <button class="ce-kb-attach kb-fixed-scope" title="当前范围：学校知识库">
+                <i data-lucide="library"></i>
+                <span id="ce-kb-label">学校知识库</span>
+                <i data-lucide="chevron-down" class="chev"></i>
+              </button>
+            </div>
+            <button class="ce-send idle" id="ce-send" onclick="ceSend()" title="发送（Enter）">
+              <i data-lucide="arrow-up"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="chat-body" id="chat-body">
+        <!-- 用户消息 -->
+        <div class="chat-msg user">
+          <div class="msg-bubble" id="chat-user-text">
+            围绕「二次函数图像与性质」出 5 道分层练习，A/B/C 三难度，给八(3)班用
+          </div>
+        </div>
+
+        <!-- AI 回复（带流式效果 + 引用 + 操作） -->
+        <div class="chat-msg ai" id="chat-ai-msg">
+          <div class="msg-avatar">F</div>
+          <div class="msg-content">
+            <p id="chat-ai-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中间底部输入 -->
+      <div class="chat-composer">
+        <div class="cc-wrap">
+          <div class="cc-input">
+            <textarea id="cc-textarea" rows="1" placeholder="继续问飞象，比如「再难一点」「换个出题角度」…"
+              oninput="autosize(this);refreshCcSend()"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendInChat()}"></textarea>
+	            <button class="cc-btn send idle" id="cc-send" title="发送（Enter）" onclick="sendInChat()">
+              <i data-lucide="arrow-up"></i>
+            </button>
+          </div>
+          <div class="cc-hint">
+            <b>Enter</b> 发送 · <b>Shift+Enter</b> 换行 · 回到目录可点右上角 ×
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ 底部 Command Bar ════════════ -->
+    <div class="bottom-bar" id="bottom-bar" data-mode="knowledge-qa">
+
+	      <div class="bb-wrap">
+		        <!-- 默认一行：知识库范围 + 问答输入 + 发送 -->
+		        <div class="bb-input">
+		          <button class="bb-ctx kb-fixed-scope" tabindex="-1"
+		            title="当前知识库范围：学校知识库">
+	            <i data-lucide="library" class="lead"></i>
+	            <span class="ctx-name">学校知识库</span>
+	          </button>
+		          <textarea id="bb-textarea" rows="1" placeholder="基于学校知识库提问…"
+            oninput="autosize(this);refreshBarSend()"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitFromBar()}"></textarea>
+	          <button class="bb-input-btn send idle" id="bb-send" title="发送（Enter）" onclick="submitFromBar()">
+	            <i data-lucide="arrow-up"></i>
+	          </button>
+	        </div>
+	      </div>
+    </div>
+
+  </main>
+
+  <!-- ════════════ 右栏 · Canvas（chat 态下 1:1） ════════════ -->
+  <aside class="sidebar-right">
+
+    <!-- Canvas 顶部 tab 切换 -->
+    <div class="canvas-head">
+      <div class="canvas-tabs" id="canvas-tabs">
+        <button class="cv-tab active" data-cv="wiki" onclick="switchCanvas('wiki')">
+          <i data-lucide="book-open"></i>
+          主题
+          <span class="cv-tab-meta">· 二次函数</span>
+        </button>
+        <button class="cv-tab" data-cv="quiz" onclick="switchCanvas('quiz')" hidden id="cv-tab-quiz">
+          <i data-lucide="sparkles"></i>
+          题目集
+          <span class="cv-tab-meta">· 5 道</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="canvas-body">
+
+      <!-- Pane 1：Wiki 镜像（默认显示，AI 当前正在引用） -->
+      <div class="cv-pane active" data-pane="wiki">
+        <article class="cv-wiki">
+          <h1>二次函数图像与性质</h1>
+          <div class="cv-wiki-meta">
+            来源 <b>12 份资料</b> · 相关词条 <b>5 个</b> · 上次更新 <b>2 小时前</b>
+          </div>
+
+          <h2>1. 抛物线的开口方向</h2>
+          <p>
+            二次函数 <span class="cv-formula">y = ax² + bx + c (a ≠ 0)</span> 的图像是一条抛物线。
+            当 <b>a &gt; 0</b> 时，开口<b>向上</b>；当 <b>a &lt; 0</b> 时，开口<b>向下</b>。
+            <span class="cv-cite">[导入课件.pptx P3]</span>
+          </p>
+
+          <h2>2. 对称轴</h2>
+          <p>
+            抛物线的对称轴是一条平行于 y 轴的直线，方程为：
+            <span class="cv-formula">x = -b / (2a)</span>
+            <span class="cv-cite">[配套习题汇编.pdf P12]</span>
+          </p>
+
+          <h2>3. 顶点坐标</h2>
+          <p>
+            顶点是抛物线的最高点或最低点，坐标为：
+            <span class="cv-formula">( -b/(2a), (4ac-b²)/(4a) )</span>
+            <span class="cv-cite">[教学设计·二次函数.docx P5]</span>
+          </p>
+
+          <h2>4. 增减性</h2>
+          <p>
+            当 <b>a &gt; 0</b> 时，在对称轴左侧 y 随 x 增大而<b>减小</b>，右侧 y 随 x 增大而<b>增大</b>。
+            <b>a &lt; 0</b> 时相反。
+            <span class="cv-cite">[海淀区 2026 一模卷 T6]</span>
+          </p>
+
+          <h2>5. 与坐标轴交点</h2>
+          <p>
+            令 x = 0 得 y 轴交点 <b>(0, c)</b>；
+            令 y = 0 解 <b>ax² + bx + c = 0</b> 得 x 轴交点（个数取决于判别式 Δ）。
+            <span class="cv-cite">[配套习题汇编.pdf P15]</span>
+          </p>
+        </article>
+      </div>
+
+      <!-- Pane 2：题目集作品（AI 生成后切到这里） -->
+      <div class="cv-pane" data-pane="quiz">
+        <div class="cv-quiz-head">
+          <h1>《二次函数》分层练习 · 5 道</h1>
+          <div class="meta">
+            AI 基于 <b>12 份资料</b> 生成 · 难度 <b>A / B / C 三档</b> ·
+            适配 <b>八(3)班</b> 学情 · <b>今天 18:42</b>
+          </div>
+        </div>
+
+        <div class="cv-quiz-group">
+          <div class="cv-quiz-group-label a">A · 基础题</div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">A1</span>
+            <span class="qi-q">已知二次函数 y = 2x² − 4x + 1，求其对称轴和顶点坐标。</span>
+            <div class="qi-a">参考答案：对称轴 <b>x = 1</b>，顶点 <b>(1, −1)</b></div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 改编自《配套习题汇编》P12</div>
+          </div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">A2</span>
+            <span class="qi-q">下列函数的图像开口方向，正确的是（   ）<br>A. y = −3x²+1 向上 &nbsp; B. y = x²−2 向上 &nbsp; C. y = −x²−x 向上 &nbsp; D. y = 2x² 向下</span>
+            <div class="qi-a">参考答案：<b>B</b></div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 改编自《导入课件》P3 例 2</div>
+          </div>
+        </div>
+
+        <div class="cv-quiz-group">
+          <div class="cv-quiz-group-label b">B · 提高题</div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">B1</span>
+            <span class="qi-q">抛物线 y = ax² + bx + c 的顶点为 (2, −3)，且经过点 (0, 5)，求 a、b、c。</span>
+            <div class="qi-a">参考答案：<b>a = 2, b = −8, c = 5</b></div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 改编自《教学设计·二次函数》P7</div>
+          </div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">B2</span>
+            <span class="qi-q">已知 y = x² − 2mx + 3，当 x ≥ 1 时 y 随 x 增大而增大，求 m 的取值范围。</span>
+            <div class="qi-a">参考答案：<b>m ≤ 1</b>（关键：对称轴 x = m 在 1 的左侧）</div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 王老师·公开课板书原题</div>
+          </div>
+        </div>
+
+        <div class="cv-quiz-group">
+          <div class="cv-quiz-group-label c">C · 拔高题</div>
+          <div class="cv-quiz-item">
+            <span class="qi-no">C1</span>
+            <span class="qi-q">设抛物线 y = x² − (k+2)x + 2k 与 x 轴交于 A、B 两点，与 y 轴交于 C 点。若 △ABC 面积为 3，求 k。</span>
+            <div class="qi-a">参考答案：<b>k = 3 或 k = −1</b>（需讨论 k 正负与韦达定理）</div>
+            <div class="qi-src"><i data-lucide="link-2"></i> 海淀区 2026 一模 T22 改编</div>
+          </div>
+        </div>
+
+        <div class="cv-actions">
+          <button class="cv-action primary" onclick="showToast('已导出为 .docx，已发送到「八(3)班·随堂练习」分组')">
+            <i data-lucide="download"></i>
+            导出为 Word
+          </button>
+          <button class="cv-action" onclick="showToast('已加入《二次函数》第二课时教案')">
+            <i data-lucide="book-plus"></i>
+            加入教案
+          </button>
+          <button class="cv-action" onclick="showToast('让 AI 再改改难度')">
+            <i data-lucide="refresh-ccw"></i>
+            重新生成
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- 占位（hidden）：兼容旧 JS 中 ai-textarea 引用 -->
+  <div style="display:none">
+    <textarea id="ai-textarea"></textarea>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/feixiang-shell.js"></script>
+<script>renderFeixiangSidebar('school-wiki');</script>
+<script src="assets/v28-shell.js?v=20260617upload"></script>
+<script src="assets/v28.js?v=20260708uploadcheckbox"></script>
+<script src="assets/shared/v28-modals.js?v=20260617a"></script>
+<script src="assets/page-header.js"></script>
+<script>
+	  function toggleDirectoryGroup(button){
+	    const group = button.dataset.directoryToggle;
+	    const items = document.querySelectorAll(`[data-directory-group="${group}"]`);
+	    const expanded = button.dataset.expanded === 'true';
+    items.forEach(item => {
+      item.hidden = expanded;
+    });
+    button.dataset.expanded = String(!expanded);
+    const label = expanded ? button.dataset.collapsedLabel : button.dataset.expandedLabel;
+    button.innerHTML = `${label} <i data-lucide="${expanded ? 'chevron-down' : 'chevron-up'}"></i>`;
+	    if(window.lucide) lucide.createIcons();
+	  }
+
+	  function toggleRecentUpdates(button){
+	    const items = document.querySelectorAll('[data-update-extra]');
+	    const expanded = button.dataset.expanded === 'true';
+	    items.forEach(item => {
+	      item.hidden = expanded;
+	    });
+	    button.dataset.expanded = String(!expanded);
+	    const label = expanded ? button.dataset.collapsedLabel : button.dataset.expandedLabel;
+	    button.innerHTML = `${label} <i data-lucide="${expanded ? 'chevron-down' : 'chevron-up'}"></i>`;
+	    if(window.lucide) lucide.createIcons();
+	  }
+
+	  const schoolQuestionPlaceholders = [
+	    '二次函数有哪些课件和题单？',
+	    '新老师应该先看哪些资料？',
+	    '这套知识库主要覆盖哪些内容？',
+	    '最近新增了哪些复习资料？'
+	  ];
+	  let schoolPlaceholderIndex = 0;
+	  function rotateSchoolQuestionPlaceholder(){
+	    const textarea = document.getElementById('bb-textarea');
+	    if(!textarea || textarea.value.trim()) return;
+	    schoolPlaceholderIndex = (schoolPlaceholderIndex + 1) % schoolQuestionPlaceholders.length;
+	    textarea.placeholder = schoolQuestionPlaceholders[schoolPlaceholderIndex];
+	  }
+	  window.setInterval(rotateSchoolQuestionPlaceholder, 3600);
+
+	</script>
+
+<!-- pin-comments: 多人评论 -->
+<script>
+  window.PIN_COMMENTS = {
+    url: 'https://dfiuujabnxacqqfclntz.supabase.co',
+    anonKey: 'sb_publishable_GoSMz1ffqZxAOOPtA6KQHA_Vj7gmUMJ',
+    projectKey: 'fxaikb',
+    pageKey: 'school-wiki.html'
+  };
+</script>
+<script src="assets/shared/supabase-optional.js?v=20260615b"></script>
+<script src="./assets/shared/pin-comments.js?v=20260615f"></script>
+<template id="review-template">
+{
+  "title": "学校知识库 · 页面体系与 Wiki 逻辑",
+  "summary": "学校知识库负责把学校资料整理成老师可浏览、可提问、可追溯来源的 Wiki 体系。产品稿保留当前版本已确定的页面类型、顶部视图、Wiki 职责和文件页职责。",
+  "reviewVersions": [
+    {
+      "id": "v1.0",
+      "label": "v1.0 本次新增",
+      "default": true,
+      "title": "学校知识库 · v1.0 本次新增",
+      "summary": "本次只评审学校知识库文件夹视图、上传弹窗题目入库勾选项，以及文件进入文件页后的添加至校本题库链路。",
+      "sections": [
+        {
+          "id": "school-kb-v1-folder-upload",
+          "title": "1. 文件夹视图与上传入口",
+          "body": "聚焦学校知识库文件夹视图中的新增上传和文件进入文件页逻辑。",
+          "blocks": [
+            {
+              "title": "本次新增 / 调整",
+              "items": [
+                "【新增】文件夹视图保留 Wiki、知识图谱、文件夹三视图，文件夹只作为资料组织方式，不替代学校知识库首页、目录 Wiki、内容 Wiki 或文件页。",
+                "【新增】上传弹窗增加 checkbox，标题为“允许文件中的题目进入 AI 校本题库”，副标题为“勾选后，AI 会自动分析符合条件的图片、PDF、Word，进入 AI 录题处理。”，默认不勾选。",
+                "【新增】勾选后只对符合条件的图片、PDF、Word 进入 AI 录题处理；未勾选时文件只进入学校知识库，不展示 AI 录题进度提示。",
+                "【新增】勾选且存在符合条件文件时，导入完成提示追加文案“符合条件的题目录入进度，可在「应用广场 - AI 录题」页面查看”。",
+                "【新增】点击文件夹视图中的文件进入文件页，文件页承接后续添加至校本题库。"
+              ]
+            },
+            {
+              "title": "上传弹窗文案",
+              "type": "table",
+              "columns": [
+                "位置",
+                "文案 / 行为"
+              ],
+              "rows": [
+                {
+                  "位置": "弹窗标题",
+                  "文案 / 行为": "上传文件"
+                },
+                {
+                  "位置": "弹窗副标题",
+                  "文案 / 行为": "上传后，AI 会自动整理并生成 Wiki 内容。"
+                },
+                {
+                  "位置": "checkbox 标题",
+                  "文案 / 行为": "允许文件中的题目进入 AI 校本题库"
+                },
+                {
+                  "位置": "checkbox 副标题",
+                  "文案 / 行为": "勾选后，AI 会自动分析符合条件的图片、PDF、Word，进入 AI 录题处理。"
+                },
+                {
+                  "位置": "上传主按钮",
+                  "文案 / 行为": "开始上传"
+                },
+                {
+                  "位置": "导入完成追加提示",
+                  "文案 / 行为": "符合条件的题目录入进度，可在「应用广场 - AI 录题」页面查看。仅勾选且存在符合条件文件时展示。"
+                }
+              ]
+            },
+            {
+              "title": "本次不评审",
+              "items": [
+                "学校知识库页面体系、目录 Wiki、内容 Wiki、知识图谱和右侧 AI 解读沿用 v0.9，不作为本次新增评审重点。"
+              ]
+            },
+            {
+              "title": "QA 检查点",
+              "items": [
+                "学校知识库底部问答范围仍显示学校知识库。",
+                "上传弹窗 checkbox 默认不勾选，勾选态清晰可见，标题和副标题文案完整展示。",
+                "未勾选时完成反馈不展示 AI 录题进度提示。",
+                "文件夹中文件点击后进入文件页，且文件页仍能识别来源为学校知识库。"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "school-kb-page-system",
+      "title": "1. 页面体系与视图规则",
+      "body": "说明学校知识库由哪些页面构成，以及 Wiki、知识图谱、文件夹三类顶部视图如何分工。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：进入学校知识库的老师。",
+            "用途：让老师知道当前处于学校知识库首页、目录 Wiki、内容 Wiki 或文件页中的哪一类页面。",
+            "产出：稳定的页面层级、顶部视图和 AI 解读入口，避免把文件页、Wiki 页和知识图谱混在同一层级。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "进入知识库",
+              "text": "老师从侧栏进入学校知识库，默认进入 Wiki 视图下的学校知识库首页。"
+            },
+            {
+              "label": "切换顶部视图",
+              "text": "点击 Wiki、知识图谱、文件夹，在同一学校知识库范围内切换组织方式。"
+            },
+            {
+              "label": "查看文件夹",
+              "text": "点击文件夹视图后，以学校文件夹路径和文件列表查看资料，列表展示文件名、上传者、更新时间、大小和操作入口。"
+            },
+            {
+              "label": "进入 Wiki 或文件",
+              "text": "点击目录主题进入目录 Wiki 或内容 Wiki；点击资料文件进入文件页。"
+            },
+            {
+              "label": "查看 AI 解读",
+              "text": "在 Wiki 页查看关联文件和相关 Wiki；在文件页查看 AI 摘要和相关 Wiki。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "当前版本确定四类页面：学校知识库首页、目录 Wiki、内容 Wiki、文件页。",
+            "顶部固定三视图：Wiki、知识图谱、文件夹；知识图谱和文件夹是与 Wiki 并列的顶部视图，不放进 Wiki 正文或右侧 AI 解读。",
+            "文件夹视图只负责展示学校资料的目录组织和文件管理入口，不替代学校知识库首页、目录 Wiki、内容 Wiki 或文件页。",
+            "上传弹窗中的题目入库勾选项只影响文件内题目是否进入 AI 录题处理，不改变原文件在学校知识库中的归属。",
+            "目录 Wiki 负责组织和进入下一层主题或文件；内容 Wiki 负责解释具体教学主题并展示来源引用。",
+            "文件页不是 Wiki 页，负责原文件预览、AI 摘要、相关 Wiki 和文件级操作。",
+            "Wiki 页 AI 解读固定为关联文件、相关 Wiki；文件页 AI 解读固定为 AI 摘要、相关 Wiki。",
+            "实体、反向链接不作为老师端一级入口。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "页面类型使用老师可见名称：学校知识库首页、目录 Wiki、内容 Wiki、文件页。",
+            "文件夹视图固定展示文件名、上传者、更新时间、大小和操作列；路径栏展示当前学校文件夹层级。",
+            "AI 录题沉淀支持 PDF、Word 和图片文件；PPT、Excel 等资料仍可作为知识库文件整理，但不承诺自动切题入库。",
+            "学校知识库入口展示文件数；红点依据当前老师上次打开时间和知识库最近更新时间判断。",
+            "每个 Wiki 或文件需要保留来源资料关系，用于引用、相关推荐和继续提问。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "老师从旧链接进入不存在的 Wiki 或文件",
+              "处理方式": "提示内容不可用，并引导返回学校知识库首页。"
+            },
+            {
+              "场景": "知识图谱或文件夹视图暂不可用",
+              "处理方式": "保留顶部视图位置，点击后提示暂不可用或返回 Wiki 视图。"
+            },
+            {
+              "场景": "资料尚未形成可读主题",
+              "处理方式": "不强行展示为老师端首页入口，可在上传结果或管理员治理入口处理。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "学校知识库首页，承载 Wiki 视图默认入口。"
+            },
+            {
+              "关联对象": "wiki-entry.html",
+              "说明": "承接目录 Wiki 和内容 Wiki。"
+            },
+            {
+              "关联对象": "file-preview.html",
+              "说明": "承接文件页、原文预览和 AI 摘要。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "顶部应稳定展示 Wiki、知识图谱、文件夹三视图。",
+            "文件夹视图与我的知识库保持同一套文件管理样式，但范围文案显示学校知识库。",
+            "上传弹窗中的 AI 校本题库 checkbox 默认不勾选，勾选态和未勾选态清晰可见。",
+            "仅当老师勾选 AI 校本题库 checkbox 时，导入完成提示才展示“符合条件的题目录入进度，可在「应用广场 - AI 录题」页面查看”。",
+            "Wiki 页和文件页的右侧 AI 解读标签页 不应混用。",
+            "文件页不应被写成文件 Wiki。",
+            "学校知识库入口展示文件数，而不是主题数或调试信息。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "school-kb-home",
+      "title": "2. 学校知识库首页",
+      "body": "学校知识库首页回答老师第一眼的问题：本知识库覆盖什么资料、有哪些教学主题、可以从哪些教学场景进入。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要浏览学校沉淀资料的老师。",
+            "用途：把学校上传的多学科、多年级资料整理成可浏览、可追问、可追溯来源的 Wiki 首页。",
+            "产出：老师能从首页进入目录 Wiki、内容 Wiki、文件页或在当前学校知识库内提问。"
+          ]
+        },
+        {
+          "title": "首页逻辑",
+          "body": [
+            "首页不是完整目录树，也不是文件夹页；它是 AI 基于当前学校知识库生成的导读页。",
+            "页面固定采用“顶部导读 → 知识目录 → 教学场景 → 近期更新 → 当前知识库提问”的顺序。",
+            "顶部导读合并规模、范围和 AI 判断：页头基础信息固定展示资料数、主题数和上次更新时间；覆盖学科年级与资料较完整方向放在说明文中。",
+            "知识目录回答全局结构：首页只展示学科级概览、代表目录 Wiki 和重点主题；完整年级学科目录进入目录 Wiki 后查看。",
+            "教学场景回答任务入口：老师可以按备课、授课、作业评价、复习备考等场景进入对应目录 Wiki。",
+            "近期更新回答变化：老师回访时可以看到近期新增资料、主题更新和题型归类情况。",
+            "页面下方输入框回答具体问题：老师不需要先理解目录结构，也可以直接在当前学校知识库范围内提问。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "查看概览",
+              "text": "老师进入首页后查看学校名称、文件数、主题数量、覆盖学科年级、资料较完整方向和最近更新时间。"
+            },
+            {
+              "label": "进入目录",
+              "text": "点击知识目录中的目录 Wiki 或重点主题，进入对应目录 Wiki 或内容 Wiki。"
+            },
+            {
+              "label": "进入教学场景",
+              "text": "点击备课资源、课堂教学、作业与测评、中考复习等场景卡片，进入对应场景主题。"
+            },
+            {
+              "label": "查看近期更新",
+              "text": "点击近期更新记录进入对应主题或文件；超过默认展示数量时在当前模块展开更多。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "首页只展示已经形成主题、能够被老师直接阅读或继续使用的内容。",
+            "首页不展示待确认资料、待归类资料、JSON、schema、调试入口或实现说明。",
+            "首页不再单独拆出资料概览模块，顶部导读统一承担事实摘要和 AI 判断，避免首屏信息重复。",
+            "顶部导读不放多个重复分类卡，主入口收束为知识目录、教学场景、近期更新和底部提问入口。",
+            "顶部导读不能只围绕单一年级或单一学科写成专题页；即使某一方向资料最多，也应先说明全校知识库已覆盖的学科和教学场景。",
+            "多学科知识库首页应同时呈现多个学科和多个年级的覆盖情况，避免看起来像某一个学科的专题首页。",
+            "知识目录在首页只展示学科级概览，不展开完整年级学科树，避免多学科资料铺满首页。",
+            "每个学科展示一句覆盖说明、3-5 个目录 Wiki 和 3-5 个重点主题；完整目录进入对应目录 Wiki 后查看。",
+            "首页不展示三级以上目录结构；学科过多时优先展示资料最多或最近更新最多的学科，其余通过展开更多学科承接。",
+            "顶部搜索固定搜索当前学校知识库内的主题标题和文件名；底部输入框固定在当前学校知识库范围内提问。",
+            "学校知识库首页的输入框不支持上传附件，不跨到全部知识库或我的知识库。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "顶部导读展示知识库名称、简介，以及资料数量、主题数量和最近更新时间；覆盖学科、覆盖年级和重点领域放在简介中。",
+            "资料数量指当前学校知识库内已上传并可被老师浏览、检索或引用的资料总数。",
+            "主题数量指已整理成可进入 Wiki 的教学主题或目录主题数量，不包含待解析、待确认或不可点击的资料。",
+            "最近更新时间取当前知识库最近一次资料上传完成、解析完成、主题归类或 Wiki 内容更新的时间。",
+            "知识目录按学科或场景分组展示；每组包含名称、简介、主题数量、目录入口、重点主题和点击去向。",
+            "近期更新展示主题或资料名称、更新时间、内容类型和进入入口。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "知识库资料较少",
+              "处理方式": "少展示入口，不用待确认资料补版面。"
+            },
+            {
+              "场景": "顶部搜索无结果",
+              "处理方式": "展示无结果说明，不提供切到全部知识库。"
+            },
+            {
+              "场景": "底部提问无可引用资料",
+              "处理方式": "提示当前学校知识库未找到可引用内容，并保留问题输入。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "wiki-entry.html",
+              "说明": "首页主题和教学场景进入 Wiki 页面。"
+            },
+            {
+              "关联对象": "file-preview.html",
+              "说明": "近期更新可进入具体文件页。"
+            },
+            {
+              "关联对象": "chat.html",
+              "说明": "当前学校知识库提问可进入知识库问答或页面对话态。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "首页首屏能看出学校知识库覆盖范围。",
+            "首屏导读不应与知识目录重复，也不应像单一学科专题说明。",
+            "知识目录不应把数学、语文、英语等所有年级目录完整铺开。",
+            "每个学科都应能看出覆盖说明、目录 Wiki 和重点主题的区别。",
+            "顶部搜索不出现全部/我的知识库/学校知识库范围切换。",
+            "底部输入框前置标签为学校知识库，范围不跨库。",
+            "近期更新整行可点击，且不跳到文件夹页。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "directory-wiki",
+      "title": "3. 目录 Wiki",
+      "body": "目录 Wiki 按年级学科或教学场景组织资料，帮助老师从目录进入更具体的 Wiki 或文件。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：想先看资料全貌或按主题逐层定位的老师。",
+            "用途：把学校资料整理成年级学科目录 Wiki 和教学场景目录 Wiki。",
+            "产出：目录概览、主题目录、近期更新和可点击的下级主题/文件。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开目录 Wiki",
+              "text": "老师从学校知识库首页点击学科、年级或教学场景主题。"
+            },
+            {
+              "label": "浏览目录",
+              "text": "页面展示顶部概览、主目录和近期更新；年级学科目录按单元与专题组织，教学场景目录按学科与年级组织。"
+            },
+            {
+              "label": "进入下级内容",
+              "text": "点击目录项进入内容 Wiki、下一级目录 Wiki 或文件页。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "目录 Wiki 不等同于来源文件夹，也不跳文件夹页面。",
+            "年级学科目录采用“九年级数学、七年级语文”这类老师可理解粒度。",
+            "教学场景目录服务备课、授课、作业评价、中考复习等任务视角。",
+            "AI 只生成主题分组、主题名称、摘要和来源关系；栏目标题、弱提示和展开按钮由产品固定。",
+            "暂时无法判断主题的资料不强行编入目录。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "目录 Wiki 页头基础信息固定展示词条/主题数、资料数和上次更新时间。",
+            "词条/主题数指当前目录下可继续点击进入的下一级 Wiki 数量；按目录类型显示为词条数或主题数，不同时展示两套数量。",
+            "资料数指当前目录覆盖的来源资料数量，包含被该目录下词条引用或归类的文件。",
+            "上次更新时间取当前目录结构、下级词条或覆盖资料关系最近一次变化的时间。",
+            "目录项展示名称、摘要、主题数或资料数、来源关系和目标页面。",
+            "近期更新的副标题说明资料类型、归入主题或目录、可用场景或变化点。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "目录下暂无可展示主题",
+              "处理方式": "展示空态说明，并保留返回学校知识库首页。"
+            },
+            {
+              "场景": "目录项来源资料已删除",
+              "处理方式": "保留目录结构时标记内容不可用，点击后提示返回上一层。"
+            },
+            {
+              "场景": "主题归类不明确",
+              "处理方式": "不在老师端强行展示，进入资料治理或上传结果处理。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "目录 Wiki 的上级入口。"
+            },
+            {
+              "关联对象": "wiki-entry.html",
+              "说明": "目录 Wiki 和内容 Wiki 使用同一页面骨架承接。"
+            },
+            {
+              "关联对象": "file-preview.html",
+              "说明": "目录中的文件项进入文件页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "目录 Wiki 标题、摘要和目录项均使用老师可理解语言。",
+            "目录项必须可点击，不能只是不可交互标签。",
+            "教学场景目录不应变成独立功能工作台。",
+            "目录 Wiki 不提供下载按钮。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "content-wiki",
+      "title": "4. 内容 Wiki",
+      "body": "内容 Wiki 围绕一个具体教学主题解释资料内容，并展示来源引用、关联文件和相关 Wiki。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：已经进入具体教学主题的老师。",
+            "用途：阅读主题说明、定位来源资料，并围绕该主题继续提问。",
+            "产出：主题正文、来源引用、关联文件、相关 Wiki 和当前主题上下文。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开内容 Wiki",
+              "text": "老师从首页、目录 Wiki、教学场景或相关 Wiki 点击具体主题。"
+            },
+            {
+              "label": "阅读正文",
+              "text": "页面展示由资料整理出的主题内容，并保留来源引用。"
+            },
+            {
+              "label": "查看 AI 解读",
+              "text": "右侧固定展示关联文件和相关 Wiki。"
+            },
+            {
+              "label": "继续提问",
+              "text": "底部输入框围绕当前 Wiki 上下文发起问题。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "内容 Wiki 的正文结构由 AI 根据资料生成，但必须保留来源引用和相关内容。",
+            "内容 Wiki 不承载文件原文预览、下载或文件级分享，这些动作进入文件页处理。",
+            "内容 Wiki 的 AI 解读不展示 AI 摘要标签页，AI 摘要属于文件页。",
+            "继续提问只能基于当前学校知识库和当前 Wiki 上下文。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "内容 Wiki 页头基础信息固定展示来源资料数、相关词条数和上次更新时间；正文展示主题名称、摘要、正文结构、来源引用、关联文件和相关 Wiki。",
+            "来源资料数指当前词条正文和结论实际引用或关联的原始资料数量。",
+            "相关词条数指可从当前词条继续浏览的相邻 Wiki 词条数量，不等同于关联题目数。",
+            "上次更新时间取当前词条正文、来源引用或相关词条关系最近一次变化的时间。",
+            "关联文件用于说明正文来源；相关 Wiki 用于继续浏览相邻主题。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "来源引用缺失",
+              "处理方式": "正文显示来源不足提示，不把无来源内容包装成确定结论。"
+            },
+            {
+              "场景": "相关 Wiki 为空",
+              "处理方式": "隐藏空列表或展示暂无相关 Wiki。"
+            },
+            {
+              "场景": "继续提问无命中",
+              "处理方式": "提示当前 Wiki 未找到相关依据，并保留问题上下文。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "file-preview.html",
+              "说明": "关联文件点击后进入文件页查看原文和 AI 摘要。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "可返回学校知识库首页。"
+            },
+            {
+              "关联对象": "chat.html",
+              "说明": "围绕当前 Wiki 的提问可进入知识库问答承接。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "内容 Wiki 右侧只出现关联文件和相关 Wiki。",
+            "正文应展示来源引用，不出现内部生成信息。",
+            "下载动作不应出现在 Wiki 页面。",
+            "继续提问范围应保持当前学校知识库和当前 Wiki 上下文。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "file-page",
+      "title": "5. 文件页",
+      "body": "文件页承载原文件预览、AI 摘要、相关 Wiki 和文件级操作。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：需要查看资料原文或确认来源的老师。",
+            "用途：展示文件本身，并把文件与 Wiki 主题关联起来。",
+            "产出：原文件预览、AI 摘要、相关 Wiki、下载和分享等文件级能力。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "打开文件页",
+              "text": "老师从首页近期更新、目录 Wiki、内容 Wiki 的关联文件或搜索结果进入文件页。"
+            },
+            {
+              "label": "查看原文",
+              "text": "主区域展示原文件预览。"
+            },
+            {
+              "label": "查看 AI 解读",
+              "text": "右侧固定展示 AI 摘要和相关 Wiki。"
+            },
+            {
+              "label": "执行文件操作",
+              "text": "在有权限时下载原文件或分享文件视图。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "文件页不是文件 Wiki，不展示目录 Wiki 或内容 Wiki 的正文结构。",
+            "文件页 AI 解读固定为 AI 摘要、相关 Wiki。",
+            "下载只出现在文件页；Wiki 页面不提供下载按钮。",
+            "无权限文件只能展示允许公开的摘要或封面，并阻止下载。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "文件页页头基础信息固定展示上传人全名、文件大小和上传/更新时间；正文展示文件名、文件类型、来源位置、预览内容、AI 摘要、相关 Wiki 和文件操作权限。",
+            "上传人全名指该文件上传记录对应老师的完整姓名，不使用“张老师”等泛称。",
+            "文件大小指原文件在资料库中的存储大小。",
+            "上传/更新时间优先展示文件最近更新时间；没有更新记录时展示上传时间。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "文件预览失败",
+              "处理方式": "展示预览失败说明，并保留下载入口或返回入口。"
+            },
+            {
+              "场景": "AI 摘要生成失败",
+              "处理方式": "右侧提示暂无法生成摘要，不影响原文预览。"
+            },
+            {
+              "场景": "无下载权限",
+              "处理方式": "下载按钮禁用或点击后提示无权限。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "wiki-entry.html",
+              "说明": "相关 Wiki 点击后回到 Wiki 页面。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "可返回学校知识库首页。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "文件页右侧应为 AI 摘要和相关 Wiki。",
+            "文件页能预览原文；预览失败有反馈。",
+            "下载按钮只在文件页出现并受权限控制。",
+            "相关 Wiki 点击后进入 Wiki 页面而不是文件夹页。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "governance-status",
+      "title": "6. 资料治理状态",
+      "body": "资料治理状态不作为老师端学校知识库首页模块展示，只在管理员工作动态、资料管理页或上传结果页处理。",
+      "blocks": [
+        {
+          "title": "功能说明",
+          "body": [
+            "对象：管理员、上传者或需要处理资料归类的人。",
+            "用途：承接待确认、待归类、解析完成需检查等治理任务。",
+            "产出：资料管理或上传结果中的处理入口，不进入老师端首页主内容。"
+          ]
+        },
+        {
+          "title": "交互流程",
+          "ordered": true,
+          "items": [
+            {
+              "label": "产生治理任务",
+              "text": "资料上传或解析后，如果需要确认归类，在工作动态或上传结果中提示。"
+            },
+            {
+              "label": "进入处理",
+              "text": "管理员或上传者点击动态进入资料管理或处理页。"
+            },
+            {
+              "label": "完成治理",
+              "text": "资料确认后再进入老师端学校知识库首页、目录 Wiki 或文件页。"
+            }
+          ]
+        },
+        {
+          "title": "业务规则",
+          "items": [
+            "老师端学校知识库首页不展示待确认资料、待归类资料或资料完善情况。",
+            "资料不足时少展示入口，不用治理状态补版面。",
+            "管理员首页工作动态可以提示需要确认归类、解析完成需检查目录归属、制度流程类资料缺正式版本。",
+            "老师可见首页不展示 JSON、schema、来源校验等技术说明。"
+          ]
+        },
+        {
+          "title": "数据说明",
+          "items": [
+            "治理状态包含待归类数量、需检查资料、处理角色和目标入口；这些信息只供管理或上传结果使用。"
+          ]
+        },
+        {
+          "title": "异常场景",
+          "type": "table",
+          "columns": [
+            "场景",
+            "处理方式"
+          ],
+          "rows": [
+            {
+              "场景": "老师无处理权限",
+              "处理方式": "不展示治理入口。"
+            },
+            {
+              "场景": "治理任务已处理",
+              "处理方式": "再次点击时提示已处理并返回知识库或工作动态。"
+            },
+            {
+              "场景": "资料解析失败",
+              "处理方式": "在上传结果或管理员动态中提示重新上传或补充信息。"
+            }
+          ]
+        },
+        {
+          "title": "关联模块",
+          "type": "table",
+          "columns": [
+            "关联对象",
+            "说明"
+          ],
+          "rows": [
+            {
+              "关联对象": "work-feed.html",
+              "说明": "管理员工作动态可提示治理任务。"
+            },
+            {
+              "关联对象": "upload-onboarding.html",
+              "说明": "上传完成后展示资料接收和解析状态。"
+            },
+            {
+              "关联对象": "school-wiki.html",
+              "说明": "治理完成后内容进入老师端知识库。"
+            }
+          ]
+        },
+        {
+          "title": "QA 检查点",
+          "items": [
+            "老师端学校知识库首页不出现待确认资料模块。",
+            "管理员或上传者有明确处理入口。",
+            "治理状态不使用内部标识作为老师可见文案。",
+            "治理完成后内容能进入对应 Wiki 或文件页。"
+          ]
+        }
+      ]
+    }
+  ]
+}
+</template>
+<aside class="review-panel" id="review-panel" aria-label="产品稿"></aside>
+<script src="assets/review-content.js"></script>
+<script src="assets/review.js"></script>
+</body>
+</html>
