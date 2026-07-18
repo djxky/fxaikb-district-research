@@ -1,0 +1,105 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "林知遥本学期学习情况分析报告",
+    "description": "基于脱敏模拟的作业、考试、作文与学生管理数据，对林知遥本学期学习表现进行证据化诊断。",
+    "generatedAt": "2026-07-18T10:00:00+08:00",
+    "sources": [
+      {
+        "id": "learning_snapshot",
+        "label": "飞象教育分析引擎 · 林知遥脱敏模拟学习快照",
+        "path": "reports/lin-zhiyao/learning-data.json",
+        "query": {
+          "description": "读取脱敏模拟学习快照，并形成报告所使用的周度趋势、学科任务画像、错误复现和假设验证数据。",
+          "engine": "duckdb",
+          "language": "sql",
+          "sql": "SELECT * FROM read_json_auto('reports/lin-zhiyao/learning-data.json');",
+          "tables_used": ["reports/lin-zhiyao/learning-data.json"],
+          "filters": ["学生：林知遥（演示化名）", "时间：2025–2026学年第二学期18周", "隔离8条重复记录与12条缺失标签记录", "不调用心理健康数据"],
+          "metric_definitions": ["高阶任务指数：开放任务量规、迁移题与综合应用任务经0–100标准化后的周度综合指数", "错误复现率：21天内再次出现同类错误的次数除以具备复查机会的同类错误数", "数据覆盖率：具备核心分析数据的教学周数除以本学期18周"]
+        }
+      },
+      {
+        "id": "moe_quality_guide",
+        "label": "教育部《义务教育质量评价指南》",
+        "href": "https://www.moe.gov.cn/srcsite/A06/s3321/202103/t20210317_520238.html"
+      }
+    ],
+    "blocks": [
+      {"id":"title","type":"markdown","body":"# 林知遥本学期学习情况分析报告"},
+      {"id":"executive_summary","type":"markdown","body":"## Executive Summary｜核心结论\n\n- **总体判断：学习发展方向积极，但不同类型任务的表现尚未稳定转化。** 林知遥在开放任务、迁移题和作文论证方面呈持续改善；常规测评的年级标准分仅由 0.08 变为 0.11，变化幅度不足以判断为显著提升。\n- **当前最需要关注的不是高难题，而是基础知识提取的稳定性。** 21 天内同类基础错误复现率为 31%，失分主要集中在数学运算、概念辨析等基础与中档任务。\n- **这是一项教学诊断，不是学生能力定级。** 现有证据支持“基础稳定性可能限制表现转化”，但作答节奏因素仍缺少充分数据，结论可信度为 B+。\n- **建议先进行两周低负担验证。** 采用间隔复习和两次低压力短测，将同类错误复现率降至 20% 以下；若未改善，应回退当前解释并补查作答节奏和测评适配。","sourceId":"learning_snapshot"},
+      {"id":"headline_metrics","type":"metric-strip","cardIds":["high_order_card","standard_score_card","recurrence_card","coverage_card"]},
+      {"id":"finding_1","type":"markdown","body":"## 高阶任务进步真实存在，但尚未稳定转化为常规测评优势\n\n**高阶任务表现连续改善，基础任务表现则总体平稳。** 周度高阶任务指数从 62 提升至 83，开放任务量规由 3.1 提升至 3.7/5，迁移题正确率提高 11 个百分点。与此同时，基础任务指数长期在 77–82 之间波动。\n\n这说明学生在理解、迁移和表达方面已经出现积极发展，但这种发展还没有稳定转化为常规测评中的得分优势。学校不宜简单追加高难度训练，更应关注基础知识能否在不同情境中稳定提取。","sourceId":"learning_snapshot"},
+      {"id":"weekly_chart_block","type":"chart","chartId":"weekly_task_chart"},
+      {"id":"finding_2","type":"markdown","body":"## 学科表现总体均衡，数学基础稳定性是最明确的短板\n\n**各学科高阶任务表现并不弱，数学和科学的综合应用表现相对突出。** 但数学基础任务正确率为 78%，低于其高阶任务得分率 81%，与常见的“难题不会”并不一致。\n\n语文、英语和科学的基础任务正确率相对稳定；当前支持方案应优先聚焦数学运算与概念辨析，同时保留跨学科观察，避免把一次诊断扩大成长期标签。","sourceId":"learning_snapshot"},
+      {"id":"subject_chart_block","type":"chart","chartId":"subject_profile_chart"},
+      {"id":"finding_3","type":"markdown","body":"## 基础知识稳定性是当前最强解释，但不是唯一解释\n\n**数学运算与符号、数学概念辨析的错误复现率分别达到 38% 和 34%。** 这些错误在订正后仍会于后续相似任务中再次出现，说明问题更接近知识提取稳定性，而不是单次粗心。\n\n不过，数据中仍存在两个不符合该解释的单元反例；同时只有两次数字化考试具备完整时长数据，因此“作答节奏影响成绩转化”仍未排除。报告使用“可能限制”，而不是“导致”。","sourceId":"learning_snapshot"},
+      {"id":"error_chart_block","type":"chart","chartId":"error_recurrence_chart"},
+      {"id":"hypothesis_table_block","type":"table","tableId":"hypothesis_table"},
+      {"id":"recommendations","type":"markdown","body":"## 建议用两周验证，而不是立即增加学习负担\n\n1. **建立小剂量间隔复习。** 每周选择 3–4 个近期高频基础错误，在第 2、7、14 天安排变式回忆，每次控制在 8–10 分钟。\n2. **安排两次低压力短测。** 题目覆盖数学运算、概念辨析和跨情境提取，不计入公开排名，主要观察同类错误是否复现。\n3. **保持高阶任务机会。** 不减少开放任务、迁移题和作文修改活动，避免为了短期分数收缩已经出现积极发展的能力。\n4. **两周后自动复盘。** 若同类错误复现率由 31% 降至 20% 以下，继续当前支持；若未改善，回退 H1，补查作答节奏、试卷适配和课堂观察证据。"},
+      {"id":"further_questions","type":"markdown","body":"## 下一轮需要回答的问题\n\n- 作答节奏是否在纸笔考试中影响基础题完成质量？需要增加教师过程观察或更多数字化测评时长数据。\n- 两个不符合 H1 的单元反例由什么造成？需要核查具体知识结构、题目呈现方式和当周教学活动。\n- 两周支持方案是否在不增加总作业时长的情况下改善错误复现率？这是下一轮复盘的核心判断。"},
+      {"id":"caveats","type":"markdown","body":"## 使用边界与假设\n\n- 本报告使用脱敏模拟数据，用于演示平台分析能力，不代表真实学生结论。\n- 不同试卷的原始分不可直接比较，报告使用年级标准分和任务结构进行校准。\n- 数据支持教学诊断，不支持因果认定、心理状态推断、能力定级、公开排名或升学决策。\n- 心理健康数据未被调用；体质数据因与本次问题缺少直接关系，未进入核心结论。\n- 第11周数据覆盖较低，相关周度波动不作为单独判断依据。"}
+    ],
+    "cards": [
+      {"id":"high_order_card","description":"开放任务综合量规，5分制。","dataset":"headline_metrics","metrics":[{"label":"高阶任务量规","field":"high_order_rubric","format":"number"},{"label":"学期初","field":"high_order_rubric_start","format":"number"}],"sourceId":"learning_snapshot"},
+      {"id":"standard_score_card","description":"按同年级同次测评校准后的标准分。","dataset":"headline_metrics","metrics":[{"label":"常规测评标准分","field":"standard_score_end","format":"number"},{"label":"学期初","field":"standard_score_start","format":"number"}],"sourceId":"learning_snapshot"},
+      {"id":"recurrence_card","description":"21天内再次出现同类错误的比例。","dataset":"headline_metrics","metrics":[{"label":"同类错误复现率","field":"error_recurrence_rate","format":"percent"},{"label":"两周目标","field":"error_recurrence_target","format":"percent"}],"sourceId":"learning_snapshot"},
+      {"id":"coverage_card","description":"具备核心分析数据的教学周占比。","dataset":"headline_metrics","metrics":[{"label":"核心数据覆盖率","field":"coverage_rate","format":"percent"},{"label":"覆盖周数","field":"covered_weeks","format":"number"}],"sourceId":"learning_snapshot"}
+    ],
+    "charts": [
+      {"id":"weekly_task_chart","title":"周度任务表现指数","description":"第1–18周，0–100标准化指数；高阶任务持续上升，基础任务总体平稳。","dataset":"weekly_task_index","type":"line","encodings":{"x":{"field":"week","type":"category"},"y":{"field":"index","type":"number"},"color":{"field":"task_type","type":"category"}},"options":{"legend":true,"valueLabels":false},"sourceId":"learning_snapshot"},
+      {"id":"subject_profile_chart","title":"学科任务表现比较","description":"本学期后6周，各学科基础任务与高阶任务得分率。","dataset":"subject_task_profile","type":"bar","encodings":{"x":{"field":"subject","type":"category"},"y":{"field":"rate","type":"number","format":"percent"},"color":{"field":"task_type","type":"category"}},"options":{"grouping":"grouped","orientation":"vertical","legend":true,"valueLabels":true},"sourceId":"learning_snapshot"},
+      {"id":"error_recurrence_chart","title":"同类错误复现率","description":"21天复查窗口；虚线目标为20%。","dataset":"error_recurrence","type":"bar","encodings":{"x":{"field":"error_type","type":"category"},"y":{"field":"recurrence_rate","type":"number","format":"percent"}},"options":{"orientation":"horizontal","valueLabels":true,"referenceLine":{"field":"target_rate","label":"两周目标"}},"sourceId":"learning_snapshot"}
+    ],
+    "tables": [
+      {"id":"hypothesis_table","title":"可能原因验证结果","description":"支持证据、反例和剩余不确定性共同决定结论强度。","dataset":"hypothesis_review","columns":[{"field":"hypothesis","label":"可能解释","type":"text"},{"field":"support_level","label":"当前证据","type":"text"},{"field":"evidence_count","label":"证据数","type":"number"},{"field":"counterexample_count","label":"反例数","type":"number"},{"field":"status","label":"处理结果","type":"text"},{"field":"interpretation","label":"判断说明","type":"text"}],"defaultSort":{"field":"evidence_count","direction":"desc"},"sourceId":"learning_snapshot"}
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "status": "fixture",
+    "generatedAt": "2026-07-18T10:00:00+08:00",
+    "datasets": {
+      "headline_metrics": [{"high_order_rubric":3.7,"high_order_rubric_start":3.1,"standard_score_end":0.11,"standard_score_start":0.08,"error_recurrence_rate":0.31,"error_recurrence_target":0.20,"coverage_rate":0.944,"covered_weeks":17}],
+      "weekly_task_index": [
+        {"week":"第1周","task_type":"高阶任务","index":62,"attempts":31,"subject_scope":"语文、数学、英语、科学"},{"week":"第1周","task_type":"基础任务","index":78,"attempts":128,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第2周","task_type":"高阶任务","index":64,"attempts":33,"subject_scope":"语文、数学、英语、科学"},{"week":"第2周","task_type":"基础任务","index":79,"attempts":134,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第3周","task_type":"高阶任务","index":63,"attempts":30,"subject_scope":"语文、数学、英语、科学"},{"week":"第3周","task_type":"基础任务","index":77,"attempts":126,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第4周","task_type":"高阶任务","index":66,"attempts":35,"subject_scope":"语文、数学、英语、科学"},{"week":"第4周","task_type":"基础任务","index":80,"attempts":137,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第5周","task_type":"高阶任务","index":67,"attempts":32,"subject_scope":"语文、数学、英语、科学"},{"week":"第5周","task_type":"基础任务","index":78,"attempts":131,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第6周","task_type":"高阶任务","index":68,"attempts":37,"subject_scope":"语文、数学、英语、科学"},{"week":"第6周","task_type":"基础任务","index":81,"attempts":142,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第7周","task_type":"高阶任务","index":70,"attempts":34,"subject_scope":"语文、数学、英语、科学"},{"week":"第7周","task_type":"基础任务","index":79,"attempts":136,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第8周","task_type":"高阶任务","index":71,"attempts":36,"subject_scope":"语文、数学、英语、科学"},{"week":"第8周","task_type":"基础任务","index":80,"attempts":139,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第9周","task_type":"高阶任务","index":72,"attempts":38,"subject_scope":"语文、数学、英语、科学"},{"week":"第9周","task_type":"基础任务","index":78,"attempts":132,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第10周","task_type":"高阶任务","index":74,"attempts":39,"subject_scope":"语文、数学、英语、科学"},{"week":"第10周","task_type":"基础任务","index":81,"attempts":144,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第11周","task_type":"高阶任务","index":73,"attempts":24,"subject_scope":"语文、数学、英语、科学"},{"week":"第11周","task_type":"基础任务","index":79,"attempts":91,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第12周","task_type":"高阶任务","index":76,"attempts":37,"subject_scope":"语文、数学、英语、科学"},{"week":"第12周","task_type":"基础任务","index":80,"attempts":138,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第13周","task_type":"高阶任务","index":77,"attempts":40,"subject_scope":"语文、数学、英语、科学"},{"week":"第13周","task_type":"基础任务","index":81,"attempts":145,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第14周","task_type":"高阶任务","index":78,"attempts":38,"subject_scope":"语文、数学、英语、科学"},{"week":"第14周","task_type":"基础任务","index":79,"attempts":135,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第15周","task_type":"高阶任务","index":80,"attempts":41,"subject_scope":"语文、数学、英语、科学"},{"week":"第15周","task_type":"基础任务","index":80,"attempts":141,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第16周","task_type":"高阶任务","index":79,"attempts":39,"subject_scope":"语文、数学、英语、科学"},{"week":"第16周","task_type":"基础任务","index":82,"attempts":146,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第17周","task_type":"高阶任务","index":82,"attempts":43,"subject_scope":"语文、数学、英语、科学"},{"week":"第17周","task_type":"基础任务","index":80,"attempts":139,"subject_scope":"语文、数学、英语、科学"},
+        {"week":"第18周","task_type":"高阶任务","index":83,"attempts":42,"subject_scope":"语文、数学、英语、科学"},{"week":"第18周","task_type":"基础任务","index":81,"attempts":142,"subject_scope":"语文、数学、英语、科学"}
+      ],
+      "subject_task_profile": [
+        {"subject":"语文","task_type":"基础任务","rate":0.84,"items":412,"comparison_rate":0.82},{"subject":"语文","task_type":"高阶任务","rate":0.79,"items":96,"comparison_rate":0.70},
+        {"subject":"数学","task_type":"基础任务","rate":0.78,"items":538,"comparison_rate":0.77},{"subject":"数学","task_type":"高阶任务","rate":0.81,"items":118,"comparison_rate":0.70},
+        {"subject":"英语","task_type":"基础任务","rate":0.82,"items":465,"comparison_rate":0.81},{"subject":"英语","task_type":"高阶任务","rate":0.76,"items":88,"comparison_rate":0.70},
+        {"subject":"科学","task_type":"基础任务","rate":0.80,"items":307,"comparison_rate":0.79},{"subject":"科学","task_type":"高阶任务","rate":0.83,"items":104,"comparison_rate":0.72}
+      ],
+      "error_recurrence": [
+        {"error_type":"数学运算与符号","recurrence_rate":0.38,"errors":37,"rechecked":97,"review_window_days":21,"target_rate":0.20},{"error_type":"数学概念辨析","recurrence_rate":0.34,"errors":28,"rechecked":82,"review_window_days":21,"target_rate":0.20},{"error_type":"语文语言基础","recurrence_rate":0.27,"errors":18,"rechecked":67,"review_window_days":21,"target_rate":0.20},{"error_type":"英语语法与词形","recurrence_rate":0.24,"errors":19,"rechecked":79,"review_window_days":21,"target_rate":0.20},{"error_type":"科学概念提取","recurrence_rate":0.29,"errors":17,"rechecked":59,"review_window_days":21,"target_rate":0.20}
+      ],
+      "hypothesis_review": [
+        {"hypothesis":"H1 基础知识提取稳定性不足","support_level":"较强支持","evidence_count":6,"counterexample_count":2,"status":"保留","interpretation":"同类基础错误在21天内重复出现，且失分集中于基础与中档任务"},{"hypothesis":"H2 本学期试卷整体变难","support_level":"不支持","evidence_count":2,"counterexample_count":4,"status":"排除主因","interpretation":"校准年级整体难度与试卷结构后，无法解释个体差异"},{"hypothesis":"H3 作答节奏影响成绩转化","support_level":"证据不足","evidence_count":1,"counterexample_count":0,"status":"保留待查","interpretation":"只有2次数字化考试具备有效时长数据，暂不能判断"}
+      ]
+    }
+  },
+  "sources": [
+    {"id":"learning_snapshot","label":"飞象教育分析引擎 · 林知遥脱敏模拟学习快照","path":"reports/lin-zhiyao/learning-data.json"},
+    {"id":"moe_quality_guide","label":"教育部《义务教育质量评价指南》","href":"https://www.moe.gov.cn/srcsite/A06/s3321/202103/t20210317_520238.html"}
+  ],
+  "package_info": {"name":"lin-zhiyao-learning-report","description":"教育局与校长沟通用脱敏模拟学生学习分析报告"}
+}

@@ -1,0 +1,81 @@
+{
+  "student": {
+    "display_name": "林知遥",
+    "grade_class": "八年级（3）班",
+    "period": "2025–2026 学年第二学期",
+    "weeks": 18,
+    "synthetic": true
+  },
+  "source_coverage": {
+    "homework_assignments": 186,
+    "homework_item_responses": 2843,
+    "assessments": 6,
+    "assessment_item_scores": 524,
+    "essays": 14,
+    "essay_revisions": 47,
+    "covered_weeks": 17,
+    "duplicate_records_removed": 8,
+    "missing_tags_isolated": 12,
+    "writing_rater_agreement": 0.86
+  },
+  "weekly_task_index": [
+    {"week":"第1周","task_type":"高阶任务","index":62,"attempts":31,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第1周","task_type":"基础任务","index":78,"attempts":128,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第2周","task_type":"高阶任务","index":64,"attempts":33,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第2周","task_type":"基础任务","index":79,"attempts":134,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第3周","task_type":"高阶任务","index":63,"attempts":30,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第3周","task_type":"基础任务","index":77,"attempts":126,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第4周","task_type":"高阶任务","index":66,"attempts":35,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第4周","task_type":"基础任务","index":80,"attempts":137,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第5周","task_type":"高阶任务","index":67,"attempts":32,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第5周","task_type":"基础任务","index":78,"attempts":131,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第6周","task_type":"高阶任务","index":68,"attempts":37,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第6周","task_type":"基础任务","index":81,"attempts":142,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第7周","task_type":"高阶任务","index":70,"attempts":34,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第7周","task_type":"基础任务","index":79,"attempts":136,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第8周","task_type":"高阶任务","index":71,"attempts":36,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第8周","task_type":"基础任务","index":80,"attempts":139,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第9周","task_type":"高阶任务","index":72,"attempts":38,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第9周","task_type":"基础任务","index":78,"attempts":132,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第10周","task_type":"高阶任务","index":74,"attempts":39,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第10周","task_type":"基础任务","index":81,"attempts":144,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第11周","task_type":"高阶任务","index":73,"attempts":24,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第11周","task_type":"基础任务","index":79,"attempts":91,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第12周","task_type":"高阶任务","index":76,"attempts":37,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第12周","task_type":"基础任务","index":80,"attempts":138,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第13周","task_type":"高阶任务","index":77,"attempts":40,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第13周","task_type":"基础任务","index":81,"attempts":145,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第14周","task_type":"高阶任务","index":78,"attempts":38,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第14周","task_type":"基础任务","index":79,"attempts":135,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第15周","task_type":"高阶任务","index":80,"attempts":41,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第15周","task_type":"基础任务","index":80,"attempts":141,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第16周","task_type":"高阶任务","index":79,"attempts":39,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第16周","task_type":"基础任务","index":82,"attempts":146,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第17周","task_type":"高阶任务","index":82,"attempts":43,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第17周","task_type":"基础任务","index":80,"attempts":139,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第18周","task_type":"高阶任务","index":83,"attempts":42,"subject_scope":"语文、数学、英语、科学"},
+    {"week":"第18周","task_type":"基础任务","index":81,"attempts":142,"subject_scope":"语文、数学、英语、科学"}
+  ],
+  "subject_task_profile": [
+    {"subject":"语文","task_type":"基础任务","rate":0.84,"items":412,"current_period":"本学期后6周","comparison_period":"本学期前6周","comparison_rate":0.82},
+    {"subject":"语文","task_type":"高阶任务","rate":0.79,"items":96,"current_period":"本学期后6周","comparison_period":"本学期前6周","comparison_rate":0.70},
+    {"subject":"数学","task_type":"基础任务","rate":0.78,"items":538,"current_period":"本学期后6周","comparison_period":"本学期前6周","comparison_rate":0.77},
+    {"subject":"数学","task_type":"高阶任务","rate":0.81,"items":118,"current_period":"本学期后6周","comparison_period":"本学期前6周","comparison_rate":0.70},
+    {"subject":"英语","task_type":"基础任务","rate":0.82,"items":465,"current_period":"本学期后6周","comparison_period":"本学期前6周","comparison_rate":0.81},
+    {"subject":"英语","task_type":"高阶任务","rate":0.76,"items":88,"current_period":"本学期后6周","comparison_period":"本学期前6周","comparison_rate":0.70},
+    {"subject":"科学","task_type":"基础任务","rate":0.80,"items":307,"current_period":"本学期后6周","comparison_period":"本学期前6周","comparison_rate":0.79},
+    {"subject":"科学","task_type":"高阶任务","rate":0.83,"items":104,"current_period":"本学期后6周","comparison_period":"本学期前6周","comparison_rate":0.72}
+  ],
+  "error_recurrence": [
+    {"error_type":"数学运算与符号","recurrence_rate":0.38,"errors":37,"rechecked":97,"review_window_days":21,"target_rate":0.20},
+    {"error_type":"数学概念辨析","recurrence_rate":0.34,"errors":28,"rechecked":82,"review_window_days":21,"target_rate":0.20},
+    {"error_type":"语文语言基础","recurrence_rate":0.27,"errors":18,"rechecked":67,"review_window_days":21,"target_rate":0.20},
+    {"error_type":"英语语法与词形","recurrence_rate":0.24,"errors":19,"rechecked":79,"review_window_days":21,"target_rate":0.20},
+    {"error_type":"科学概念提取","recurrence_rate":0.29,"errors":17,"rechecked":59,"review_window_days":21,"target_rate":0.20}
+  ],
+  "hypothesis_review": [
+    {"hypothesis":"H1 基础知识提取稳定性不足","support_level":"较强支持","evidence_count":6,"counterexample_count":2,"status":"保留","interpretation":"同类基础错误在21天内重复出现，且失分集中于基础与中档任务"},
+    {"hypothesis":"H2 本学期试卷整体变难","support_level":"不支持","evidence_count":2,"counterexample_count":4,"status":"排除主因","interpretation":"校准年级整体难度与试卷结构后，无法解释个体差异"},
+    {"hypothesis":"H3 作答节奏影响成绩转化","support_level":"证据不足","evidence_count":1,"counterexample_count":0,"status":"保留待查","interpretation":"只有2次数字化考试具备有效时长数据，暂不能判断"}
+  ]
+}
