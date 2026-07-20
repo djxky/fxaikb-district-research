@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="飞象教育 · 整体学习情况黄金样板">
+  <title>飞象教育 · 整体学习情况</title>
+  <link rel="stylesheet" href="assets/research-live.css?v=stream-14">
+  <link rel="stylesheet" href="assets/research-golden.css?v=golden-10">
+  <script src="assets/research-cases.js?v=golden-01" defer></script>
+  <script src="assets/research-golden.js?v=golden-10" defer></script>
+</head>
+<body>
+  <header class="golden-topbar">
+    <div class="golden-topbar-inner">
+      <a class="golden-back" href="index.html" aria-label="返回首页">‹</a>
+      <div><strong>林知遥 · 整体学习情况</strong><small>飞象教育研究助手</small></div>
+      <div class="golden-trust"><span>授权数据</span><span>过程可追溯</span><span>结论有边界</span></div>
+    </div>
+  </header>
+  <main class="golden-shell">
+    <section class="golden-query" aria-label="用户问题">
+      <h1 id="queryText"></h1>
+    </section>
+    <section class="golden-scope">
+      <div class="golden-eyebrow">本次研究范围</div>
+      <p id="scopeLine">数据载入中</p>
+      <div class="golden-scope-note">心理健康数据未调用；本报告不用于能力定级、排名或其他高影响决定。</div>
+    </section>
+    <div class="run-toolbar" id="runToolbar"><span class="status-dot"></span><strong id="runStatus">正在准备研究</strong><span id="runElapsed">00:00</span><div class="toolbar-actions"><button id="stopResearch" type="button" hidden>停止</button><button id="continueResearch" type="button" hidden>继续</button><button id="restartResearch" type="button" hidden>重新开始</button></div></div>
+    <section class="stream" id="stream" aria-live="polite" aria-label="研究过程"></section>
+    <button class="follow-latest" id="followLatest" type="button" hidden>回到最新进度 ↓</button>
+    <section class="finish-message" id="finishMessage" hidden><div class="message-avatar done">✓</div><div class="message-content"><div class="message-label">研究完成</div><h2>整体学习情况报告已生成</h2><p>报告按结论、方法、具体案例、边界、教学支持和证据附录顺序展开。</p><button class="primary-button" id="openReport" type="button">查看完整报告</button></div></section>
+    <details class="history" id="history" hidden><summary><span id="historyTitle">查看研究活动</span><span>＋</span></summary><div id="historyBody"></div></details>
+    <div class="error-message" id="errorMessage" hidden></div>
+  </main>
+  <dialog id="reportDialog" class="report-dialog" aria-labelledby="reportTitle"><div class="dialog-head"><div class="report-window-title"><span class="report-window-icon">▧</span><div><strong>文件预览</strong><small>整体学习情况分析报告</small></div></div><div class="report-window-actions"><button class="report-action" id="downloadReport" type="button">下载</button><button class="close" id="closeReport" type="button" aria-label="关闭报告">×</button></div></div><div class="report-layout"><main class="report-page" id="reportPage"><div id="reportDocument"></div><div id="reportAppendixMount"></div></main></div></dialog>
+</body>
+</html>

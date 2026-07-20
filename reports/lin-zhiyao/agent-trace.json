@@ -1,0 +1,736 @@
+{
+  "trace_id": "DR-2026-0719-01",
+  "synthetic": true,
+  "purpose": "展示研究代理如何读取、治理、比对和回写教育数据；不代表真实学生数据",
+  "source_runs": [
+    {
+      "source": "智能作业",
+      "connector": "homework_item_response",
+      "requested": 2843,
+      "returned": 2843,
+      "valid": 2828,
+      "duration_ms": 842,
+      "status": "completed",
+      "fields": [
+        "student_id",
+        "assignment_id",
+        "item_id",
+        "knowledge_tag",
+        "task_type",
+        "first_answer",
+        "revision_answer",
+        "recheck_answer"
+      ]
+    },
+    {
+      "source": "考试评价",
+      "connector": "exam_item_score",
+      "requested": 524,
+      "returned": 524,
+      "valid": 519,
+      "duration_ms": 516,
+      "status": "completed",
+      "fields": [
+        "assessment_id",
+        "item_id",
+        "raw_score",
+        "max_score",
+        "difficulty",
+        "grade_distribution",
+        "item_duration"
+      ]
+    },
+    {
+      "source": "AI作文",
+      "connector": "writing_rubric_revision",
+      "requested": 61,
+      "returned": 61,
+      "valid": 61,
+      "duration_ms": 388,
+      "status": "completed",
+      "fields": [
+        "writing_id",
+        "rubric_version",
+        "teacher_score",
+        "ai_review_score",
+        "revision_count"
+      ]
+    },
+    {
+      "source": "学生管理",
+      "connector": "attendance_teacher_note",
+      "requested": 91,
+      "returned": 91,
+      "valid": 89,
+      "duration_ms": 264,
+      "status": "completed",
+      "fields": [
+        "teaching_day",
+        "attendance_status",
+        "teacher_note",
+        "subject"
+      ]
+    },
+    {
+      "source": "课程与知识图谱",
+      "connector": "curriculum_knowledge_map",
+      "requested": 212,
+      "returned": 212,
+      "valid": 212,
+      "duration_ms": 301,
+      "status": "completed",
+      "fields": [
+        "mapping_id",
+        "record_id",
+        "subject",
+        "textbook_unit",
+        "learning_content",
+        "confidence"
+      ]
+    }
+  ],
+  "quality_checks": [
+    {
+      "check": "身份与学期范围",
+      "rule": "student_id + semester_id 一致",
+      "input": 3428,
+      "passed": 3428,
+      "isolated": 0,
+      "status": "passed"
+    },
+    {
+      "check": "重复记录",
+      "rule": "同一学生、题目、作答时间窗口去重",
+      "input": 3428,
+      "passed": 3420,
+      "isolated": 8,
+      "status": "isolated"
+    },
+    {
+      "check": "学科与任务标签",
+      "rule": "subject / task_type 不为空且在字典内",
+      "input": 3420,
+      "passed": 3408,
+      "isolated": 12,
+      "status": "isolated"
+    },
+    {
+      "check": "考试有效题目",
+      "rule": "六次测评有效分题合计",
+      "input": 524,
+      "passed": 519,
+      "isolated": 5,
+      "status": "passed_with_exclusions",
+      "note": "2条重复与3条缺标签已包含在基础质检中，不重复扣除"
+    },
+    {
+      "check": "时间覆盖",
+      "rule": "至少覆盖6周且有效作答不少于30条",
+      "input": 5,
+      "passed": 4,
+      "isolated": 1,
+      "status": "insufficient"
+    },
+    {
+      "check": "作文评分一致性",
+      "rule": "教师评分与AI复核的加权一致性",
+      "input": 47,
+      "passed": 47,
+      "isolated": 0,
+      "status": "passed",
+      "agreement": 0.86
+    }
+  ],
+  "batch_reads": [
+    {
+      "batch": "HW-01",
+      "source": "智能作业",
+      "window": "第1–4周",
+      "rows": 621,
+      "valid": 615,
+      "focus": "基础任务、错误标签",
+      "note": "第3周一次函数换情境使用题形成首个可追踪样本"
+    },
+    {
+      "batch": "HW-02",
+      "source": "智能作业",
+      "window": "第5–8周",
+      "rows": 648,
+      "valid": 642,
+      "focus": "变式任务、订正",
+      "note": "数学需要解释和应用的任务正确率开始脱离前段基线"
+    },
+    {
+      "batch": "HW-03",
+      "source": "智能作业",
+      "window": "第9–12周",
+      "rows": 677,
+      "valid": 668,
+      "focus": "跨题型复现",
+      "note": "发现运算与符号错误在21天窗口内复现"
+    },
+    {
+      "batch": "HW-04",
+      "source": "智能作业",
+      "window": "第13–18周",
+      "rows": 897,
+      "valid": 883,
+      "focus": "后段换情境使用、开放任务",
+      "note": "需要解释和应用的任务改善，但基础错误并未同步清零"
+    },
+    {
+      "batch": "EX-01",
+      "source": "考试评价",
+      "window": "第3、6、9周",
+      "rows": 271,
+      "valid": 264,
+      "focus": "阶段练习与期中练习",
+      "note": "年级标准分保持在0.06–0.09"
+    },
+    {
+      "batch": "EX-02",
+      "source": "考试评价",
+      "window": "第12、15、18周",
+      "rows": 253,
+      "valid": 248,
+      "focus": "换情境使用题、难度校准",
+      "note": "后段标准分均值0.11，不能等同于排名跃升"
+    },
+    {
+      "batch": "WR-01",
+      "source": "AI作文",
+      "window": "第2–8周",
+      "rows": 24,
+      "valid": 24,
+      "focus": "证据使用与论证结构",
+      "note": "证据使用均值3.10，保留教师复核方向"
+    },
+    {
+      "batch": "WR-02",
+      "source": "AI作文",
+      "window": "第10–18周",
+      "rows": 37,
+      "valid": 37,
+      "focus": "修改轮次与量规变化",
+      "note": "证据使用均值3.68，后段样本仍需持续观察"
+    }
+  ],
+  "metric_jobs": [
+    {
+      "job": "trend.compare",
+      "metric": "需要解释和应用的任务指数",
+      "formula": "后6周同口径均值 - 前6周同口径均值",
+      "result": "79.8 - 65.0 = +14.8",
+      "sample": "72条周度任务记录",
+      "status": "completed"
+    },
+    {
+      "job": "math_function.align",
+      "metric": "一次函数情境与综合应用类任务正确率",
+      "formula": "后段95/118 - 前段67/96",
+      "result": "80.5% - 69.8% = +10.72pp，展示约+11pp",
+      "sample": "214条带标签任务",
+      "status": "completed"
+    },
+    {
+      "job": "writing.rubric",
+      "metric": "作文材料支持观点量规",
+      "formula": "后5篇均值 - 前5篇均值",
+      "result": "3.68 - 3.10 = +0.58",
+      "sample": "10篇同量规作文",
+      "status": "completed"
+    },
+    {
+      "job": "assessment.normalize",
+      "metric": "年级标准分",
+      "formula": "各次测评按年级分布校准后比较",
+      "result": "0.08 → 0.11",
+      "sample": "前3次 / 后3次；有效分题519",
+      "status": "completed"
+    },
+    {
+      "job": "error.recurrence",
+      "metric": "错误复现率",
+      "formula": "21天内同类错误再次出现 / 进入复查窗口的错误",
+      "result": "119 / 384 = 31.0%；数学两类65/179=36.3%",
+      "sample": "5类错误标签",
+      "status": "completed"
+    },
+    {
+      "job": "coverage.audit",
+      "metric": "学科数据充分性",
+      "formula": "覆盖周数 >= 6 且有效作答 >= 30",
+      "result": "4/5学科通过，道德与法治停止判断",
+      "sample": "5个学科",
+      "status": "completed_with_stop"
+    }
+  ],
+  "evidence_links": [
+    {
+      "claim": "C1-MATH",
+      "source_count": 2,
+      "records": 52,
+      "direction": "一致支持",
+      "confidence": "较强支持",
+      "last_updated": "第18周"
+    },
+    {
+      "claim": "C1-CHINESE",
+      "source_count": 2,
+      "records": 34,
+      "direction": "一致支持",
+      "confidence": "较强支持",
+      "last_updated": "第16周"
+    },
+    {
+      "claim": "C2-RECURRENCE",
+      "source_count": 2,
+      "records": 78,
+      "direction": "支持但有反例",
+      "confidence": "中等支持",
+      "last_updated": "第17周"
+    },
+    {
+      "claim": "CROSS-03",
+      "source_count": 1,
+      "records": 20,
+      "direction": "样本不足",
+      "confidence": "停止判断",
+      "last_updated": "第18周"
+    }
+  ],
+  "hypothesis_revisions": [
+    {
+      "stage": "候选解释",
+      "text": "部分订正内容保持不稳定，可能解释具体任务与常规测评之间的差异",
+      "trigger": "错误复现率31%",
+      "action": "保留候选解释"
+    },
+    {
+      "stage": "收窄判断",
+      "text": "保持不稳定是可能因素之一，不是唯一原因",
+      "trigger": "发现数学U07、U12反例，作答节奏数据不足",
+      "action": "收窄表述并保留替代解释"
+    },
+    {
+      "stage": "复盘方案",
+      "text": "先进行分学科两周低负担复查，不以当前解释直接干预或定级",
+      "trigger": "证据账本184条完成归档",
+      "action": "进入教师复核与复盘"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "EVT-001",
+      "action": "confirm_scope",
+      "status": "completed",
+      "started_at_offset_ms": 0,
+      "completed_at_offset_ms": 180,
+      "records_returned": 0,
+      "result_summary": "确认林知遥、2025–2026学年第二学期18周和低风险教学支持用途",
+      "next_action": "读取学习业务记录",
+      "related_record_ids": []
+    },
+    {
+      "event_id": "EVT-002",
+      "action": "read_learning_business_records",
+      "status": "completed",
+      "started_at_offset_ms": 180,
+      "completed_at_offset_ms": 980,
+      "records_returned": 3428,
+      "result_summary": "返回2,843条智能作业、524条考试评价、61条作文与修改记录",
+      "next_action": "独立读取教学背景与课程映射",
+      "related_record_ids": [
+        "HW-RAW-0001",
+        "EX-RAW-0001",
+        "WR-RAW-0001"
+      ]
+    },
+    {
+      "event_id": "EVT-003",
+      "action": "read_attendance_context",
+      "status": "completed",
+      "started_at_offset_ms": 980,
+      "completed_at_offset_ms": 1260,
+      "records_returned": 91,
+      "result_summary": "独立返回91个教学日；出勤背景不混入学习业务总量",
+      "next_action": "读取课程映射",
+      "related_record_ids": [
+        "ATT-TEACHING-DAYS"
+      ]
+    },
+    {
+      "event_id": "EVT-004",
+      "action": "read_curriculum_mappings",
+      "status": "completed",
+      "started_at_offset_ms": 1260,
+      "completed_at_offset_ms": 1580,
+      "records_returned": 212,
+      "result_summary": "返回212条题目或任务到课程内容的映射边",
+      "next_action": "执行重复和标签质检",
+      "related_record_ids": [
+        "MAP-MATH-0001",
+        "MAP-CN-0001"
+      ]
+    },
+    {
+      "event_id": "EVT-005",
+      "action": "remove_duplicate_records",
+      "status": "completed",
+      "started_at_offset_ms": 1580,
+      "completed_at_offset_ms": 1840,
+      "records_returned": 8,
+      "result_summary": "发现并移除8条重复记录，剩余3,420条",
+      "next_action": "隔离缺少必要标签的记录",
+      "related_record_ids": [
+        "HW-RAW-0001",
+        "EX-RAW-0001"
+      ]
+    },
+    {
+      "event_id": "EVT-006",
+      "action": "isolate_missing_tags",
+      "status": "completed",
+      "started_at_offset_ms": 1840,
+      "completed_at_offset_ms": 2140,
+      "records_returned": 12,
+      "result_summary": "隔离12条缺少必要标签的记录，未静默补齐",
+      "next_action": "汇总基础质检结果",
+      "related_record_ids": [
+        "HW-RAW-0002",
+        "EX-RAW-0002"
+      ]
+    },
+    {
+      "event_id": "EVT-007",
+      "action": "complete_basic_quality_check",
+      "status": "completed",
+      "started_at_offset_ms": 2140,
+      "completed_at_offset_ms": 2460,
+      "records_returned": 3408,
+      "result_summary": "3,408条通过基础质检；作文评分一致性保留0.86",
+      "next_action": "计算学科同口径比较",
+      "related_record_ids": []
+    },
+    {
+      "event_id": "EVT-008",
+      "action": "align_subject_comparison",
+      "status": "completed",
+      "started_at_offset_ms": 2460,
+      "completed_at_offset_ms": 2920,
+      "records_returned": 2128,
+      "result_summary": "2,128条进入语文、数学、英语、物理同口径比较",
+      "next_action": "道德与法治停止判断",
+      "related_record_ids": []
+    },
+    {
+      "event_id": "EVT-009",
+      "action": "stop_insufficient_subject",
+      "status": "completed",
+      "started_at_offset_ms": 2920,
+      "completed_at_offset_ms": 3180,
+      "records_returned": 22,
+      "result_summary": "道德与法治仅3周、22条有效作答，不进入学期判断",
+      "next_action": "计算数学专项",
+      "related_record_ids": [
+        "ETHICS-RAW-0001"
+      ]
+    },
+    {
+      "event_id": "EVT-010",
+      "action": "calculate_math_function_metric",
+      "status": "completed",
+      "started_at_offset_ms": 3180,
+      "completed_at_offset_ms": 3540,
+      "records_returned": 214,
+      "result_summary": "一次函数专项67/96（69.8%）→95/118（80.5%），约提高11个百分点",
+      "next_action": "读取数学具体案例",
+      "related_record_ids": [
+        "HW-MATH-FUNC-041",
+        "EX-MATH-FUNC-018",
+        "HW-MATH-FUNC-063"
+      ]
+    },
+    {
+      "event_id": "EVT-011",
+      "action": "calculate_writing_metric",
+      "status": "completed",
+      "started_at_offset_ms": 3540,
+      "completed_at_offset_ms": 3820,
+      "records_returned": 10,
+      "result_summary": "作文材料支持观点前5篇3.10/5，后5篇3.68/5",
+      "next_action": "读取语文修改和开放任务",
+      "related_record_ids": [
+        "WR-003-REV-02",
+        "WR-012"
+      ]
+    },
+    {
+      "event_id": "EVT-012",
+      "action": "normalize_assessment_metric",
+      "status": "completed",
+      "started_at_offset_ms": 3820,
+      "completed_at_offset_ms": 4080,
+      "records_returned": 6,
+      "result_summary": "六次测评有效分题合计519；前3次标准分0.08，后3次0.11",
+      "next_action": "检查错误复现",
+      "related_record_ids": [
+        "EX-2026-02-18",
+        "EX-2026-06-18"
+      ]
+    },
+    {
+      "event_id": "EVT-013",
+      "action": "calculate_error_recurrence",
+      "status": "completed",
+      "started_at_offset_ms": 4080,
+      "completed_at_offset_ms": 4420,
+      "records_returned": 384,
+      "result_summary": "119/384=31.0%；数学两类错误65/179=36.3%",
+      "next_action": "读取具体运算和概念案例",
+      "related_record_ids": [
+        "HW-MATH-OPS-044",
+        "HW-MATH-FUNC-063"
+      ]
+    },
+    {
+      "event_id": "EVT-014",
+      "action": "read_math_case_records",
+      "status": "completed",
+      "started_at_offset_ms": 4420,
+      "completed_at_offset_ms": 4780,
+      "records_returned": 4,
+      "result_summary": "读取水箱函数、交点解释、增减性和移项符号四类具体记录",
+      "next_action": "读取语文写作过程",
+      "related_record_ids": [
+        "HW-MATH-FUNC-041",
+        "EX-MATH-FUNC-018",
+        "HW-MATH-FUNC-063",
+        "HW-MATH-OPS-044"
+      ]
+    },
+    {
+      "event_id": "EVT-015",
+      "action": "read_chinese_revision_records",
+      "status": "completed",
+      "started_at_offset_ms": 4780,
+      "completed_at_offset_ms": 5120,
+      "records_returned": 3,
+      "result_summary": "读取材料支持观点、开放任务和人物描写修改过程",
+      "next_action": "读取英语和物理观察线索",
+      "related_record_ids": [
+        "WR-003-REV-02",
+        "HW-CN-OPEN-061",
+        "WR-007-REV-01"
+      ]
+    },
+    {
+      "event_id": "EVT-016",
+      "action": "read_english_observation",
+      "status": "completed",
+      "started_at_offset_ms": 5120,
+      "completed_at_offset_ms": 5360,
+      "records_returned": 1,
+      "result_summary": "英语仅有一条展开语篇案例，不形成学期主要结论",
+      "next_action": "读取物理实验观察",
+      "related_record_ids": [
+        "HW-EN-GRAM-052"
+      ]
+    },
+    {
+      "event_id": "EVT-017",
+      "action": "read_physics_observation",
+      "status": "completed",
+      "started_at_offset_ms": 5360,
+      "completed_at_offset_ms": 5600,
+      "records_returned": 1,
+      "result_summary": "物理仅有一次提示后订正，无独立复查，不形成能力判断",
+      "next_action": "建立证据账本",
+      "related_record_ids": [
+        "HW-PHY-INQ-017"
+      ]
+    },
+    {
+      "event_id": "EVT-018",
+      "action": "build_evidence_ledger",
+      "status": "completed",
+      "started_at_offset_ms": 5600,
+      "completed_at_offset_ms": 6120,
+      "records_returned": 184,
+      "result_summary": "建立184条互斥分类证据账本，固定12条前台代表记录",
+      "next_action": "检查反例和停止判断",
+      "related_record_ids": [
+        "HW-MATH-FUNC-041",
+        "EX-MATH-FUNC-018",
+        "HW-MATH-FUNC-063"
+      ]
+    },
+    {
+      "event_id": "EVT-019",
+      "action": "check_counterexamples",
+      "status": "completed",
+      "started_at_offset_ms": 6120,
+      "completed_at_offset_ms": 6420,
+      "records_returned": 2,
+      "result_summary": "两条数学反例不支持单一解释，收窄为可能因素之一",
+      "next_action": "生成分学科两周方案",
+      "related_record_ids": [
+        "HW-MATH-U07-034",
+        "HW-MATH-U12-019"
+      ]
+    },
+    {
+      "event_id": "EVT-020",
+      "action": "create_subject_support_plan",
+      "status": "completed",
+      "started_at_offset_ms": 6420,
+      "completed_at_offset_ms": 6840,
+      "records_returned": 4,
+      "result_summary": "生成数学、语文、英语、物理分学科支持与复查标准，不增加总作业时长",
+      "next_action": "整理报告中的分学科复查标准",
+      "related_record_ids": [
+        "MATH-SUPPORT",
+        "CHINESE-SUPPORT",
+        "ENGLISH-SUPPORT",
+        "PHYSICS-SUPPORT"
+      ]
+    },
+    {
+      "event_id": "EVT-021",
+      "action": "read_math_counterexamples",
+      "status": "completed",
+      "started_at_offset_ms": 6920,
+      "completed_at_offset_ms": 7160,
+      "records_returned": 2,
+      "result_summary": "读取两条数学反例：基础题稳定但情境应用未同步改善；基础错误下降但常规测评转化有限",
+      "next_action": "收窄解释并保留替代因素",
+      "related_record_ids": [
+        "HW-MATH-U07-034",
+        "HW-MATH-U12-019"
+      ]
+    },
+    {
+      "event_id": "EVT-022",
+      "action": "stop_timing_judgment",
+      "status": "completed",
+      "started_at_offset_ms": 7200,
+      "completed_at_offset_ms": 7360,
+      "records_returned": 2,
+      "result_summary": "作答节奏只有2次数字化测评具备有效分题时长，证据不足，停止判断",
+      "next_action": "不把作答节奏写入主要结论",
+      "related_record_ids": [
+        "EX-2026-05-21",
+        "EX-2026-06-18-TIME"
+      ]
+    }
+  ],
+  "curriculum_context": {
+    "region": "上海市虹口区",
+    "grade": "八年级",
+    "semester": "第二学期",
+    "synthetic": true,
+    "subjects": [
+      {
+        "subject": "数学",
+        "textbook": "数学（试用本）（八/二）",
+        "publisher": "上海教育出版社",
+        "verification": "演示设定；正式接入由学校教务确认"
+      },
+      {
+        "subject": "语文",
+        "textbook": "统编语文八年级下册",
+        "verification": "演示设定；具体单元进度由学校确认"
+      },
+      {
+        "subject": "英语",
+        "textbook": "学校实际选用的八年级第二学期教材",
+        "verification": "当前不绑定具体 Unit"
+      },
+      {
+        "subject": "物理",
+        "textbook": "学校实际使用的八年级第二学期物理教材",
+        "verification": "演示设定；正式接入由学校确认"
+      },
+      {
+        "subject": "道德与法治",
+        "textbook": "学校实际选用的八年级第二学期教材",
+        "verification": "样本覆盖不足，不进入本次学期判断"
+      }
+    ]
+  },
+  "data_quality_funnel": {
+    "raw_learning_business_records": 3428,
+    "duplicate_records_removed": 8,
+    "after_duplicate_removal": 3420,
+    "missing_required_tags_isolated": 12,
+    "passed_basic_quality": 3408,
+    "same_criteria_subject_comparison": 2128,
+    "excluded_from_same_criteria": 1280,
+    "exclusion_breakdown": {
+      "independent_assessment": 519,
+      "writing_analysis": 61,
+      "ethics_insufficient_coverage": 22,
+      "homework_not_comparable": 678
+    },
+    "source_breakdown": [
+      {
+        "source": "智能作业",
+        "raw": 2843,
+        "duplicate": 6,
+        "missing_tags": 9,
+        "passed_basic_quality": 2828
+      },
+      {
+        "source": "考试评价",
+        "raw": 524,
+        "duplicate": 2,
+        "missing_tags": 3,
+        "passed_basic_quality": 519
+      },
+      {
+        "source": "AI作文",
+        "raw": 61,
+        "duplicate": 0,
+        "missing_tags": 0,
+        "passed_basic_quality": 61
+      }
+    ]
+  },
+  "evidence_ledger_summary": {
+    "total": 184,
+    "buckets": {
+      "math_function_support": 52,
+      "chinese_evidence_support": 34,
+      "recurrence": 61,
+      "counterexample": 17,
+      "boundary": 20
+    },
+    "counting_rule": "primary_bucket 互斥统计；单条证据可关联多个 claim_ids，但只能进入一个 primary_bucket"
+  },
+  "representative_record_ids": [
+    "HW-MATH-FUNC-041",
+    "EX-MATH-FUNC-018",
+    "HW-MATH-FUNC-063",
+    "HW-MATH-OPS-044",
+    "HW-MATH-U07-034",
+    "HW-MATH-U12-019",
+    "WR-003-REV-02",
+    "HW-CN-OPEN-061",
+    "WR-007-REV-01",
+    "HW-EN-GRAM-052",
+    "HW-PHY-INQ-017",
+    "EX-2026-06-18-TIME"
+  ],
+  "runtime_contract": {
+    "queue_source": "agent-trace.json.events",
+    "event_state_order": [
+      "queued",
+      "calling",
+      "returned",
+      "adopted"
+    ],
+    "frontend_must_not_invent_business_facts": true,
+    "report_source": "artifact.json.report_document",
+    "no_manual_review_gate": true
+  }
+}
