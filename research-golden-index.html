@@ -80,7 +80,10 @@
       const params = new URLSearchParams({case:'overall', g:'11', golden:'16', q:query});
       if (version === 'v2') params.set('v2', '1');
       if (version === 'v3') params.set('v3', '1');
-      if (version === 'v4') params.set('v4', '1');
+      if (version === 'v4') {
+        params.set('v4', '1');
+        params.set('build', 'golden-v4-11');
+      }
       location.href = `${target}?${params.toString()}`;
     });
     sync();

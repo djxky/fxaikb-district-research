@@ -223,7 +223,15 @@ button { color: inherit; }
 .v4-stage-marker svg { width: 13px; height: 13px; }
 .v4-research-stage.is-running .v4-stage-marker svg { animation: v4-spin 1.2s linear infinite; }
 .v4-research-stage.is-complete .v4-stage-marker { border-color: #bed1c5; background: var(--v4-green); color: var(--v4-green-strong); }
-.v4-research-stage.is-complete .v4-stage-marker svg { animation: none; }
+.v4-research-stage.is-complete .v4-stage-marker svg { display: none; animation: none; }
+.v4-research-stage.is-complete .v4-stage-marker::after {
+  width: 7px;
+  height: 4px;
+  border-bottom: 1.8px solid currentColor;
+  border-left: 1.8px solid currentColor;
+  content: "";
+  transform: translateY(-1px) rotate(-45deg);
+}
 .v4-stage-heading { display: flex; appearance: none; align-items: flex-start; justify-content: space-between; gap: 16px; width: 100%; margin: 0 0 11px; padding: 0; border: 0; background: transparent; text-align: left; }
 .v4-research-stage.is-complete .v4-stage-heading { cursor: pointer; }
 .v4-stage-heading:focus { outline: none; }
