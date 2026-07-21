@@ -365,7 +365,7 @@
       ['01', '数据基础与分析可信度', '3,428→3,408→2,128，口径明确', '较充分', 'is-strong'],
       ['02', '学业发展总体状况', '数学、语文出现具体变化，不能概括全部学科', '有限', 'is-medium'],
       ['03', '学科关键能力与主要问题', '一次函数应用与材料表达有证据支持', '中等', 'is-medium'],
-      ['04', '学习过程与学习品质', '有订正保持证据，缺少完整投入度数据', '有限', 'is-medium'],
+      ['04', '学习过程与改进成效', '有订正保持证据，缺少完整投入度数据', '有限', 'is-medium'],
       ['05', '阅读与语言表达素养', '作文修改与开放任务方向一致', '中等', 'is-medium'],
       ['06', '身心健康与体育锻炼', '本轮未接入阳光跑、运动会等记录', '不足', 'is-weak'],
       ['07', '社会参与与责任意识', '本轮未接入志愿服务和学校活动记录', '不足', 'is-weak'],
@@ -414,16 +414,17 @@
     const context = state.context;
     const coverage = context.coverage;
     const turn = ensureResearchCanvas();
-    const stage = appendStage('gather-student-data', '第一步 · 数据准备', '调取并汇总学生发展数据', '3,408条通过');
+    const stage = appendStage('gather-student-data', '第一步 · 调取并汇总学生发展数据', '形成学生学期数据概览和数据质量说明', '3,408条通过');
     const content = stage.querySelector('.v4-stage-content');
-    content.innerHTML = `<p class="v4-stage-copy">分析对象为林知遥八年级第二学期，报告用于教学支持与后续复查。系统按来源调取作业、测评、作文过程、教学覆盖和课程映射，先检查完整性、连续性与可比性，再限定可进入分析的记录范围。</p><div class="v4-research-contract"><div><span>分析周期</span><strong>2025—2026学年第二学期 · 18周</strong></div><div><span>比较基准</span><strong>自身阶段变化与同口径任务</strong></div><div><span>报告用途</span><strong>低风险教育支持</strong></div><div><span>信息处理</span><strong>最小必要 · 身份脱敏</strong></div></div><div class="v4-source-grid"><article class="v4-source-card">${icon('notebook-pen')}<span>智能作业</span><strong>186次作业</strong><small>2,843条题目级作答</small></article><article class="v4-source-card">${icon('file-chart-column')}<span>考试评价</span><strong>6次阶段测评</strong><small>524条分题得分</small></article><article class="v4-source-card">${icon('scan-text')}<span>作文过程</span><strong>14篇作文</strong><small>47次修改 · 61条记录</small></article><article class="v4-source-card">${icon('calendar-days')}<span>学习过程</span><strong>91个教学日</strong><small>17/18个教学周有记录</small></article><article class="v4-source-card">${icon('network')}<span>课程映射</span><strong>${num(coverage.curriculum_mapping_items)}条</strong><small>学科、单元与学习内容</small></article></div>${analysisTable(['学科', '作业批次 / 作答', '测评分题', '同口径记录', '本轮用途'], demoProfile.sourceRows, '分学科数据资产与可用范围')}<div class="v4-index-result"><div><strong>3,428</strong><span>学习业务原始记录</span></div><div><strong>3,408</strong><span>通过基础质量检查</span></div><div><strong>2,128</strong><span>进入同口径比较</span></div></div><div class="v4-boundary-strip"><span>${icon('shield-check')}作业2,843条 + 测评524条 + 作文过程61条 = 3,428条；去除8条重复、隔离12条缺标签后为3,408条。阅读打卡等未形成可靠连续数据的内容只说明缺口。</span></div>`;
+    content.innerHTML = `<p class="v4-stage-copy">先形成“学生基本情况与数据说明”：本轮分析对象为八年级林知遥，周期为2025—2026学年第二学期，数据范围覆盖语文作文、数学与英语作业、相关考试、出勤/阅读等学习过程记录。随后说明哪些记录通过质检、哪些记录被剔除或隔离，以及本轮结论的可信范围。</p><div class="v4-research-contract"><div><span>学生与学段</span><strong>林知遥 · 八年级</strong></div><div><span>分析周期</span><strong>2025—2026学年第二学期 · 18周</strong></div><div><span>报告用途</span><strong>教学支持与后续复查</strong></div><div><span>可信口径</span><strong>同口径比较 · 证据不足则停止判断</strong></div></div><div class="v4-source-grid"><article class="v4-source-card">${icon('notebook-pen')}<span>智能作业</span><strong>186次作业</strong><small>2,843条数学、英语等题目级作答</small></article><article class="v4-source-card">${icon('file-chart-column')}<span>相关考试</span><strong>6次阶段测评</strong><small>524条分题得分，保留原始量尺</small></article><article class="v4-source-card">${icon('scan-text')}<span>语文作文</span><strong>14篇作文</strong><small>47次修改，形成61条过程记录</small></article><article class="v4-source-card">${icon('calendar-days')}<span>学习过程</span><strong>91个教学日</strong><small>17/18周有记录，阅读打卡连续性不足</small></article><article class="v4-source-card">${icon('network')}<span>课程映射</span><strong>${num(coverage.curriculum_mapping_items)}条</strong><small>关联学科、单元、知识内容和任务类型</small></article></div><div class="v4-index-result v4-data-ledger"><div><strong>3,428</strong><span>学习业务记录</span></div><div><strong>3,408</strong><span>通过基础质检</span></div><div><strong>2,128</strong><span>同口径比较记录</span></div><div><strong>184</strong><span>证据记录</span></div><div><strong>12</strong><span>代表证据</span></div></div><div class="v4-triple-note"><article><b>数据来源</b><p>智能作业2,843条、考试评价524条、AI作文及修改61条，并接入91个教学日、212条课程内容映射；其中作业侧对应186次任务，作文侧对应14篇作文和47次修改。</p></article><article><b>质量处理</b><p>完成完整性、连续性和可比性检查；去除重复记录8条，隔离缺少学科或任务标签记录12条，保留作业、作文量规和考试标准分的原始评价单位。</p></article><article><b>分析边界</b><p>个人敏感信息在画布中脱敏；心理健康数据未调用。体育、社会参与、志愿服务和研学数据本轮未达到判断条件；阅读打卡连续性不足，只说明缺口，不替代事实。</p></article></div><div class="v4-boundary-strip"><span>${icon('shield-check')}阶段结果：形成学生学期数据概览和数据质量说明。后续分析只使用通过质检且具备比较条件的数据，不能由缺失数据推导学生判断。</span></div>`;
     await playActivity(content, '正在调取并汇总学生发展数据', [
       ['user-round-check', '确认分析对象与报告用途', '八年级第二学期 · 用于教学支持与后续复查'],
       ['notebook-pen', '调取智能作业记录', '186次作业 · 2,843条题目级作答'],
       ['file-chart-column', '调取考试评价记录', '6次阶段测评 · 524条分题得分'],
       ['scan-text', '调取作文及修改过程', '14篇作文 · 47次修改 · 61条过程记录'],
-      ['calendar-days', '核对学习过程覆盖', '91个教学日 · 17/18个教学周有记录'],
+      ['calendar-days', '调取出勤与阅读打卡等过程数据', '91个教学日 · 阅读连续记录不足，仅说明缺口'],
       ['network', '关联课程学习内容', '212条课程映射保留学科、单元和任务关系'],
+      ['calendar-check-2', '检查完整性、连续性和可比性', '按学科、任务、时间和评价口径逐项筛选'],
       ['copy-x', '检查重复与标签缺失', '去除8条重复记录 · 隔离12条缺标签记录'],
       ['arrow-right-left', '建立可比数据范围', '3,428 → 3,408 → 2,128'],
       ['shield-check', '完成脱敏与范围说明', '只读取最小必要字段，缺失数据不替代事实']
@@ -436,16 +437,18 @@
 
   async function runSubjectPerformanceV2(signal) {
     const context = state.context;
-    const stage = appendStage('subject-performance', '第二步 · 学科分析', '分析各学科学习表现与变化', '语文 · 数学 · 英语');
+    const stage = appendStage('subject-performance', '第二步 · 分析各学科学习表现与变化', '形成语文、数学、英语学科学习分析', '语文 · 数学 · 英语');
     const content = stage.querySelector('.v4-stage-content');
-    content.innerHTML = `<p class="v4-stage-copy">分别保留作业、考试和作文评价的原有单位，沿学期时间轴比较前后阶段，并核对日常任务与综合评价是否一致。变化只落到有连续证据支持的学科内容和任务类型。</p><div class="v4-discovery-grid"><article><span>数学 · 一次函数具体任务</span><strong>${num(context.earlyMath.correct)}/${num(context.earlyMath.total)} → ${num(context.lateMath.correct)}/${num(context.lateMath.total)}</strong><small>前6周69.8% → 中6周75.9% → 后6周80.5%；连续抬升但测评转化有限</small></article><article><span>语文 · 材料支持观点</span><strong>${context.earlyWriting.toFixed(2)} → ${context.lateWriting.toFixed(2)}</strong><small>10篇同量规作文逐篇值：${demoProfile.writingScores.join(' / ')}</small></article></div>${analysisTable(['分析对象', '阶段一', '阶段二', '阶段三 / 后段', '学期判断'], [['数学一次函数', '67/96 · 69.8%', '82/108 · 75.9%', '95/118 · 80.5%', '具体任务呈连续变化'], ['常规测评标准分', '0.04 / 0.09 / 0.11', '—', '0.07 / 0.12 / 0.14', '前3次0.08 → 后3次0.11，变化有限'], ['语文材料支持观点', '前5篇均值3.10', 'WR-003修改过程', '后5篇均值3.68', '开放任务方向一致'], ['英语一般过去时', '49次作业共733条作答', '任务语境差异较大', 'HW-EN-GRAM-052出现波动', '仅保留观察线索']], '学科阶段表现与任务转化')}<div class="v4-cross-matrix"><div class="v4-cross-row"><span>语文</span><strong>作文量规 × 一二稿修改 × 教师反馈 × 开放任务</strong><b class="is-support">具体表达表现出现变化</b></div><div class="v4-cross-row"><span>数学</span><strong>日常作业 × 阶段测评 × 订正 × 延时复查</strong><b class="is-support">专项变化，转化待核实</b></div><div class="v4-cross-row"><span>英语</span><strong>573条同口径分题记录，但连续同类任务不足</strong><b>不以记录量替代证据连续性</b></div><div class="v4-cross-row"><span>学科边界</span><strong>道德与法治仅3周、22条有效作答</strong><b class="is-stop">停止学期判断</b></div></div>`;
+    content.innerHTML = `<p class="v4-stage-copy">语文、数学、英语分别按各自评价单位分析，不把作文量规、题目正确率和考试标准分直接相加。系统沿学期时间轴比较阶段变化，同时核对日常作业与考试表现是否一致，最后只保留能落到具体文体、知识内容或任务类型的判断。</p><div class="v4-discovery-grid"><article><span>数学 · 一次函数具体任务</span><strong>${num(context.earlyMath.correct)}/${num(context.earlyMath.total)} → ${num(context.lateMath.correct)}/${num(context.lateMath.total)}</strong><small>前6周69.8% → 中6周75.9% → 后6周80.5%；连续抬升但测评转化有限</small></article><article><span>语文 · 材料支持观点</span><strong>${context.earlyWriting.toFixed(2)} → ${context.lateWriting.toFixed(2)}</strong><small>10篇同量规作文逐篇值：${demoProfile.writingScores.join(' / ')}</small></article></div>${analysisTable(['学科', '文档要求', '本轮分析动作', '阶段发现'], [['语文', '不同文体作文得分、评语和表现变化', '比较14篇作文、47次修改、教师评语与量规维度', '材料支持观点前5篇3.10 → 后5篇3.68'], ['语文', '比较作文一稿与二稿修改情况', '追踪WR-003-REV-02中材料替换、观点解释和二稿回扣', '反馈吸收有具体证据'], ['数学', '作业正确情况及阶段性变化', '按一次函数同口径任务分前/中/后三段', '67/96 → 82/108 → 95/118'], ['数学', '错误集中的知识内容和题目类型', '定位变量关系、函数图像意义、参数变化、移项符号', '问题集中在情境解释和保持'], ['数学', '结合作业与考试表现', '专项任务与常规测评标准分并列核对', '0.08 → 0.11，综合转化有限'], ['英语', '作业正确情况、稳定程度与综合运用', '检查一般过去时语篇任务及相关作业/考试口径', '只保留HW-EN-GRAM-052波动线索']], 'V2 第二步学科分析清单')}<div class="v4-cross-matrix"><div class="v4-cross-row"><span>语文</span><strong>作文量规 × 一二稿修改 × 教师反馈 × 开放任务</strong><b class="is-support">提炼写作亮点、问题与阶段变化</b></div><div class="v4-cross-row"><span>数学</span><strong>日常作业 × 阶段测评 × 订正 × 延时复查</strong><b class="is-support">识别正确率变化和错误集中点</b></div><div class="v4-cross-row"><span>英语</span><strong>作业稳定性 × 语篇语法任务 × 考试口径</strong><b>只作观察，不扩大为学期结论</b></div><div class="v4-cross-row"><span>阶段结果</span><strong>形成语文、数学、英语学科学习分析</strong><b class="is-support">保留原量尺和证据边界</b></div></div>`;
     await playActivity(content, '正在分析各学科学习表现与变化', [
       ['notebook-pen', '比较语文作文量规', '前5篇3.10 → 后5篇3.68'],
+      ['message-square-text', '读取作文评语与文体表现', '定位观点、材料、解释、回扣四类表达维度'],
       ['git-compare', '核对一稿与修改过程', 'WR-003-REV-02显示材料与观点关系得到调整'],
       ['file-check-2', '复核作文外开放任务', 'HW-CN-OPEN-061与作文变化方向一致'],
       ['calculator', '比较数学阶段表现', '一次函数前6周67/96 → 后6周95/118'],
+      ['list-filter', '识别数学错误集中内容', '变量关系、图像意义、参数变化和移项符号'],
       ['chart-no-axes-combined', '核对数学测评转化', '常规测评前3次0.08 → 后3次0.11'],
-      ['languages', '检查英语任务稳定性', 'HW-EN-GRAM-052仅支持一般过去时波动线索'],
+      ['languages', '检查英语任务稳定性与考试口径', 'HW-EN-GRAM-052仅支持一般过去时波动线索'],
       ['arrow-right-left', '比对日常与综合任务', '专项任务变化较明显，综合评价转化有限'],
       ['calendar-range', '识别阶段变化与转折', '只保留有连续数据支持的变化']
     ], signal);
@@ -455,15 +458,16 @@
   }
 
   async function runProblemLocalizationV2(signal) {
-    const stage = appendStage('problem-localization', '第三步 · 问题定位', '定位各学科主要学习问题', '2项重点 · 2项观察');
+    const stage = appendStage('problem-localization', '第三步 · 定位各学科主要学习问题', '形成主要学习问题清单及分析依据', '2项重点 · 2项观察');
     const content = stage.querySelector('.v4-stage-content');
-    content.innerHTML = `<p class="v4-stage-copy">每项问题按“问题表现—具体数据—出现时间—涉及内容—变化情况—可能影响因素”组织，并区分偶发、反复与持续。可能因素只作为待验证解释，不写成学生标签。</p>${analysisTable(['问题表现', '具体数据', '时间与内容', '变化情况', '可能影响因素 / 处理'], [['订正后保持不稳定', '21天复查119/384复现', '全学期 · 5类错误标签', '即时改善，延时复现', '订正后的间隔巩固不足 · 优先复查'], ['专项到测评转化有限', '69.8%→80.5%；0.08→0.11', '一次函数 · 专项与常规测评', '专项变化明显，测评变化有限', '任务情境与综合度不同 · 优先跟踪'], ['一般过去时波动', 'HW-EN-GRAM-052', 'Last Sunday语篇任务', '单项出现', '偶发线索 · 不作学期结论'], ['控制条件表达遗漏', 'HW-PHY-INQ-017', '滑动摩擦力实验任务', '单项出现', '偶发线索 · 仅作观察']], '主要问题清单及分析依据')}<div class="v4-hypothesis-list"><article><span>反复出现 · 掌握不稳定</span><strong>订正后的保持</strong><small>多次同类错误在延时任务中复现，证据强于单次作答。</small></article><article><span>阶段差异 · 综合运用待核实</span><strong>专项到常规测评</strong><small>保留任务难度、题型结构和评价情境差异，不直接归因为学生因素。</small></article><article><span>证据不足 · 停止归因</span><strong>非知识性失误与投入不足</strong><small>缺少稳定过程证据，本轮不作判断。</small></article></div><div class="v4-boundary-strip"><span>${icon('scale')}当前只形成2项优先问题和2项观察线索；不使用“粗心、态度、能力”等归因。</span></div>`;
+    content.innerHTML = `<p class="v4-stage-copy">把“哪里出问题”拆到学科、时间段、具体内容和任务类型，而不是给学生下笼统判断。每项问题都按“问题表现—具体数据—出现时间—涉及内容—变化情况—可能影响因素”呈现，并区分偶发、反复、持续；可能因素只作为教学假设，不写成学生标签。</p>${analysisTable(['问题表现', '具体数据', '出现时间', '涉及内容', '变化情况', '可能影响因素 / 处理'], [['订正后保持不稳定', '21天复查119/384复现', '全学期延时复查', '方程移项符号、函数图像意义等5类标签', '即时订正后仍有延时复现', '间隔巩固不足 · 优先复查'], ['专项到测评转化有限', '69.8%→80.5%；0.08→0.11', '一次函数学习后段', '情境应用、综合评价任务', '专项变化明显，测评变化有限', '任务综合度不同 · 优先跟踪'], ['一般过去时波动', 'HW-EN-GRAM-052', 'Last Sunday语篇任务', '英语语篇语法', '单项出现', '偶发线索 · 不作学期结论'], ['控制条件表达遗漏', 'HW-PHY-INQ-017', '滑动摩擦力实验任务', '物理实验结论表达', '单项出现', '偶发线索 · 仅作观察']], '主要学习问题清单及分析依据')}<div class="v4-hypothesis-list"><article><span>尚未掌握 / 掌握不稳 / 迁移运用困难</span><strong>三类问题分开处理</strong><small>一次函数基础、情境解释、综合应用和订正保持分别核对，不把所有错误混为“基础薄弱”。</small></article><article><span>多项数据支持</span><strong>作业、考试、教师反馈、订正复查共同验证</strong><small>只有能被多次或不同类型数据支持的问题，才进入优先改进清单。</small></article><article><span>数据不足说明</span><strong>投入不足、非知识性失误暂不判断</strong><small>缺少稳定过程证据，本轮只说明边界，不作归因。</small></article></div><div class="v4-boundary-strip"><span>${icon('scale')}阶段结果：形成2项优先问题与2项观察线索；不使用“粗心、态度、能力”等标签化归因。</span></div>`;
     await playActivity(content, '正在定位主要学习问题并核对依据', [
       ['list-filter', '按学科和时间定位问题', '问题落到具体周次、知识内容和任务类型'],
       ['repeat-2', '识别反复出现的问题', '21天复查119/384条同类错误再次出现'],
       ['chart-no-axes-combined', '识别阶段性转化差异', '专项变化明显，常规测评变化有限'],
-      ['tags', '区分问题性质', '尚未掌握、掌握不稳与综合运用差异分别处理'],
-      ['files', '核对多项数据支持', '作业、测评、订正和复查共同验证重点问题'],
+      ['tags', '区分问题性质', '尚未掌握、掌握不稳定、迁移运用困难和非知识性失误分别处理'],
+      ['files', '对照作业、考试和教师评语', '多项数据共同支持才进入主要问题清单'],
+      ['circle-help', '分析可能影响因素', '只作为待验证教学假设，不写成学生标签'],
       ['search-check', '查找反例与限制证据', '检出2条数学反例，主动收窄结论'],
       ['circle-dashed', '标记偶发观察线索', '英语与物理各仅1项代表记录'],
       ['shield-check', '停止证据不足的归因', '非知识性失误和投入不足均不作判断']
@@ -474,18 +478,20 @@
   }
 
   async function runLearningProcessV2(signal) {
-    const stage = appendStage('learning-process', '第四步 · 过程成效', '分析学习过程与改进成效', '订正 · 修改 · 复查');
+    const stage = appendStage('learning-process', '第四步 · 分析学习过程与学习状态', '形成学习过程与改进成效分析', '订正 · 修改 · 复查');
     const content = stage.querySelector('.v4-stage-content');
-    content.innerHTML = `<p class="v4-stage-copy">把首次作答、订正、作文修改、教师反馈和延时复查放在同一时间链中，判断变化是否能够持续。过程记录不足时，不把结果差异解释为学习投入或自我管理问题。</p>${analysisTable(['延时复现标签', '复现条数', '过程解释'], demoProfile.retentionRows, '21天订正保持复查的错误分布')}<div class="v4-volume-note"><strong>119/384</strong><span>同类错误延时复现</span><i></i><span>5类标签</span><i></i><span>第2、7、14天复查</span></div><div class="v4-cross-matrix"><div class="v4-cross-row"><span>作文修改</span><strong>材料选择 × 观点解释 × 二稿回扣</strong><b class="is-support">反馈得到具体落实</b></div><div class="v4-cross-row"><span>数学订正</span><strong>首次作答 × 即时订正 × 21天复查</strong><b class="is-support">即时改善，保持待加强</b></div><div class="v4-cross-row"><span>任务转化</span><strong>专项练习 × 常规测评</strong><b>会做专项任务，综合评价仍待核实</b></div><div class="v4-cross-row"><span>作答节奏</span><strong>数字化考试分题时长</strong><b class="is-stop">仅2次有效记录，停止判断</b></div><div class="v4-cross-row"><span>阅读与投入</span><strong>连续过程数据不足</strong><b class="is-stop">不判断投入程度和自我管理</b></div></div><div class="v4-final-boundary">${icon('badge-check')}阶段结果：可以确认“部分反馈已落实”，同时存在“订正后保持不稳”和“专项到综合任务转化有限”；尚不能确认“投入不足”。</div>`;
-    await playActivity(content, '正在分析学习过程与改进成效', [
+    content.innerHTML = `<p class="v4-stage-copy">把作业完成、提交连续性、订正、作文修改、教师反馈、阅读打卡和延时复查放在同一条过程链里，判断结果变化是否来自稳定学习过程。过程证据不足时，系统不会把成绩波动解释为投入不足或自我管理问题。</p>${analysisTable(['过程维度', '本轮证据', '分析判断'], [['作业完成与订正', '186次作业；保留首次作答、订正与复查链条', '可以分析订正后保持情况'], ['作业提交连续性', '17/18个教学周有学习记录', '支持学期过程观察，但不推断每日投入'], ['阅读打卡频次与持续性', '记录未形成可靠连续链条', '只说明缺口，不判断阅读习惯'], ['作文反馈落实', 'WR-003-REV-02；14篇作文、47次修改', '部分反馈能够进入二稿表达'], ['过程与结果一致性', '数学专项提升，常规测评变化有限', '存在任务转化待核实现象']], 'V2 第四步学习过程与状态检查')} ${analysisTable(['延时复现标签', '复现条数', '过程解释'], demoProfile.retentionRows, '21天订正保持复查的错误分布')}<div class="v4-volume-note"><strong>119/384</strong><span>同类错误延时复现</span><i></i><span>5类标签</span><i></i><span>第2、7、14天复查</span></div><div class="v4-cross-matrix"><div class="v4-cross-row"><span>知识不会</span><strong>需同时出现首次错误、订正困难和复查不通过</strong><b>当前只对具体内容保留</b></div><div class="v4-cross-row"><span>掌握不稳</span><strong>即时订正后，延时复查仍有119/384复现</strong><b class="is-support">作为优先支持点</b></div><div class="v4-cross-row"><span>综合运用困难</span><strong>专项练习变化明显，常规测评变化有限</strong><b>继续核实任务转化</b></div><div class="v4-cross-row"><span>投入不足</span><strong>阅读、作答节奏等连续证据不足</strong><b class="is-stop">停止判断</b></div></div><div class="v4-final-boundary">${icon('badge-check')}阶段结果：形成学生学习过程与学习状态分析；可以确认“部分反馈已落实”“订正后保持不稳”“专项到综合任务转化有限”，尚不能确认“投入不足”。</div>`;
+    await playActivity(content, '正在分析学习过程与学习状态', [
+      ['clipboard-list', '分析作业完成、订正和反馈落实', '首次作答、订正、教师反馈和复查链条一并保留'],
+      ['calendar-check-2', '分析作业提交连续性', '17/18个教学周有记录，但不推断每日投入'],
+      ['book-open', '检查阅读打卡频次和持续性', '连续过程证据不足，只说明缺口'],
       ['history', '连接首次作答与订正记录', '保留错误、修改和反馈落实过程'],
       ['scan-text', '检查作文反馈吸收', 'WR-003-REV-02显示材料与观点关系得到修订'],
-      ['book-open-check', '复核开放任务表现', 'HW-CN-OPEN-061与作文修改方向一致'],
+      ['book-open-check', '分析过程与学业结果是否一致', '作文反馈落实较清楚，数学测评转化仍需复核'],
       ['calendar-clock', '执行21天延时复查', '119/384条同类错误再次出现'],
       ['arrow-right-left', '比较专项与综合任务', '专项变化尚未稳定进入常规测评'],
       ['timer-off', '检查作答节奏证据', '仅2次有效分题时长，停止判断'],
-      ['calendar-x-2', '检查阅读与连续投入数据', '当前覆盖不足，不推断投入程度'],
-      ['badge-check', '形成过程成效判断', '区分已落实、保持不稳与证据不足']
+      ['badge-check', '区分知识不会、掌握不稳和投入不足', '只确认有证据支持的过程判断']
     ], signal);
     refreshIcons();
     await wait(1200, signal);
@@ -493,15 +499,15 @@
   }
 
   async function runComprehensiveEvaluationV2(signal) {
-    const stage = appendStage('comprehensive-evaluation', '第五步 · 综合评估', '评估综合学业表现', '2项优势 · 2项重点');
+    const stage = appendStage('comprehensive-evaluation', '第五步 · 评估综合学业表现', '形成学生学期发展综合分析结论', '2项优势 · 2项重点');
     const content = stage.querySelector('.v4-stage-content');
-    content.innerHTML = `<div class="v4-discovery-grid"><article><span>主要优势 01 · 有限至中等可信</span><strong>数学一次函数具体任务出现阶段变化</strong><small>前6周69.8% → 中6周75.9% → 后6周80.5%；结论不扩大到数学整体</small></article><article><span>主要优势 02 · 中等可信</span><strong>语文材料支持观点的表现增强</strong><small>10篇同量规作文3.10 → 3.68，并有修改过程与开放任务印证</small></article></div>${analysisTable(['结论领域', '数据覆盖', '证据组合', '可信程度', '可用范围'], [['数据基础', '17/18周 · 3,408条通过', '质量、来源、课程映射', '较充分', '支持学期内同口径分析'], ['数学具体任务', '作业+测评+订正+复查', '744条同口径记录+代表案例', '有限至中等', '只到一次函数具体任务'], ['语文材料表达', '10篇同量规作文+修改+开放任务', '量规、过程与任务互证', '中等', '只到材料支持观点'], ['英语与物理', '记录量足但同类连续证据不足', '各1条代表线索', '较低', '只作观察'], ['跨学科共同特点', '不足2个学科连续同向证据', '停止检验', '不足', '不形成结论']], '综合结论的证据充分度')}<div class="v4-hypothesis-list"><article><span>优先改进 01</span><strong>提高订正后的稳定保持</strong><small>21天复查119/384条同类错误复现 · 建议第2、7、14天复查</small></article><article><span>优先改进 02</span><strong>检验专项表现能否转化为综合任务</strong><small>常规测评0.08 → 0.11 · 需要更多变式和情境任务验证</small></article><article><span>证据账本 · 184条</span><strong>78支持 / 61限制 / 19反例 / 26边界</strong><small>从中选取12条代表证据进入报告。</small></article></div><div class="v4-boundary-strip"><span>${icon('shield-check')}跨学科结论需要两个及以上学科的连续证据。当前只能确认学科内的具体变化，不能据此判断稳定的知识迁移或综合能力。</span></div>`;
+    content.innerHTML = `<div class="v4-discovery-grid"><article><span>主要优势 01 · 有限至中等可信</span><strong>数学一次函数具体任务出现阶段变化</strong><small>前6周69.8% → 中6周75.9% → 后6周80.5%；结论不扩大到数学整体</small></article><article><span>主要优势 02 · 中等可信</span><strong>语文材料支持观点的表现增强</strong><small>10篇同量规作文3.10 → 3.68，并有修改过程与开放任务印证</small></article></div>${analysisTable(['V2 评估项', '本轮判断', '依据与可信程度'], [['整体学习表现', '总体评价结果相对稳定，内部出现两处具体变化', '3,408条通过质检；2,128条可比记录；结论限于低风险教学支持'], ['2—3项主要优势', '数学一次函数具体任务变化；语文材料支持观点增强', '均有多次记录或不同类型数据支持'], ['2—3项优先改进问题', '订正后的稳定保持；专项表现向综合任务转化', '21天复查119/384；常规测评0.08→0.11'], ['各学科趋势和稳定程度', '语文、数学有具体变化；英语仅观察线索', '不以记录量替代连续同类证据'], ['阅读理解、语言表达、逻辑思考、知识运用共同特点', '语言表达与数学情境解释均涉及“证据/条件—结论”关系', '跨学科共同特点证据有限，只作为待验证线索'], ['数据依据与可信程度', '数据基础较充分，学科结论有限至中等', '184条证据记录；12条代表证据；19条反例/边界记录'], ['需补充信息', '阅读打卡连续性、更多综合任务、后续复查数据', '不补数据则不扩大判断']], 'V2 第五步综合评估清单')}<div class="v4-hypothesis-list"><article><span>优先改进 01</span><strong>提高订正后的稳定保持</strong><small>21天复查119/384条同类错误复现 · 建议第2、7、14天复查</small></article><article><span>优先改进 02</span><strong>检验专项表现能否转化为综合任务</strong><small>常规测评0.08 → 0.11 · 需要更多变式和情境任务验证</small></article><article><span>证据账本 · 184条</span><strong>78支持 / 61限制 / 19反例 / 26边界</strong><small>从中选取12条代表证据进入报告。</small></article></div><div class="v4-boundary-strip"><span>${icon('shield-check')}阶段结果：形成学生学期发展综合分析结论；跨学科结论需要两个及以上学科连续证据，当前只保留待验证线索。</span></div>`;
     await playActivity(content, '正在评估综合学业表现', [
       ['sparkles', '提炼主要优势', '只保留多次、不同类型数据共同支持的变化'],
       ['triangle-alert', '识别优先改进问题', '订正保持与综合任务转化进入优先级'],
       ['chart-no-axes-combined', '判断发展趋势与稳定程度', '区分持续变化、阶段差异和偶发线索'],
-      ['languages', '核对跨学科共同特点', '未达到两个以上学科连续证据条件'],
-      ['badge-check', '标注结论可信程度', '数据基础较充分，学科结论有限至中等'],
+      ['languages', '分析阅读理解、语言表达、逻辑思考和知识运用共同特点', '仅形成“证据/条件—结论”关系的待验证线索'],
+      ['badge-check', '标明重要结论的数据依据和可信程度', '数据基础较充分，学科结论有限至中等'],
       ['circle-help', '列出需要补充的问题', '阅读连续性、更多学科任务和后续复查'],
       ['scale', '形成综合学业结论', '不计算综合总分，不用单项表现替代整体判断']
     ], signal);
@@ -511,15 +517,16 @@
   }
 
   async function runLayeredSupport(signal) {
-    const stage = appendStage('layered-support', '第六步 · 支持方案', '提出针对性改进建议', '行动可执行');
+    const stage = appendStage('layered-support', '第六步 · 提出针对性改进建议', '形成学生、教师与学校两个层面的改进建议', '行动可执行');
     const content = stage.querySelector('.v4-stage-content');
-    content.innerHTML = `<div class="v4-support-grid"><div class="v4-plan-column"><h4>学生层面 · 两周</h4><div class="v4-plan-item is-keep">${icon('calculator')}<span><b>数学</b>用变式任务复查变量、条件和交点意义。</span></div><div class="v4-plan-item is-keep">${icon('notebook-pen')}<span><b>语文</b>完成“观点—材料—解释—回扣”开放表达。</span></div><div class="v4-plan-item is-watch">${icon('calendar-check-2')}<span><b>跟踪</b>第2、7、14天记录独立完成情况。</span></div></div><div class="v4-plan-column"><h4>教师与学校层面</h4><div class="v4-plan-item is-keep">${icon('replace')}<span><b>任务</b>以同等时长变式练习替换重复训练。</span></div><div class="v4-plan-item is-keep">${icon('history')}<span><b>反馈</b>保留首次作答、订正和延时复查链条。</span></div><div class="v4-plan-item is-watch">${icon('eye')}<span><b>观察</b>英语、物理线索，不提前形成学期判断。</span></div></div><div class="v4-plan-column"><h4>区域管理层面</h4><div class="v4-plan-item is-keep">${icon('school')}<span><b>验证</b>在班级、学校层面检查同类现象是否普遍。</span></div><div class="v4-plan-item is-keep">${icon('chart-no-axes-combined')}<span><b>研判</b>分别检查作业订正、测评转化和课程实施。</span></div><div class="v4-plan-item is-watch">${icon('shield-check')}<span><b>边界</b>不以单个学生个案直接推导区域结论。</span></div></div></div><div class="v4-final-boundary">${icon('shield-check')}每项建议均绑定问题依据、改进目标、责任主体、实施周期和跟踪指标。</div>`;
+    content.innerHTML = `<p class="v4-stage-copy">建议不按“多做题”处理，而是从诊断问题反推行动：学生知道下一阶段优先改什么、怎么做、用什么指标自查；教师、家长和学校知道如何支持、如何跟踪、哪些结论还需要补证。</p><div class="v4-support-grid"><div class="v4-plan-column"><h4>学生层面 · 两周</h4><div class="v4-plan-item is-keep">${icon('calculator')}<span><b>优先问题</b>订正后保持与一次函数综合运用。</span></div><div class="v4-plan-item is-keep">${icon('replace')}<span><b>具体行动</b>用变式任务复查变量、条件、交点意义和反例。</span></div><div class="v4-plan-item is-watch">${icon('calendar-check-2')}<span><b>自我检查</b>第2、7、14天记录独立完成情况和复现错误。</span></div></div><div class="v4-plan-column"><h4>教师、家长与学校层面</h4><div class="v4-plan-item is-keep">${icon('presentation')}<span><b>教学支持</b>围绕一次函数情境解释和语文材料表达设计短周期任务。</span></div><div class="v4-plan-item is-keep">${icon('history')}<span><b>反馈跟踪</b>保留首次作答、订正、二稿修改和延时复查链条。</span></div><div class="v4-plan-item is-watch">${icon('users-round')}<span><b>家庭配合</b>只协助按时复查和说明思路，不额外叠加重复训练。</span></div></div><div class="v4-plan-column"><h4>学校与区域教研层面</h4><div class="v4-plan-item is-keep">${icon('school')}<span><b>群体验证</b>检查同类“专项会做、综合转化有限”是否在班级或年级普遍出现。</span></div><div class="v4-plan-item is-keep">${icon('chart-no-axes-combined')}<span><b>教研线索</b>分别复核作业订正机制、测评任务结构和课程实施节奏。</span></div><div class="v4-plan-item is-watch">${icon('shield-check')}<span><b>使用边界</b>个体发现只作为待验证线索，不直接推导区域结论。</span></div></div></div>${analysisTable(['改进建议', '对应诊断问题', '实施主体', '周期与跟踪指标'], [['数学变式复查', '专项到综合任务转化有限', '学生、数学教师', '2周；变式任务正确率与解释完整度'], ['订正后间隔复查', '21天复查119/384复现', '学生、任课教师、家长协助提醒', '第2、7、14天；同类错误复现率'], ['语文开放表达任务', '材料支持观点需持续巩固', '学生、语文教师', '2次开放任务；观点—材料—解释—回扣完整度'], ['学校教研复核', '个体发现是否具有群体意义', '备课组、教研组', '同类任务抽样；班级/年级层面对比']], 'V2 第六步建议与诊断对应关系')}<div class="v4-final-boundary">${icon('shield-check')}阶段结果：形成学生、教师、家长与学校两个层面的改进建议；每项建议绑定问题依据、责任主体、实施周期和跟踪指标。</div>`;
     await playActivity(content, '正在提出针对性改进建议', [
-      ['user-round', '生成学生层面建议', '明确任务、周期与自我检查方式'],
+      ['user-round', '明确学生层面优先改进问题', '订正保持与综合任务转化进入两周行动'],
       ['calculator', '生成数学支持行动', '变式复查变量、条件与交点意义'],
       ['notebook-pen', '生成语文支持行动', '开放任务复查材料与观点关系'],
-      ['presentation', '生成教师支持行动', '优化任务设计、反馈与延时跟踪'],
-      ['school', '生成学校支持行动', '补足过程数据并提供适宜学习机会'],
+      ['presentation', '生成教师支持行动', '针对具体知识内容和能力问题组织反馈'],
+      ['users-round', '生成家长配合建议', '按周期提醒复查，不额外增加重复练习量'],
+      ['school', '生成学校支持行动', '完善作业反馈、订正和持续跟踪'],
       ['landmark', '生成区域研判事项', '开展班级、学校或区域比较验证'],
       ['list-checks', '绑定跟踪指标', '第2、7、14天复查，不增加每日作业总时长']
     ], signal);
@@ -529,9 +536,9 @@
   }
 
   async function runReportQuality(signal) {
-    const stage = appendStage('report-quality', '第七步 · 报告审核', '生成并审核分析报告', '6个板块 · 9项检查');
+    const stage = appendStage('report-quality', '第七步 · 生成并审核分析报告', '按照六个一级板块完成报告复核', '6个板块 · 9项检查');
     const content = stage.querySelector('.v4-stage-content');
-    content.innerHTML = `<div class="v4-report-sections"><span>01 学生基本情况与数据说明</span><span>02 学期学业发展全景</span><span>03 学科学习能力深度分析</span><span>04 学习过程与改进成效</span><span>05 关键优势与核心问题诊断</span><span>06 个性化提升与协同支持方案</span></div><div class="v4-job-list"><div class="v4-job-row"><span class="v4-job-status">${icon('check')}</span><div><strong>数据引用与连续性</strong><small>核对指标计算、阶段变化与关键转折</small></div><b>通过</b></div><div class="v4-job-row"><span class="v4-job-status">${icon('check')}</span><div><strong>问题性质与多源支持</strong><small>区分偶发、反复和持续，保留反例与限制证据</small></div><b>通过</b></div><div class="v4-job-row"><span class="v4-job-status">${icon('check')}</span><div><strong>跨学科结论条件</strong><small>不足两个学科连续证据时停止共同特点判断</small></div><b>通过</b></div><div class="v4-job-row"><span class="v4-job-status">${icon('check')}</span><div><strong>建议与诊断对应</strong><small>明确主体、周期、行动和跟踪指标</small></div><b>通过</b></div><div class="v4-job-row"><span class="v4-job-status">${icon('check')}</span><div><strong>语言与教育评价规范</strong><small>客观、清楚、尊重学生，不使用标签化归因</small></div><b>通过</b></div></div><div class="v4-final-boundary">${icon('file-check-2')}《林知遥 · 八年级第二学期综合发展分析一页学习报告》已生成并完成审核。</div>`;
+    content.innerHTML = `<div class="v4-report-sections"><span>01 学生基本情况与数据说明</span><span>02 学期学业发展全景</span><span>03 学科学习能力深度分析</span><span>04 学习过程与改进成效</span><span>05 关键优势与核心问题诊断</span><span>06 个性化提升与协同支持方案</span></div>${analysisTable(['审核项', '审核口径', '结果'], [['数据引用和指标计算是否准确', '逐项核对分子、分母、均值、阶段区间和原始量尺', '通过'], ['变化、波动和关键转折是否有连续数据支持', '只保留17/18周覆盖内的连续或同口径记录', '通过'], ['学科分析是否具体到文体、能力维度、知识内容或任务类型', '语文到量规维度；数学到一次函数任务；英语到语篇语法线索', '通过'], ['是否区分偶发、反复和持续性问题', '英语/物理为观察线索；订正保持为反复问题', '通过'], ['优势和核心问题是否有多次、不同类型数据支持', '优势需作文/作业/测评/修改/复查等多源印证', '通过'], ['跨学科结论是否有两个及以上学科数据依据', '不足条件时只写待验证线索，不写结论', '通过'], ['改进建议是否与诊断问题一一对应', '每条建议绑定具体问题、主体和指标', '通过'], ['建议是否明确实施主体、周期和跟踪指标', '学生、教师、家长、学校分别标明', '通过'], ['语言是否客观、清楚、通俗并尊重学生', '删除标签化归因和高风险用途表述', '通过']], 'V2 第七步报告质量审核')}<div class="v4-final-boundary">${icon('file-check-2')}阶段结果：《林知遥 · 八年级第二学期综合发展分析两页学习报告》已按六个一级板块生成，并完成9项质量复核。</div>`;
     await playActivity(content, '正在生成报告并执行质量复核', [
       ['user-round-check', '生成基本情况与数据说明', '说明对象、周期、数据范围、缺失和可信度'],
       ['chart-no-axes-combined', '生成学期学业发展全景', '呈现学科趋势、阶段变化与任务转化'],
@@ -565,137 +572,17 @@
       <section class="v4-chain-section"><h3>判断边界</h3><p>不同来源保持各自分母和评价单位；专项任务变化不直接写成学科整体提升。结论仅用于低风险教学支持，不用于定级、排名或其他高影响决定。</p></section>`;
   }
 
-  const reportEvidenceLabels = {
-    1: '相关数学作业记录', 2: '一次函数任务记录', 3: '参数条件专项记录', 4: '订正后延时复查记录',
-    5: '数学反例记录一', 6: '数学反例记录二', 7: '语文材料修改记录', 8: '语文开放任务记录',
-    9: '人物描写观察记录', 10: '英语语篇观察记录', 11: '物理实验观察记录', 12: '数据边界记录'
-  };
+  const REPORT_V2_URL = 'assets/lin-zhiyao-learning-report-v2.html';
 
-  function reportText(text) {
-    return esc(text).replace(/\[证据(\d+)\]/g, (_, id) => `<sup class="report-citation" title="${reportEvidenceLabels[id] || '相关记录'}">[${id}]</sup>`);
-  }
-
-  function reportTable(table, index = 1) {
-    const head = (table.headers || []).map((cell) => `<th scope="col">${esc(cell)}</th>`).join('');
-    const rows = (table.rows || []).map((row) => `<tr>${row.map((cell) => `<td>${esc(cell)}</td>`).join('')}</tr>`).join('');
-    const title = table.type === 'funnel' ? '学习业务记录的数据处理过程' : table.type === 'support' ? '分学科两周支持安排' : table.type === 'method' ? '主要指标与判断口径' : '数据说明';
-    const source = table.type === 'funnel' ? 'learning-data.json · source_coverage / quality_funnel' : table.type === 'support' ? 'artifact.json · report_document.sections[四]' : 'artifact.json · report_document';
-    const note = table.type === 'funnel' ? '注：不同数据粒度分别处理；质检排除项不进入同口径比较。' : table.type === 'support' ? '注：支持安排替换同等时长的常规练习，不增加每日作业总时长。' : '注：课程映射用于解释学习内容，不据此判断学生达到具体课标等级。';
-    return `<figure class="golden-report-table-figure"><figcaption><span>表 ${index}</span>${esc(title)}</figcaption><div class="golden-report-table-wrap"><table class="golden-report-table"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div><p class="golden-report-table-note">${esc(note)}<br><span>数据来源：${esc(source)}</span></p></figure>`;
-  }
-
-  function reportAppendix(appendix, section) {
-    const evidence = (appendix?.evidence_records || []).map((record, index) => `<details class="golden-report-evidence"><summary><span class="report-evidence-number">[${index + 1}]</span><strong>${esc(record.evidence_type || record.record_id)}</strong><span>${esc(record.subject || '')} · 第${esc(record.week || '')}周</span></summary><div class="golden-report-evidence-body"><p>${esc(record.observation || '')}</p><dl><dt>来源记录</dt><dd><code>${esc(record.record_id || '')}</code></dd><dt>指标参考</dt><dd>${esc(record.metric || '')}</dd><dt>结论编号</dt><dd>${esc((record.claim_ids || []).join('、'))}</dd></dl></div></details>`).join('');
-    return `<section class="golden-report-section golden-report-appendix" id="report-section-appendix"><h2>${esc(section?.number || '六')} ${esc(section?.title || '学情分析依据附录')}</h2>${(section?.paragraphs || []).map((paragraph) => `<p>${reportText(paragraph)}</p>`).join('')}${(section?.tables || []).map((table, index) => reportTable(table, index + 3)).join('')}<h3>附录 A　代表性学习记录</h3><div class="golden-report-evidence-list">${evidence}</div></section>`;
-  }
-
-  function renderReport() {
-    const doc = state.artifact.report_document;
-    const appendixSection = (doc.sections || []).find((section) => section.id === 'appendix');
-    const appendixHtml = reportAppendix(doc.appendix, { ...appendixSection, number: '附录', title: '分析依据与代表性学习记录' });
-    const dataTable = reportTable({ type: 'method', headers: ['数据环节', '记录数量', '处理说明'], rows: [['学习业务原始记录', '3,428条', '保留来源与原评价单位'], ['通过基础质量检查', '3,408条', '去除8条重复记录，隔离12条缺标签记录'], ['进入同口径比较', '2,128条', '按学科、任务、时间和评价口径筛选'], ['证据记录', '184条', '选取12条代表性学习记录']] }, 1);
-    $('reportDocument').innerHTML = `<article class="golden-report"><div class="golden-report-running-head"><span>飞象老师 · 综合发展分析</span><span>林知遥 · 八年级第二学期综合发展分析报告</span></div><header id="report-cover" class="golden-report-cover"><div class="golden-report-brand"><span class="golden-report-mark">飞</span><span>飞象老师</span></div><div class="golden-report-cover-rule"></div><div class="golden-eyebrow">多源教育数据综合分析</div><h1>林知遥 · 八年级第二学期综合发展分析报告</h1><p class="golden-report-subtitle">——基于多源教育数据的个体诊断与支持建议</p><div class="golden-report-cover-meta"><span>分析对象</span><strong>林知遥 · 学号1805****</strong><span>分析周期</span><strong>2025—2026学年第二学期</strong><span>编制单位</span><strong>飞象老师 · 2026年7月</strong></div><p class="golden-report-boundary">本报告不计算综合总分，只用于低风险教育支持和后续复查；不用于定级、排名或其他高影响决定。</p></header><section class="golden-report-summary" id="report-summary"><div class="golden-report-chapter-kicker">综合结论</div><h2>可以确认的变化与需要继续核实的事项</h2><p>本学期能够确认的积极变化主要集中在两个具体领域：数学一次函数情境与综合应用任务的正确率由前6周69.8%变为后6周80.5%；语文“材料支持观点”量规由前5篇平均3.10变为后5篇3.68，并有作文外开放任务作为方向一致的证据。[证据1][证据2][证据7][证据8]</p><p>这些变化尚不能扩大为学科整体提升。常规测评标准分均值仅由0.08变为0.11；21天复查中119/384条同类错误再次出现，并检出2条数学反例。英语和物理只保留观察线索。[证据4][证据5][证据6][证据10][证据11]</p><p>体育锻炼、社会参与、志愿服务和研学活动等数据未达到本轮分析条件，因此不判断五育发展均衡性，也不以其他领域表现填补这一证据缺口。</p></section><section class="golden-report-section" id="report-section-overview"><div class="golden-report-chapter-kicker">一 · 报告正文</div><h2>学生概况与数据说明</h2><p>分析覆盖2025—2026学年第二学期18周，其中17个教学周有有效学习记录。数据来源包括智能作业、考试评价、AI作文及修改、教学覆盖信息和课程内容映射。身份字段按最小必要原则脱敏展示。</p>${dataTable}<p>不同系统的原始分、作文量规和题目级结果分别处理，不直接相加。心理健康数据未调用；体育、活动和研学等本轮无可靠数据的领域停止判断。</p></section><section class="golden-report-section" id="report-section-academic"><div class="golden-report-chapter-kicker">二 · 报告正文</div><h2>学业质量与学科关键能力</h2><section class="golden-report-subsection"><h3>数学</h3><p>一次函数情境与综合应用任务出现阶段变化，能够在水箱变化、图像交点实际意义和参数变化任务中表现出更完整的数量关系表达。[证据1][证据2][证据3] 但常规测评转化有限，订正后的延时保持仍需复查，不据此判断数学学科整体提升。</p></section><section class="golden-report-subsection"><h3>语文</h3><p>“材料支持观点”的表现由3.10变为3.68，社区志愿者材料的修改过程和作文外开放任务方向一致。[证据7][证据8] 人物描写仅有单篇观察，不扩大为稳定能力结论。[证据9]</p></section><section class="golden-report-subsection"><h3>英语、物理与跨学科判断</h3><p>英语一般过去时和物理实验控制条件仅保留局部观察线索。[证据10][证据11] 当前证据可以支持“在明确任务结构和材料支架下，部分具体表现出现变化”，但不能推导稳定的跨学科学习迁移或综合能力结论。</p></section></section><section class="golden-report-section" id="report-section-process"><div class="golden-report-chapter-kicker">三 · 报告正文</div><h2>学习过程与学习品质</h2><p>作业、订正和延时复查记录显示，部分内容在即时订正后能够改善，但21天后的同类任务仍出现119/384条错误复现。当前记录能够说明“订正后的稳定保持需要加强”，不能将其解释为投入不足、态度问题或自我管理能力不足。</p><p>出勤与阅读数据不足以完整判断学习投入度、持续性和自我管理。结果与过程之间可以确认的差异是：专项任务变化较明显，而常规测评转化有限，需要通过后续间隔复查继续观察。</p></section><section class="golden-report-section" id="report-section-health"><div class="golden-report-chapter-kicker">四 · 报告正文</div><h2>身心健康与综合实践</h2><p>本轮未接入能够支持学期判断的阳光跑、运动会、学校活动、志愿服务和研学成果记录，心理健康数据也未调用。因此不判断体育锻炼习惯、学校融入、社会责任、实践学习或五育发展均衡性。</p><p>该部分的结论是“证据不足”，不是“学生没有参与”或“相关表现不足”。后续如补充数据，应先核实活动机会、参与资格、客观条件和记录缺失，再开展分析。</p></section><section class="golden-report-section" id="report-section-diagnosis"><div class="golden-report-chapter-kicker">五 · 报告正文</div><h2>综合发展诊断</h2><h3>主要优势</h3><p>一是数学一次函数具体任务出现阶段变化；二是语文材料与观点关系的表达出现方向一致的改善。两项优势均落到具体课程内容和任务证据，不写成宽泛能力标签。</p><h3>需要改进</h3><p>一是加强订正后的间隔保持；二是继续观察专项任务变化能否转化为常规测评表现。发展均衡性因非学业证据不足暂不判断。</p><h3>风险信号与证据充分度</h3><p>英语和物理局部线索列为一般提示；订正后同类错误复现列为持续关注；当前没有多类数据共同指向同一高风险问题，因此不形成重点关注预警。数据基础证据较充分，数学和语文判断为有限至中等充分，其他综合发展领域证据不足。</p></section><section class="golden-report-section" id="report-section-support"><div class="golden-report-chapter-kicker">六 · 报告正文</div><h2>支持建议与区域启示</h2><h3>学生层面</h3><p>未来两周以数学变式任务复查变量、条件和交点意义，以语文开放任务复查“观点—材料—解释—回扣”，在第2、7、14天记录独立完成情况。</p><h3>教师与学校层面</h3><p>以同等时长的变式任务替换重复训练，保留首次作答、订正与延时复查链条；英语、物理只观察具体线索，不提前形成学期判断；不增加每日作业总时长。</p><h3>区域管理层面</h3><p>可在班级、学校和区域层面进一步检验“订正保持”“专项任务向测评转化”等现象是否具有普遍性，并分别研判作业管理、课程实施和评价机制。单个学生个案不能直接推导区域结论。</p></section>${appendixHtml}<footer class="golden-report-footer"><span>飞象老师 · 综合发展分析报告</span><span>仅用于低风险教育支持</span><span class="golden-report-page-number">页面可打印</span></footer></article>`;
-  }
-
-  function renderOnePageReport() {
-    $('reportDocument').innerHTML = `
-      <article class="golden-report onepage-report">
-        <header class="onepage-head">
-          <div class="onepage-title-block">
-            <div class="onepage-eyebrow">飞象老师 · 多源教育数据综合分析</div>
-            <h1>林知遥 · 八年级第二学期综合发展分析</h1>
-            <p>一页学习报告 · 用于教学支持与后续复查</p>
-          </div>
-          <dl class="onepage-meta">
-            <div><dt>分析周期</dt><dd>2025—2026学年第二学期 · 18周</dd></div>
-            <div><dt>分析对象</dt><dd>林知遥 · 学号1805****</dd></div>
-            <div><dt>比较口径</dt><dd>自身阶段变化与同口径任务</dd></div>
-          </dl>
-        </header>
-
-        <section class="onepage-thesis" aria-labelledby="onepage-thesis-title">
-          <span id="onepage-thesis-title">综合研判</span>
-          <p><strong>本学期可以确认的积极变化集中在数学一次函数具体任务和语文材料支持观点两个领域。</strong>数学专项变化尚未稳定转化为常规测评表现，订正后的延时保持仍需复查；英语只保留观察线索，其他数据不足内容停止判断。</p>
-        </section>
-
-        <section class="onepage-data-block" aria-labelledby="onepage-data-title">
-          <header class="onepage-band-head"><span>01</span><div><h2 id="onepage-data-title">学生基本情况与数据说明</h2><p>八年级 · 2025—2026学年第二学期 · 数据基础较充分，学科结论有限至中等可信</p></div></header>
-          <div class="onepage-data" aria-label="数据基础">
-          <div><strong>3,428</strong><span>学习业务记录</span></div>
-          <div><strong>3,408</strong><span>通过基础质检</span></div>
-          <div><strong>2,128</strong><span>同口径比较</span></div>
-          <div><strong>184</strong><span>证据记录</span></div>
-          <p>作业：数学1,026 / 语文612 / 英语733 / 物理384 / 道法88；测评：146 / 128 / 137 / 91 / 22；另含61条作文过程、91个教学日、212条课程映射</p>
-          </div>
-        </section>
-
-        <div class="onepage-main">
-          <section class="onepage-section onepage-evidence" aria-labelledby="onepage-change-title">
-            <header><span>02</span><div><h2 id="onepage-change-title">学期学业发展全景</h2><p>呈现学科趋势、阶段变化及日常任务与综合评价的一致程度</p></div></header>
-
-            <div class="onepage-subhead"><span>03</span><strong>学科学习能力深度分析</strong><small>具体到知识内容、评价量规和任务类型</small></div>
-
-            <article class="onepage-metric onepage-metric--math">
-              <div class="onepage-metric-head"><div><span>数学 · 一次函数专项</span><strong>具体任务出现阶段变化</strong></div><b>+10.7个百分点</b></div>
-              <div class="onepage-pair-bars">
-                <div><em>前6周</em><i><b style="width:69.8%"></b></i><strong>67/96 · 69.8%</strong></div>
-                <div><em>中6周</em><i><b style="width:75.9%"></b></i><strong>82/108 · 75.9%</strong></div>
-                <div><em>后6周</em><i><b style="width:80.5%"></b></i><strong>95/118 · 80.5%</strong></div>
-              </div>
-              <p>水箱变量、图像交点实际意义和参数变化任务提供支持；不扩大为数学学科整体提升。<sup>[1][2][3]</sup></p>
-            </article>
-
-            <div class="onepage-delta-grid">
-              <article class="onepage-delta">
-                <span>语文 · 材料支持观点</span>
-                <div><strong>3.10</strong><i>→</i><strong>3.68</strong></div>
-                <p>10篇同量规作文：3.00/3.10/3.00/3.20/3.20 → 3.50/3.60/3.70/3.80/3.80。<sup>[7][8]</sup></p>
-              </article>
-              <article class="onepage-delta is-limited">
-                <span>常规测评 · 标准分</span>
-                <div><strong>0.08</strong><i>→</i><strong>0.11</strong></div>
-                <p>0.04/0.09/0.11 → 0.07/0.12/0.14，均值变化有限。</p>
-              </article>
-            </div>
-
-            <div class="onepage-process-head"><span>04</span><h2>学习过程与改进成效</h2><small>订正、修改与反馈落实</small></div>
-            <article class="onepage-retention">
-              <div><span>21天订正保持复查</span><strong>119/384</strong></div>
-              <i><b></b></i>
-              <p>同类错误再次出现，并检出2条数学反例；说明即时订正已有落实，但稳定保持仍需加强。<sup>[4][5][6]</sup></p>
-            </article>
-          </section>
-
-          <aside class="onepage-section onepage-judgement" aria-labelledby="onepage-judgement-title">
-            <header><span>05</span><div><h2 id="onepage-judgement-title">关键优势与核心问题诊断</h2><p>标明具体依据、持续程度、影响范围和改进优先级</p></div></header>
-            <div class="onepage-trajectory">
-              <section class="is-confirmed"><span>主要优势 · 有限至中等可信</span><h3>两项具体变化</h3><p>数学一次函数专项表现提高；语文材料与观点关系的表达增强。</p></section>
-              <section class="is-review"><span>核心问题 · 优先改进</span><h3>转化与保持</h3><p>专项变化能否进入常规测评，以及订正内容能否稳定保持。</p></section>
-              <section class="is-observe"><span>只作观察</span><h3>英语、物理线索</h3><p>一般过去时波动、实验结论遗漏控制条件，不形成学期判断。</p></section>
-              <section class="is-stop"><span>停止判断</span><h3>证据不足领域</h3><p>道德与法治仅3周、22条有效作答；作答节奏仅2次有效分题时长。体育、社会参与和综合实践无可靠数据。</p></section>
-            </div>
-          </aside>
-        </div>
-
-        <section class="onepage-support" aria-labelledby="onepage-support-title">
-          <header><span>06</span><div><h2 id="onepage-support-title">个性化提升与协同支持方案</h2><p>围绕两个优先问题安排两周行动，不增加每日作业总时长</p></div></header>
-          <div class="onepage-support-grid">
-            <article><span>学生 · 2周</span><strong>6道数学变式 + 2次语文开放表达</strong><p>第2、7、14天自检；记录独立完成、提示后完成和仍需讲解三种结果。</p></article>
-            <article><span>教师与学校 · 3个节点</span><strong>保留首次—订正—延时复查链条</strong><p>数学第14天目标5/6独立正确；语文按同一量规复核材料、解释与回扣。</p></article>
-            <article><span>区域 · 待验证教研线索</span><strong>按班级和学校复核两类现象</strong><p>检验订正保持率与专项—测评差异分布，不由单个学生直接推导区域结论。</p></article>
-          </div>
-        </section>
-
-        <footer class="onepage-foot">
-          <p><strong>使用边界：</strong>不调用心理健康数据，不计算综合总分，不用于定级、排名或其他高影响决定；结论仅用于低风险教育支持。</p>
-          <span>Demo构造数据 · 仅用于产品展示</span>
-        </footer>
-      </article>`;
+  function renderTwoPageReport() {
+    const mount = $('reportDocument');
+    if (!mount) return;
+    mount.innerHTML = `<iframe class="v4-report-frame" title="林知遥·八年级第二学期综合发展分析报告" src="${REPORT_V2_URL}"></iframe>`;
   }
 
   function openReportPreview() {
     if (!state.artifact) return;
-    renderOnePageReport();
+    renderTwoPageReport();
     document.body.classList.add('report-open');
     const dialog = $('reportDialog');
     if (!dialog.open) {
@@ -712,14 +599,14 @@
     setTimeout(() => { if (dialog.open) dialog.close(); }, state.reducedMotion ? 10 : 260);
   }
 
-  function downloadReport() {
-    const article = $('reportDocument')?.innerHTML;
-    if (!article) return;
-    const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>林知遥 · 八年级第二学期一页学习报告</title><link rel="stylesheet" href="assets/research-golden.css"><link rel="stylesheet" href="assets/research-golden-v4.css"></head><body class="v4-page"><main class="report-page"><div>${article}</div></main></body></html>`;
+  async function downloadReport() {
+    const response = await fetch(REPORT_V2_URL, { cache: 'no-store' });
+    if (!response.ok) return;
+    const html = await response.text();
     const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = '林知遥 · 八年级第二学期一页学习报告.html';
+    link.download = '林知遥 · 八年级第二学期综合发展分析报告.html';
     document.body.appendChild(link);
     link.click();
     link.remove();

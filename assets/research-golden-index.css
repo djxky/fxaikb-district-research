@@ -37,34 +37,45 @@ button { color: inherit; cursor: pointer; }
 .rail-brand {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  margin-bottom: 17px;
-  color: #6d6b65;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 18px;
+  color: #6f6c66;
 }
+.rail-brand .icon { width: 17px; height: 17px; stroke-width: 1.55; }
 .rail-nav {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 .rail-btn {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   border: 1px solid transparent;
-  border-radius: 10px;
-  color: #77756f;
+  border-radius: 9px;
+  color: #77746d;
   background: transparent;
 }
-.rail-btn .icon { width: 17px; height: 17px; }
+.rail-btn .icon { width: 15px; height: 15px; stroke-width: 1.55; }
+.rail-btn[aria-label="新对话"] .icon,
+.rail-btn[aria-label="历史记录"] .icon,
+.rail-btn[aria-label="云空间"] .icon,
+.rail-btn[aria-label="我的作品"] .icon,
+.rail-btn[aria-label="知识库"] .icon,
+.rail-btn[aria-label="应用"] .icon,
+.rail-btn[aria-label="消息"] .icon,
+.rail-btn[aria-label="任务"] .icon { width: 16px; height: 16px; }
 .rail-btn.active {
-  border-color: #ded9cf;
-  background: #faf9f6;
-  box-shadow: 0 2px 8px rgba(62, 55, 46, .025);
+  border-color: #dfdacf;
+  color: #6d6a63;
+  background: rgba(255, 255, 255, .74);
+  box-shadow: 0 2px 8px rgba(62, 55, 46, .03);
 }
+.rail-btn.active .icon { width: 15px; height: 15px; stroke-width: 1.55; }
 .rail-user {
   width: 32px;
   height: 32px;
@@ -278,7 +289,10 @@ button:focus-visible { outline: 3px solid rgba(59, 92, 78, .24); outline-offset:
   .composer { grid-template-columns: auto minmax(0, 1fr) auto; min-height: 86px; border-radius: 22px; }
   .mic { display: none; }
   .mode-row { flex-wrap: wrap; }
-  .recommend { grid-template-columns: 1fr; }
+  .recommend { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .recommend-info { padding: 8px 10px 10px; }
+  .recommend-info h3 { font-size: 13px; }
+  .recommend-info > div { font-size: 11px; }
 }
 @media (max-width: 520px) {
   .greeting { gap: 13px; }
@@ -288,6 +302,7 @@ button:focus-visible { outline: 3px solid rgba(59, 92, 78, .24); outline-offset:
   .composer textarea { font-size: 15px; }
   .mode { height: 42px; padding: 0 12px; font-size: 13px; }
   .apps { gap: 34px; padding: 0; }
+  .recommend { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
