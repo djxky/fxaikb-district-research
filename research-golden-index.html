@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>飞象老师校园版 · Deep Research</title>
+  <link rel="stylesheet" href="assets/research-golden-index.css?v=index-03">
+  <script src="assets/lucide-local.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="rail" aria-label="校园版主导航">
+    <div class="rail-brand"><i data-lucide="panel-left"></i></div>
+    <nav class="rail-nav">
+      <button class="rail-btn active" aria-label="首页"><i data-lucide="bot"></i></button>
+      <button class="rail-btn" aria-label="新对话"><i data-lucide="message-square-plus"></i></button>
+      <button class="rail-btn" aria-label="历史记录"><i data-lucide="history"></i></button>
+      <button class="rail-btn" aria-label="云空间"><i data-lucide="cloud"></i></button>
+      <button class="rail-btn" aria-label="我的作品"><i data-lucide="inbox"></i></button>
+      <button class="rail-btn" aria-label="知识库"><i data-lucide="library"></i></button>
+      <button class="rail-btn" aria-label="应用"><i data-lucide="archive"></i></button>
+      <button class="rail-btn" aria-label="发现"><i data-lucide="globe"></i></button>
+    </nav>
+    <div class="rail-user"><img src="assets/home/avatar.jpg" alt="邓老师"></div>
+  </aside>
+
+  <main class="main">
+    <div class="greeting"><img class="assistant-avatar" src="assets/home/chat-logo.png" alt=""><h1>邓老师，今天想做什么？</h1></div>
+
+    <form class="composer" id="queryForm">
+      <button class="icon-button" type="button" aria-label="添加附件"><i data-lucide="plus"></i></button>
+      <textarea id="queryInput" rows="1" autofocus placeholder="例如：分析林知遥本学期的学习情况">林知遥本学期整体学习情况如何？</textarea>
+      <button class="icon-button mic" type="button" aria-label="语音输入"><i data-lucide="mic"></i></button>
+      <button class="icon-button send" id="sendQuery" type="submit" disabled aria-label="发送"><i data-lucide="arrow-up"></i></button>
+    </form>
+
+    <div class="mode-row" aria-label="工作模式">
+      <button class="mode" type="button"><i data-lucide="sparkles"></i>AI生成</button>
+      <button class="mode" type="button"><i data-lucide="search"></i>知识库问答</button>
+      <button class="mode" type="button"><i data-lucide="blocks"></i>创建应用</button>
+    </div>
+
+    <section class="section">
+      <div class="section-head"><h2>常用应用</h2><button class="section-link" type="button"><i data-lucide="pencil"></i>编辑</button></div>
+      <div class="apps">
+        <button class="app-card" type="button"><img src="assets/home/ai-school-qbank.png" alt=""><strong>AI校本题库</strong></button>
+        <button class="app-card" type="button"><img src="assets/home/ai-question-input.png" alt=""><strong>AI录题</strong></button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>为你推荐</h2><button class="section-link" type="button">全部<i data-lucide="chevron-right"></i></button></div>
+      <div class="recommend">
+        <article class="recommend-card"><img src="assets/home/recommend-workshop.jpg" alt="飞象老师 AI 工作坊"><span class="views">6.6万</span></article>
+        <article class="recommend-card"><img src="assets/home/recommend-english.jpg" alt="英语互动课件"><span class="badge">热门</span><span class="views">10万</span></article>
+        <article class="recommend-card"><img src="assets/home/recommend-cases.jpg" alt="飞象老师经典案例解析"><span class="badge">热门</span><span class="views">6.6万</span></article>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  (() => {
+    const input = document.getElementById('queryInput');
+    const form = document.getElementById('queryForm');
+    const send = document.getElementById('sendQuery');
+    const requestedVersion = new URLSearchParams(location.search).get('version');
+    const version = ['v1', 'v2', 'v3'].includes(requestedVersion) ? requestedVersion : 'v2';
+    const fallback = '林知遥本学期整体学习情况如何？';
+    const sync = () => { send.disabled = !input.value.trim(); };
+    input.addEventListener('input', sync);
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); }
+    });
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const query = input.value.trim() || fallback;
+      const targets = { v1: 'research-golden.html', v2: 'research-golden-v2.html', v3: 'research-golden-v3.html' };
+      const target = targets[version];
+      const params = new URLSearchParams({case:'overall', g:'11', golden:'16', q:query});
+      if (version === 'v2') params.set('v2', '1');
+      if (version === 'v3') params.set('v3', '1');
+      location.href = `${target}?${params.toString()}`;
+    });
+    sync();
+    window.lucide && window.lucide.createIcons();
+  })();
+</script>
+</body>
+</html>
