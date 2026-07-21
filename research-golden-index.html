@@ -65,7 +65,7 @@
     const form = document.getElementById('queryForm');
     const send = document.getElementById('sendQuery');
     const requestedVersion = new URLSearchParams(location.search).get('version');
-    const version = ['v1', 'v2', 'v3'].includes(requestedVersion) ? requestedVersion : 'v2';
+    const version = ['v1', 'v2', 'v3', 'v4'].includes(requestedVersion) ? requestedVersion : 'v2';
     const fallback = '林知遥本学期整体学习情况如何？';
     const sync = () => { send.disabled = !input.value.trim(); };
     input.addEventListener('input', sync);
@@ -75,11 +75,12 @@
     form.addEventListener('submit', event => {
       event.preventDefault();
       const query = input.value.trim() || fallback;
-      const targets = { v1: 'research-golden.html', v2: 'research-golden-v2.html', v3: 'research-golden-v3.html' };
+      const targets = { v1: 'research-golden.html', v2: 'research-golden-v2.html', v3: 'research-golden-v3.html', v4: 'research-golden-v4.html' };
       const target = targets[version];
       const params = new URLSearchParams({case:'overall', g:'11', golden:'16', q:query});
       if (version === 'v2') params.set('v2', '1');
       if (version === 'v3') params.set('v3', '1');
+      if (version === 'v4') params.set('v4', '1');
       location.href = `${target}?${params.toString()}`;
     });
     sync();
