@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>飞象老师校园版 · Deep Research</title>
-  <link rel="stylesheet" href="assets/research-golden-index.css?v=index-03">
+  <link rel="stylesheet" href="assets/research-golden-index.css?v=index-04">
   <script src="assets/lucide-local.js"></script>
 </head>
 <body>
@@ -12,7 +12,7 @@
   <aside class="rail" aria-label="校园版主导航">
     <div class="rail-brand"><i data-lucide="panel-left"></i></div>
     <nav class="rail-nav">
-      <button class="rail-btn active" aria-label="首页"><i data-lucide="bot"></i></button>
+      <button class="rail-btn active" aria-label="首页"><i data-lucide="house"></i></button>
       <button class="rail-btn" aria-label="新对话"><i data-lucide="message-square-plus"></i></button>
       <button class="rail-btn" aria-label="历史记录"><i data-lucide="history"></i></button>
       <button class="rail-btn" aria-label="云空间"><i data-lucide="cloud"></i></button>
@@ -20,6 +20,8 @@
       <button class="rail-btn" aria-label="知识库"><i data-lucide="library"></i></button>
       <button class="rail-btn" aria-label="应用"><i data-lucide="archive"></i></button>
       <button class="rail-btn" aria-label="发现"><i data-lucide="globe"></i></button>
+      <button class="rail-btn" aria-label="消息"><i data-lucide="message-square"></i></button>
+      <button class="rail-btn" aria-label="任务"><i data-lucide="square-check-big"></i></button>
     </nav>
     <div class="rail-user"><img src="assets/home/avatar.jpg" alt="邓老师"></div>
   </aside>
@@ -51,9 +53,18 @@
     <section class="section">
       <div class="section-head"><h2>为你推荐</h2><button class="section-link" type="button">全部<i data-lucide="chevron-right"></i></button></div>
       <div class="recommend">
-        <article class="recommend-card"><img src="assets/home/recommend-workshop.jpg" alt="飞象老师 AI 工作坊"><span class="views">6.6万</span></article>
-        <article class="recommend-card"><img src="assets/home/recommend-english.jpg" alt="英语互动课件"><span class="badge">热门</span><span class="views">10万</span></article>
-        <article class="recommend-card"><img src="assets/home/recommend-cases.jpg" alt="飞象老师经典案例解析"><span class="badge">热门</span><span class="views">6.6万</span></article>
+        <article class="recommend-card">
+          <div class="recommend-cover"><img src="assets/home/recommend-workshop.jpg" alt="飞象老师 AI 工作坊"><span class="views"><i data-lucide="eye"></i>6.6万</span></div>
+          <div class="recommend-info"><h3>飞象老师AI工作坊</h3><div><span class="author"><img src="assets/home/avatar.jpg" alt="">TeacherYO</span><span><i data-lucide="star"></i>6473</span></div></div>
+        </article>
+        <article class="recommend-card">
+          <div class="recommend-cover"><img src="assets/home/recommend-english.jpg" alt="英语互动课件"><span class="badge"><i data-lucide="flame"></i>热门</span><span class="views"><i data-lucide="eye"></i>10.1万</span></div>
+          <div class="recommend-info"><h3>Unit4 Healthy Food 第一课时</h3><div><span class="author"><img src="assets/home/avatar.jpg" alt="">海淀老师勇闯AI圈</span><span><i data-lucide="star"></i>6275</span></div></div>
+        </article>
+        <article class="recommend-card">
+          <div class="recommend-cover"><img src="assets/home/recommend-cases.jpg" alt="飞象老师经典案例解析"><span class="badge"><i data-lucide="flame"></i>热门</span><span class="views"><i data-lucide="eye"></i>6.6万</span></div>
+          <div class="recommend-info"><h3>【教学动画】生成语数英通用工具教学动画...</h3><div><span class="author"><img src="assets/home/avatar.jpg" alt="">TeacherYO</span><span><i data-lucide="star"></i>6169</span></div></div>
+        </article>
       </div>
     </section>
   </main>
@@ -82,7 +93,7 @@
       if (version === 'v3') params.set('v3', '1');
       if (version === 'v4') {
         params.set('v4', '1');
-        params.set('build', 'golden-v4-11');
+        params.set('build', 'golden-v4-22');
       }
       location.href = `${target}?${params.toString()}`;
     });
