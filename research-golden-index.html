@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>飞象老师校园版 · Deep Research</title>
-  <link rel="stylesheet" href="assets/research-golden-index.css?v=index-15">
+  <link rel="stylesheet" href="assets/research-golden-index.css?v=index-16">
   <script src="assets/lucide-local.js"></script>
 </head>
 <body>
@@ -28,10 +28,17 @@
     <div class="greeting"><img class="assistant-avatar" src="assets/home/chat-logo.png" alt=""><h1>邓老师，今天想做什么？</h1></div>
 
     <form class="composer" id="queryForm">
+      <div class="attachment-list" id="attachmentList" aria-live="polite"></div>
       <textarea id="queryInput" rows="2" autofocus placeholder="请输入想要分析的学情问题"></textarea>
       <div class="composer-footer">
         <div class="composer-tools">
-          <button class="icon-button add-attachment" type="button" aria-label="添加附件"><i data-lucide="plus"></i></button>
+          <div class="attachment-control">
+            <button class="icon-button add-attachment" id="attachmentTrigger" type="button" aria-label="添加文件或图片" aria-haspopup="menu" aria-expanded="false"><i data-lucide="plus"></i></button>
+            <div class="attachment-menu" id="attachmentMenu" role="menu" aria-label="添加附件" hidden>
+              <button type="button" role="menuitem" data-picker="file"><i data-lucide="paperclip"></i><span>添加文件</span></button>
+              <button type="button" role="menuitem" data-picker="image"><i data-lucide="image"></i><span>添加图片</span></button>
+            </div>
+          </div>
           <div class="selected-feature" aria-label="当前功能：学情分析">
             <i data-lucide="chart-no-axes-combined"></i>
             <span>学情分析</span>
@@ -42,6 +49,8 @@
           <button class="icon-button send" id="sendQuery" type="submit" disabled aria-label="发送"><i data-lucide="arrow-up"></i></button>
         </div>
       </div>
+      <input class="visually-hidden" id="filePicker" type="file" multiple>
+      <input class="visually-hidden" id="imagePicker" type="file" accept="image/*" multiple>
     </form>
 
     <div class="query-suggestions" aria-label="问题建议">
@@ -85,9 +94,122 @@
     const form = document.getElementById('queryForm');
     const send = document.getElementById('sendQuery');
     const suggestions = document.querySelectorAll('.query-suggestion');
+    const attachmentTrigger = document.getElementById('attachmentTrigger');
+    const attachmentMenu = document.getElementById('attachmentMenu');
+    const attachmentList = document.getElementById('attachmentList');
+    const filePicker = document.getElementById('filePicker');
+    const imagePicker = document.getElementById('imagePicker');
+    const attachmentLimit = 10;
+    let attachments = [];
     const requestedVersion = new URLSearchParams(location.search).get('version');
     const version = ['v1', 'v2', 'v3', 'v4'].includes(requestedVersion) ? requestedVersion : 'v2';
     const sync = () => { send.disabled = !input.value.trim(); };
+    const formatSize = bytes => {
+      if (bytes < 1024) return `${bytes}B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(bytes < 10240 ? 2 : 1)}KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(2)}MB`;
+    };
+    const extensionOf = name => {
+      const suffix = name.includes('.') ? name.split('.').pop() : '文件';
+      return suffix.slice(0, 4).toUpperCase();
+    };
+    const iconOf = (name, kind) => {
+      if (kind === 'image') return 'file-image';
+      const extension = extensionOf(name).toLowerCase();
+      if (['xls', 'xlsx', 'csv'].includes(extension)) return 'file-spreadsheet';
+      if (['html', 'htm', 'js', 'json', 'py'].includes(extension)) return 'file-code';
+      if (['doc', 'docx', 'pdf', 'txt', 'md'].includes(extension)) return 'file-text';
+      return 'file';
+    };
+    const closeAttachmentMenu = () => {
+      attachmentMenu.hidden = true;
+      attachmentTrigger.setAttribute('aria-expanded', 'false');
+    };
+    const renderAttachments = () => {
+      attachmentList.replaceChildren();
+      attachmentList.hidden = attachments.length === 0;
+      form.classList.toggle('has-attachments', attachments.length > 0);
+      attachments.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'attachment-card';
+        card.dataset.attachmentId = item.id;
+
+        const icon = document.createElement('span');
+        icon.className = `attachment-file-icon ${item.kind === 'image' ? 'is-image' : ''}`;
+        icon.innerHTML = `<i data-lucide="${iconOf(item.file.name, item.kind)}"></i>`;
+
+        const meta = document.createElement('span');
+        meta.className = 'attachment-meta';
+        const name = document.createElement('span');
+        name.className = 'attachment-name';
+        name.textContent = item.file.name;
+        const status = document.createElement('span');
+        status.className = 'attachment-status';
+        status.textContent = item.status === 'uploading' ? `上传中 ${item.progress}%` : formatSize(item.file.size);
+        meta.append(name, status);
+
+        const remove = document.createElement('button');
+        remove.className = 'attachment-remove';
+        remove.type = 'button';
+        remove.setAttribute('aria-label', `移除 ${item.file.name}`);
+        remove.innerHTML = '<i data-lucide="x"></i>';
+        remove.addEventListener('click', () => {
+          attachments = attachments.filter(attachment => attachment.id !== item.id);
+          renderAttachments();
+        });
+
+        card.append(icon, meta, remove);
+        attachmentList.appendChild(card);
+      });
+      window.lucide && window.lucide.createIcons({ nodes: [attachmentList] });
+    };
+    const finishUpload = id => {
+      const item = attachments.find(attachment => attachment.id === id);
+      if (!item) return;
+      if (item.progress < 100) {
+        item.progress = Math.min(100, item.progress + 25);
+        renderAttachments();
+        window.setTimeout(() => finishUpload(id), 90);
+        return;
+      }
+      item.status = 'done';
+      renderAttachments();
+    };
+    const addFiles = (files, kind) => {
+      const available = Math.max(0, attachmentLimit - attachments.length);
+      Array.from(files).slice(0, available).forEach((file, index) => {
+        const id = `${Date.now()}-${index}-${Math.random().toString(16).slice(2)}`;
+        attachments.push({ id, file, kind, status: 'uploading', progress: 0 });
+        window.setTimeout(() => finishUpload(id), 80 + index * 50);
+      });
+      renderAttachments();
+      filePicker.value = '';
+      imagePicker.value = '';
+    };
+    attachmentTrigger.addEventListener('click', event => {
+      event.stopPropagation();
+      const willOpen = attachmentMenu.hidden;
+      attachmentMenu.hidden = !willOpen;
+      attachmentTrigger.setAttribute('aria-expanded', String(willOpen));
+      if (willOpen) attachmentMenu.querySelector('button')?.focus();
+    });
+    attachmentMenu.addEventListener('click', event => {
+      const option = event.target.closest('[data-picker]');
+      if (!option) return;
+      closeAttachmentMenu();
+      (option.dataset.picker === 'image' ? imagePicker : filePicker).click();
+    });
+    filePicker.addEventListener('change', () => addFiles(filePicker.files, 'file'));
+    imagePicker.addEventListener('change', () => addFiles(imagePicker.files, 'image'));
+    document.addEventListener('click', event => {
+      if (!event.target.closest('.attachment-control')) closeAttachmentMenu();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeAttachmentMenu();
+        attachmentTrigger.focus();
+      }
+    });
     input.addEventListener('input', sync);
     input.addEventListener('keydown', event => {
       if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); }

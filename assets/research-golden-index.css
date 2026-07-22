@@ -17,7 +17,7 @@ html, body {
   font: 14px/1.55 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-button, textarea { font: inherit; }
+button, textarea, input { font: inherit; }
 button { color: inherit; cursor: pointer; }
 .icon { width: 18px; height: 18px; stroke-width: 1.65; }
 
@@ -120,6 +120,7 @@ button { color: inherit; cursor: pointer; }
 }
 
 .composer {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 136px;
@@ -130,6 +131,87 @@ button { color: inherit; cursor: pointer; }
   background: var(--surface);
   box-shadow: var(--shadow);
 }
+.composer.has-attachments { min-height: 202px; }
+.visually-hidden {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.attachment-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  padding: 0 7px 12px;
+}
+.attachment-list[hidden] { display: none; }
+.attachment-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 220px;
+  min-width: 0;
+  height: 64px;
+  padding: 10px 30px 10px 12px;
+  border-radius: 12px;
+  background: #f7f7f5;
+}
+.attachment-file-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 36px;
+  flex: 0 0 auto;
+  color: #639a71;
+}
+.attachment-file-icon.is-image { color: #7c91a7; }
+.attachment-file-icon .icon { width: 29px; height: 34px; stroke-width: 1.65; }
+.attachment-meta {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+}
+.attachment-name {
+  overflow: hidden;
+  color: #292824;
+  font-size: 14px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attachment-status {
+  margin-top: 2px;
+  color: #9b9fa3;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.attachment-remove {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #85827b;
+  background: transparent;
+  opacity: 0;
+  transition: opacity .16s ease, background-color .16s ease;
+}
+.attachment-card:hover .attachment-remove,
+.attachment-remove:focus-visible { opacity: 1; }
+.attachment-remove:hover { background: #ebeae6; }
+.attachment-remove .icon { width: 14px; height: 14px; }
 .icon-button {
   display: grid;
   place-items: center;
@@ -171,6 +253,40 @@ button { color: inherit; cursor: pointer; }
   align-items: center;
   gap: 10px;
 }
+.attachment-control { position: relative; }
+.attachment-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 9px);
+  left: 0;
+  width: 142px;
+  padding: 6px;
+  border: 1px solid #ebe8e1;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(45, 42, 35, .12);
+}
+.attachment-menu[hidden] { display: none; }
+.attachment-menu button {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  height: 42px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9px;
+  color: #34332f;
+  background: transparent;
+  font-size: 14px;
+  text-align: left;
+}
+.attachment-menu button:hover,
+.attachment-menu button:focus-visible {
+  outline: 0;
+  background: #f6f5f1;
+}
+.attachment-menu .icon { width: 18px; height: 18px; stroke-width: 1.8; }
 .selected-feature {
   display: inline-flex;
   align-items: center;
@@ -348,6 +464,9 @@ button:focus-visible { outline: 3px solid rgba(59, 92, 78, .24); outline-offset:
   .greeting { gap: 13px; }
   .greeting h1 { font-size: 24px; }
   .composer { padding: 14px; gap: 8px; }
+  .composer.has-attachments { min-height: 202px; }
+  .attachment-list { gap: 8px; padding: 0 0 8px; }
+  .attachment-card { width: 100%; }
   .icon-button { width: 36px; height: 36px; border-radius: 11px; }
   .composer textarea { font-size: 15px; }
   .selected-feature { height: 36px; padding: 0 11px; font-size: 13px; }
