@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>飞象老师校园版 · Deep Research</title>
-  <link rel="stylesheet" href="assets/research-golden-index.css?v=index-12">
+  <link rel="stylesheet" href="assets/research-golden-index.css?v=index-15">
   <script src="assets/lucide-local.js"></script>
 </head>
 <body>
@@ -28,7 +28,7 @@
     <div class="greeting"><img class="assistant-avatar" src="assets/home/chat-logo.png" alt=""><h1>邓老师，今天想做什么？</h1></div>
 
     <form class="composer" id="queryForm">
-      <textarea id="queryInput" rows="2" autofocus placeholder="请输入想要分析的学情问题">林知遥本学期整体学习情况如何？</textarea>
+      <textarea id="queryInput" rows="2" autofocus placeholder="请输入想要分析的学情问题"></textarea>
       <div class="composer-footer">
         <div class="composer-tools">
           <button class="icon-button add-attachment" type="button" aria-label="添加附件"><i data-lucide="plus"></i></button>
@@ -43,6 +43,13 @@
         </div>
       </div>
     </form>
+
+    <div class="query-suggestions" aria-label="问题建议">
+      <span class="suggestion-label">试试问我</span>
+      <button class="query-suggestion" type="button" data-query="林知遥本学期整体学习情况如何？">
+        <span>林知遥本学期整体学习情况如何？</span>
+      </button>
+    </div>
 
     <section class="section">
       <div class="section-head"><h2>常用应用</h2><button class="section-link" type="button"><i data-lucide="pencil"></i>编辑</button></div>
@@ -77,17 +84,26 @@
     const input = document.getElementById('queryInput');
     const form = document.getElementById('queryForm');
     const send = document.getElementById('sendQuery');
+    const suggestions = document.querySelectorAll('.query-suggestion');
     const requestedVersion = new URLSearchParams(location.search).get('version');
     const version = ['v1', 'v2', 'v3', 'v4'].includes(requestedVersion) ? requestedVersion : 'v2';
-    const fallback = '林知遥本学期整体学习情况如何？';
     const sync = () => { send.disabled = !input.value.trim(); };
     input.addEventListener('input', sync);
     input.addEventListener('keydown', event => {
       if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); }
     });
+    suggestions.forEach(suggestion => {
+      suggestion.addEventListener('click', () => {
+        input.value = suggestion.dataset.query || '';
+        sync();
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      });
+    });
     form.addEventListener('submit', event => {
       event.preventDefault();
-      const query = input.value.trim() || fallback;
+      const query = input.value.trim();
+      if (!query) return;
       const targets = { v1: 'research-golden.html', v2: 'research-golden-v2.html', v3: 'research-golden-v3.html', v4: 'research-golden-v4.html' };
       const target = targets[version];
       const params = new URLSearchParams({case:'overall', g:'11', golden:'16', q:query});

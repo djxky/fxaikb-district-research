@@ -186,6 +186,44 @@ button { color: inherit; cursor: pointer; }
 }
 .selected-feature .icon { width: 17px; height: 17px; stroke-width: 1.8; }
 
+.query-suggestions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 34px;
+  margin-top: 13px;
+  padding-left: 8px;
+}
+.suggestion-label {
+  flex: 0 0 auto;
+  color: #9b9891;
+  font-size: 13px;
+}
+.query-suggestion {
+  display: inline-block;
+  max-width: min(100%, 390px);
+  padding: 5px 12px;
+  overflow: hidden;
+  border: 1px solid #dedbd4;
+  border-radius: 999px;
+  color: #77736c;
+  background: rgba(255, 255, 255, .55);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  transition: color .16s ease;
+}
+.query-suggestion span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.query-suggestion:hover {
+  border-color: #cbded7;
+  color: #356f60;
+  background: #f7faf8;
+}
+
 .section { margin-top: 44px; }
 .section + .section { margin-top: 52px; }
 .section-head {
@@ -314,6 +352,9 @@ button:focus-visible { outline: 3px solid rgba(59, 92, 78, .24); outline-offset:
   .composer textarea { font-size: 15px; }
   .selected-feature { height: 36px; padding: 0 11px; font-size: 13px; }
   .composer-tools, .composer-actions { gap: 7px; }
+  .query-suggestions { align-items: flex-start; gap: 8px; padding-left: 2px; }
+  .suggestion-label { padding-top: 8px; }
+  .query-suggestion { min-width: 0; }
   .apps { gap: 34px; padding: 0; }
   .recommend { grid-template-columns: 1fr; }
 }
