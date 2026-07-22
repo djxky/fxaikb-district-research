@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>飞象老师校园版 · Deep Research</title>
-  <link rel="stylesheet" href="assets/research-golden-index.css?v=index-07">
+  <link rel="stylesheet" href="assets/research-golden-index.css?v=index-08">
   <script src="assets/lucide-local.js"></script>
 </head>
 <body>
@@ -30,17 +30,21 @@
     <div class="greeting"><img class="assistant-avatar" src="assets/home/chat-logo.png" alt=""><h1>邓老师，今天想做什么？</h1></div>
 
     <form class="composer" id="queryForm">
-      <button class="icon-button" type="button" aria-label="添加附件"><i data-lucide="plus"></i></button>
-      <textarea id="queryInput" rows="1" autofocus placeholder="例如：分析林知遥本学期的学习情况">林知遥本学期整体学习情况如何？</textarea>
-      <button class="icon-button mic" type="button" aria-label="语音输入"><i data-lucide="mic"></i></button>
-      <button class="icon-button send" id="sendQuery" type="submit" disabled aria-label="发送"><i data-lucide="arrow-up"></i></button>
+      <textarea id="queryInput" rows="2" autofocus placeholder="请输入想要分析的学情问题">林知遥本学期整体学习情况如何？</textarea>
+      <div class="composer-footer">
+        <div class="composer-tools">
+          <button class="icon-button add-attachment" type="button" aria-label="添加附件"><i data-lucide="plus"></i></button>
+          <div class="selected-feature" aria-label="当前功能：学情分析">
+            <i data-lucide="chart-no-axes-combined"></i>
+            <span>学情分析</span>
+          </div>
+        </div>
+        <div class="composer-actions">
+          <button class="icon-button mic" type="button" aria-label="语音输入"><i data-lucide="mic"></i></button>
+          <button class="icon-button send" id="sendQuery" type="submit" disabled aria-label="发送"><i data-lucide="arrow-up"></i></button>
+        </div>
+      </div>
     </form>
-
-    <div class="mode-row" aria-label="工作模式">
-      <button class="mode" type="button"><i data-lucide="sparkles"></i>AI生成</button>
-      <button class="mode" type="button"><i data-lucide="search"></i>知识库问答</button>
-      <button class="mode" type="button"><i data-lucide="blocks"></i>创建应用</button>
-    </div>
 
     <section class="section">
       <div class="section-head"><h2>常用应用</h2><button class="section-link" type="button"><i data-lucide="pencil"></i>编辑</button></div>
