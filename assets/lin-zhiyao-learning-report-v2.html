@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>林知遥·八年级第二学期综合发展分析报告</title>
+  <style>
+    :root {
+      --ink: #172326;
+      --muted: #687574;
+      --line: #b8c2be;
+      --soft-line: #dfe5e2;
+      --paper: #ffffff;
+      --canvas: #e9eeeb;
+      --green: #2f6e5d;
+      --green-2: #628f7f;
+      --green-soft: #eaf1ed;
+      --blue: #285f75;
+      --blue-soft: #eaf1f4;
+      --orange: #b56c3e;
+      --orange-soft: #f7eee7;
+      --gold: #9b7a33;
+      --gold-soft: #f5f1e6;
+      --red: #a64b42;
+      --red-soft: #f7eae8;
+      --gray-soft: #f4f6f5;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--canvas); color: var(--ink); }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      font-size: 10px;
+      line-height: 1.52;
+      -webkit-font-smoothing: antialiased;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 12mm auto;
+      padding: 9mm 13mm 8mm;
+      background: var(--paper);
+      box-shadow: 0 10px 35px rgba(25, 44, 38, .14);
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+    }
+    .page:last-child { page-break-after: auto; }
+
+    @page { size: A4; margin: 0; }
+    @media print {
+      html, body { background: #fff; }
+      .page { margin: 0; box-shadow: none; }
+    }
+
+    h1, h2, h3, h4, p { margin: 0; }
+    h1, .serif { font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif; }
+    h1 { font-size: 27px; line-height: 1.25; letter-spacing: .5px; font-weight: 700; }
+    h2 { font-size: 13px; line-height: 1.35; }
+    h3 { font-size: 11px; line-height: 1.4; }
+    h4 { font-size: 10px; }
+
+    .brand {
+      color: var(--green);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .6px;
+      margin-bottom: 3.5mm;
+    }
+    .topline {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10mm;
+    }
+    .subtitle { color: #40504e; font-size: 9px; margin-top: 3mm; }
+    .meta {
+      width: 66mm;
+      border-collapse: collapse;
+      font-size: 8px;
+      margin-top: 3mm;
+    }
+    .meta td { padding: 1.45mm 0; border-bottom: 1px solid var(--soft-line); vertical-align: top; }
+    .meta td:first-child { width: 19mm; color: var(--muted); }
+    .summary-banner {
+      display: grid;
+      grid-template-columns: 23mm 1fr;
+      margin-top: 3.5mm;
+      padding: 2.5mm 3.5mm;
+      background: var(--green-soft);
+      border-left: 2px solid var(--green);
+    }
+    .summary-banner strong { color: var(--green); font-size: 9px; }
+    .summary-banner p { font-size: 9px; line-height: 1.65; }
+
+    .section { margin-top: 3.1mm; }
+    .section-title {
+      display: grid;
+      grid-template-columns: 9mm auto 1fr;
+      align-items: baseline;
+      gap: 1.2mm;
+      margin-bottom: 1.8mm;
+    }
+    .section-no { color: var(--blue); font-size: 8px; font-weight: 800; letter-spacing: .8px; }
+    .section-title h2 { font-weight: 750; }
+    .section-title .desc { color: var(--muted); font-size: 7.5px; margin-left: 2mm; }
+    .rule { height: 1px; background: var(--ink); margin-bottom: 2.4mm; }
+    .thin-rule { height: 1px; background: var(--soft-line); }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1.5px solid var(--ink);
+      border-bottom: 1px solid var(--line);
+    }
+    .kpi { padding: 2.4mm 3mm 2.2mm; border-right: 1px solid var(--soft-line); min-height: 18mm; }
+    .kpi:last-child { border-right: 0; }
+    .kpi .num { color: var(--blue); font-size: 19px; font-weight: 800; letter-spacing: .4px; line-height: 1; }
+    .kpi .label { margin-top: 1.6mm; font-size: 8px; font-weight: 650; }
+    .kpi .note { color: var(--muted); font-size: 7px; margin-top: .6mm; }
+    .data-note { color: var(--muted); font-size: 7px; margin-top: 1.5mm; }
+
+    .two-col { display: grid; grid-template-columns: 1.18fr .82fr; gap: 5mm; }
+    .equal-col { display: grid; grid-template-columns: 1fr 1fr; gap: 4.5mm; }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.2mm; }
+
+    .subject-card {
+      border-top: 1.5px solid var(--ink);
+      padding: 2.2mm 2.5mm;
+      background: linear-gradient(to bottom, #fff, #fbfcfb);
+    }
+    .subject-card + .subject-card { margin-top: 1.6mm; }
+    .subject-head { display: flex; justify-content: space-between; align-items: baseline; gap: 3mm; }
+    .subject-head .tag { color: var(--green); font-weight: 800; font-size: 8px; }
+    .subject-head .delta { color: var(--green); font-size: 8px; font-weight: 750; }
+    .subject-card h3 { margin-top: .8mm; }
+    .subject-card p { color: #43504f; font-size: 8px; margin-top: 1mm; }
+    .metric-row { display: grid; grid-template-columns: 31mm 1fr 25mm; gap: 2mm; align-items: center; margin-top: 1.3mm; }
+    .metric-row .m-label { color: #566361; font-size: 7.5px; }
+    .bar { height: 4px; background: #e6ebe8; position: relative; overflow: hidden; }
+    .bar > i { display: block; height: 100%; background: var(--green-2); }
+    .bar.orange > i { background: var(--orange); }
+    .bar.blue > i { background: var(--blue); }
+    .metric-row .m-value { text-align: right; font-size: 7.5px; font-weight: 700; }
+
+    .finding-stack { border-top: 1.5px solid var(--ink); }
+    .finding {
+      position: relative;
+      padding: 3mm 3mm 2.8mm 7mm;
+      background: var(--gray-soft);
+      margin-top: 2mm;
+      min-height: 22mm;
+    }
+    .finding:before {
+      content: "";
+      position: absolute;
+      left: 2.7mm;
+      top: 5.1mm;
+      width: 2.2mm;
+      height: 2.2mm;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 1px #fff, 0 0 0 1.5px var(--green);
+    }
+    .finding.orange:before { background: var(--orange); box-shadow: 0 0 0 1px #fff, 0 0 0 1.5px var(--orange); }
+    .finding.blue:before { background: var(--blue); box-shadow: 0 0 0 1px #fff, 0 0 0 1.5px var(--blue); }
+    .finding.red:before { background: var(--red); box-shadow: 0 0 0 1px #fff, 0 0 0 1.5px var(--red); }
+    .finding .eyebrow { color: var(--muted); font-size: 7px; }
+    .finding h3 { margin-top: .5mm; }
+    .finding p { color: #4f5b59; font-size: 7.5px; margin-top: .7mm; }
+
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1.5px solid var(--ink);
+      padding-bottom: 2.2mm;
+      margin-bottom: 3mm;
+    }
+    .page-head .report-name { font-family: "Songti SC", serif; font-size: 13px; font-weight: 700; }
+    .page-head .page-index { color: var(--muted); font-size: 7.5px; }
+
+    .panel { border: 1px solid var(--soft-line); background: #fff; }
+    .panel-title { padding: 2.2mm 3mm; border-bottom: 1px solid var(--soft-line); background: var(--gray-soft); display: flex; justify-content: space-between; }
+    .panel-title h3 { font-size: 9px; }
+    .panel-title span { color: var(--muted); font-size: 7px; }
+    .panel-body { padding: 2.2mm 2.6mm; }
+    .insight { border-left: 2px solid var(--green); padding-left: 2.5mm; font-size: 8px; color: #3c4b48; }
+
+    .draft-chart { margin-top: 1.5mm; }
+    .draft-row { display: grid; grid-template-columns: 19mm 1fr 19mm; align-items: center; gap: 2mm; margin: 1.6mm 0; }
+    .draft-label { color: var(--muted); font-size: 7px; }
+    .dualbar { display: flex; align-items: center; gap: 1mm; }
+    .dualbar .first { height: 5px; background: #cbd5d1; }
+    .dualbar .second { height: 5px; background: var(--green); }
+    .draft-score { text-align: right; font-size: 7.5px; font-weight: 700; }
+    .legend { display: flex; gap: 4mm; color: var(--muted); font-size: 6.8px; margin-top: 1.5mm; }
+    .legend i { display: inline-block; width: 7px; height: 4px; margin-right: 1mm; vertical-align: middle; }
+
+    .radar-wrap { display: grid; grid-template-columns: 35mm 1fr; gap: 2.5mm; align-items: center; }
+    .radar-notes div { margin: 1.2mm 0; font-size: 7.4px; }
+    .radar-notes b { display: inline-block; width: 19mm; }
+
+    .stack-row { display: grid; grid-template-columns: 24mm 1fr 29mm; gap: 2mm; align-items: center; margin: 1.8mm 0; }
+    .stack-label { font-size: 7.2px; font-weight: 650; }
+    .stack { display: flex; height: 7px; background: #edf0ee; overflow: hidden; }
+    .stack .good { background: #5d9d85; }
+    .stack .attention { background: #7775c7; }
+    .stack .critical { background: #e49b58; }
+    .stack-value { text-align: right; color: var(--muted); font-size: 6.8px; }
+
+    table.data-table { width: 100%; border-collapse: collapse; font-size: 7.2px; margin-top: 2mm; }
+    .data-table th { color: #667370; font-weight: 500; background: var(--gray-soft); text-align: left; padding: 1.5mm 1.6mm; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .data-table td { padding: 1.45mm 1.6mm; border-bottom: 1px solid var(--soft-line); vertical-align: top; }
+    .data-table .risk { color: var(--red); font-weight: 750; }
+    .data-table .watch { color: var(--orange); font-weight: 750; }
+
+    .english-bars .metric-row { grid-template-columns: 28mm 1fr 13mm; margin-top: 1.1mm; }
+    .mini-note { color: var(--muted); font-size: 6.8px; margin-top: 1.5mm; }
+
+    .process-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+    .process-card { border-top: 2px solid var(--green); background: var(--gray-soft); padding: 2.4mm; min-height: 25mm; }
+    .process-card.orange { border-color: var(--orange); }
+    .process-card.blue { border-color: var(--blue); }
+    .process-card .big { font-size: 17px; font-weight: 800; line-height: 1; color: var(--green); }
+    .process-card.orange .big { color: var(--orange); }
+    .process-card.blue .big { color: var(--blue); }
+    .process-card h3 { margin-top: 1.6mm; }
+    .process-card p { color: #4b5956; font-size: 7.5px; margin-top: 1mm; }
+
+    .diagnosis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+    .diagnosis-col { border-top: 1.5px solid var(--ink); }
+    .diag-item { display: grid; grid-template-columns: 5mm 1fr; gap: 2mm; padding: 2.5mm 0; border-bottom: 1px solid var(--soft-line); }
+    .diag-dot { width: 3mm; height: 3mm; border-radius: 50%; background: var(--green); margin-top: .7mm; color: #fff; font-size: 6px; display: flex; align-items: center; justify-content: center; }
+    .diag-dot.problem { background: var(--orange); }
+    .diag-item h3 { font-size: 8.5px; }
+    .diag-item p { color: #53605e; font-size: 7.2px; margin-top: .6mm; }
+
+    .cross-box {
+      margin-top: 3mm;
+      display: grid;
+      grid-template-columns: 1fr 1.18fr 1fr;
+      gap: 3mm;
+      align-items: stretch;
+    }
+    .cross-side { background: var(--gray-soft); padding: 3mm; }
+    .cross-side h3 { color: var(--green); margin-bottom: 1.4mm; }
+    .cross-side p { color: #4e5a58; font-size: 7.3px; }
+    .cross-core { background: var(--green-soft); border: 1px solid #cddbd5; padding: 3mm; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+    .cross-core .quote { font-family: "Songti SC", serif; font-size: 12px; line-height: 1.55; font-weight: 700; }
+    .cross-core p { color: #50605c; font-size: 7.2px; margin-top: 1.5mm; }
+
+    .support-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1.5px solid var(--ink); border-bottom: 1px solid var(--line); }
+    .support { min-height: 34mm; padding: 2.5mm; border-right: 1px solid var(--soft-line); }
+    .support:last-child { border-right: 0; }
+    .support .role { color: var(--blue); font-size: 7px; font-weight: 800; }
+    .support h3 { margin-top: 1mm; font-size: 8.5px; }
+    .support p { margin-top: 1.3mm; color: #4e5b59; font-size: 7px; }
+    .support b { color: var(--ink); }
+
+    .footer {
+      position: absolute;
+      left: 13mm;
+      right: 13mm;
+      bottom: 4.5mm;
+      display: flex;
+      justify-content: space-between;
+      color: #75817f;
+      font-size: 6.4px;
+      border-top: 1px solid var(--soft-line);
+      padding-top: 1.5mm;
+    }
+    .pill { display: inline-block; padding: .5mm 1.5mm; border-radius: 20px; background: var(--green-soft); color: var(--green); font-size: 6.5px; font-weight: 700; }
+    .pill.orange { background: var(--orange-soft); color: var(--orange); }
+    .pill.blue { background: var(--blue-soft); color: var(--blue); }
+    .muted { color: var(--muted); }
+
+    .overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.6mm; }
+    .overview-grid .subject-card { margin-top: 0; min-height: 38mm; }
+    .overview-grid .metric-row { grid-template-columns: 21mm 1fr 24mm; gap: 1.2mm; }
+    .overview-grid .subject-card p { font-size: 7.1px; }
+    .key-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2mm; margin-top: 2.2mm; }
+    .key-chip { padding: 2mm 2.2mm; background: var(--gray-soft); border-top: 1.5px solid var(--green); min-height: 18mm; }
+    .key-chip.orange { border-color: var(--orange); }
+    .key-chip.blue { border-color: var(--blue); }
+    .key-chip.red { border-color: var(--red); }
+    .key-chip b { display: block; font-size: 7.8px; margin-bottom: .7mm; }
+    .key-chip span { display: block; color: #52605d; font-size: 6.7px; }
+    .mini-three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.4mm; margin-top: 2mm; }
+    .mini-insight { background: var(--gray-soft); padding: 2mm 2.3mm; border-top: 1.5px solid var(--green); min-height: 18mm; }
+    .mini-insight.blue { border-color: var(--blue); }
+    .mini-insight.orange { border-color: var(--orange); }
+    .mini-insight h3 { font-size: 8px; }
+    .mini-insight p { font-size: 6.7px; color: #52605d; margin-top: .6mm; }
+    .tight .panel-title { padding: 1.7mm 2.4mm; }
+    .tight .panel-body { padding: 1.8mm 2.4mm; }
+    .tight .data-table { margin-top: .5mm; font-size: 6.7px; }
+    .tight .data-table th, .tight .data-table td { padding: 1.05mm 1.2mm; }
+    .tight .stack-row { margin: 1.25mm 0; }
+    .tight .metric-row { margin-top: .8mm; }
+    .compact-diagnosis .diag-item { padding: 1.7mm 0; }
+    .compact-diagnosis .diag-item h3 { font-size: 7.8px; }
+    .compact-diagnosis .diag-item p { font-size: 6.6px; }
+    .conclusion-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.6mm; }
+    .conclusion-card { background: var(--gray-soft); border-top: 2px solid var(--green); padding: 2.6mm 2.8mm; min-height: 28mm; }
+    .conclusion-card.blue { border-color: var(--blue); }
+    .conclusion-card.orange { border-color: var(--orange); }
+    .conclusion-card h3 { font-size: 9px; line-height: 1.45; }
+    .conclusion-card p { color: #4f5d5a; font-size: 7px; margin-top: 1.2mm; }
+    .evidence-label { color: var(--green); font-size: 6.6px; letter-spacing: .3px; margin-bottom: .7mm; }
+    .evidence-list { margin: 1.3mm 0 0; padding-left: 3.8mm; color: #4d5a58; font-size: 7px; }
+    .evidence-list li { margin: .7mm 0; }
+    .statement-note { background: var(--green-soft); border-left: 2px solid var(--green); padding: 2.1mm 2.8mm; margin-top: 2mm; }
+    .statement-note h3 { font-size: 8.5px; }
+    .statement-note p { color: #4c5b57; font-size: 6.9px; margin-top: .7mm; }
+    .compact-page .page-head { margin-bottom: 1.8mm; padding-bottom: 1.6mm; }
+    .compact-page .section { margin-top: 2.1mm; }
+    .compact-page .section-title { margin-bottom: 1.2mm; }
+    .compact-page .statement-note { padding: 1.4mm 2.4mm; margin-top: 1.1mm; }
+    .compact-page .statement-note p { margin-top: .35mm; }
+    .compact-page .panel-title { padding: 1.4mm 2.2mm; }
+    .compact-page .panel-body { padding: 1.45mm 2.2mm; }
+    .compact-page .evidence-list { margin-top: .7mm; }
+    .compact-page .evidence-list li { margin: .35mm 0; }
+    .compact-page .process-card { min-height: 20mm; padding: 1.8mm 2.2mm; }
+    .compact-page .process-card h3 { margin-top: 1mm; }
+    .compact-page .process-card p { margin-top: .5mm; }
+    .compact-page .support { min-height: 26mm; padding: 1.8mm 2.2mm; }
+    .compact-page .support h3 { margin-top: .6mm; }
+    .compact-page .support p { margin-top: .7mm; }
+    .compact-page .key-chip { min-height: 14mm; padding: 1.5mm 1.8mm; }
+    .compact-page .diag-item { padding: 1.1mm 0; }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <section class="page compact-page">
+    <div class="brand">飞象老师 · 多源学习数据综合分析</div>
+    <div class="topline">
+      <div>
+        <h1 style="font-size:24px">林知遥 · 八年级第二学期<br />综合发展分析报告</h1>
+        <p class="subtitle">基于语文、数学、英语学习数据的学业诊断与改进建议</p>
+      </div>
+      <table class="meta">
+        <tr><td>分析周期</td><td>2025—2026学年第二学期</td></tr>
+        <tr><td>分析对象</td><td>林知遥 · 学号18050123</td></tr>
+        <tr><td>编制单位</td><td>飞象老师</td></tr>
+        <tr><td>报告日期</td><td>2026年7月</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-no">01</span><h2>学期学业发展全景</h2></div>
+      <div class="statement-note" style="margin-top:0"><h3>三科学习总体表现良好，学生有较好的理解能力和学习基础，但综合运用仍需加强</h3></div>
+      <div class="conclusion-grid">
+        <div class="conclusion-card">
+          <div class="evidence-label">结论依据</div>
+          <h3>学生具备较好的学业基础和整体理解能力</h3>
+          <p>数学作业正确率87.4%，测验平均88.7，均高于班级；英语作业正确率78.8%，测验平均31.5，也高于班级；语文作文平均30.6分。</p>
+        </div>
+        <div class="conclusion-card blue">
+          <div class="evidence-label">结论依据</div>
+          <h3>学生能够根据具体反馈实现及时改进</h3>
+          <p>四篇作文从一稿到二稿全部提升，分别提高4、2、2、3分，说明教师的具体指导能够有效转化为学习改进。</p>
+        </div>
+        <div class="conclusion-card orange">
+          <div class="evidence-label">结论依据</div>
+          <h3>学生整体理解较好，但信息组织和准确表达仍需加强</h3>
+          <p>语文详略问题反复出现，数学部分知识作业较好但测验下降，英语整体理解优于语法和细节加工。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-no">02</span><h2>学科学习能力深度分析</h2><span class="desc">分语文、数学、英语和跨学科呈现</span></div>
+      <div class="statement-note" style="margin-top:0"><h3>语文：写作表现出明显成长，材料安排是下一步重点</h3></div>
+      <div class="equal-col tight">
+        <div class="panel">
+          <div class="panel-title"><h3>学生能根据反馈及时修改，四篇作文均有进步</h3><span>数据支撑</span></div>
+          <div class="panel-body">
+            <div class="draft-row"><span class="draft-label">第一篇</span><div class="dualbar"><span class="first" style="width:80%"></span><span class="second" style="width:90%"></span></div><span class="draft-score">32 → 36</span></div>
+            <div class="draft-row"><span class="draft-label">第二篇</span><div class="dualbar"><span class="first" style="width:75%"></span><span class="second" style="width:80%"></span></div><span class="draft-score">30 → 32</span></div>
+            <div class="draft-row"><span class="draft-label">第三篇</span><div class="dualbar"><span class="first" style="width:70%"></span><span class="second" style="width:75%"></span></div><span class="draft-score">28 → 30</span></div>
+            <div class="draft-row"><span class="draft-label">第四篇</span><div class="dualbar"><span class="first" style="width:67.5%"></span><span class="second" style="width:75%"></span></div><span class="draft-score">27 → 30</span></div>
+            <div class="legend"><span><i style="background:#cbd5d1"></i>一稿</span><span><i style="background:#2f6e5d"></i>二稿</span><span>平均提高 <b>2.75分</b></span></div>
+            <ul class="evidence-list"><li>四篇作文修改后合计提高11分。</li><li>后续需要观察这些改进能否保持到新的作文中。</li></ul>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><h3>学生能写出真实的中心和生动的细节，但材料取舍和详略安排不够合理</h3><span>能力支撑</span></div>
+          <div class="panel-body radar-wrap">
+            <svg width="108" height="108" viewBox="0 0 120 120" aria-label="语文核心素养雷达图">
+              <polygon points="60,10 110,60 60,110 10,60" fill="none" stroke="#dce4e0" /><polygon points="60,25 95,60 60,95 25,60" fill="none" stroke="#dce4e0" /><polygon points="60,40 80,60 60,80 40,60" fill="none" stroke="#dce4e0" />
+              <line x1="60" y1="10" x2="60" y2="110" stroke="#e4e9e6" /><line x1="10" y1="60" x2="110" y2="60" stroke="#e4e9e6" />
+              <polygon points="60,25 105,60 60,105 30,60" fill="rgba(47,110,93,.24)" stroke="#2f6e5d" stroke-width="2" />
+              <text x="60" y="7" text-anchor="middle" font-size="7" fill="#63706d">文化自信</text><text x="115" y="62" text-anchor="end" font-size="7" fill="#63706d">语言运用</text><text x="60" y="118" text-anchor="middle" font-size="7" fill="#63706d">审美创造</text><text x="4" y="62" font-size="7" fill="#63706d">思维能力</text>
+            </svg>
+            <div class="radar-notes"><div><b>文化自信</b>7</div><div><b>语言运用</b>9</div><div><b>审美创造</b>9</div><div><b>思维能力</b>6</div><ul class="evidence-list"><li>中心由空泛升华转向真实生活落点。</li><li>能用感官细节联结内心情绪。</li><li>多篇记叙文核心事件着墨偏少、铺垫偏多。</li></ul></div>
+          </div>
+        </div>
+      </div>
+      <div class="statement-note"><h3>写作提升的重点是围绕中心安排材料，把重点情节写充分</h3><p>写作前明确核心事件和重点段落，写完后检查每一部分是否直接服务于文章中心。</p></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-no">2.2</span><h2>数学</h2></div>
+      <div class="statement-note" style="margin-top:0"><h3>数学基础较好，但图形与几何、函数关系和综合应用仍需加强</h3></div>
+      <div class="equal-col tight">
+        <div class="panel">
+          <div class="panel-title"><h3>数学知识掌握总体较好，图形与几何相对薄弱</h3><span>结构依据</span></div>
+          <div class="panel-body">
+            <div class="stack-row"><span class="stack-label">统计与概率</span><div class="stack"><i class="good" style="width:80%"></i><i class="attention" style="width:20%"></i></div><span class="stack-value">24 / 6 / 0</span></div>
+            <div class="stack-row"><span class="stack-label">数与代数</span><div class="stack"><i class="good" style="width:69.2%"></i><i class="attention" style="width:26.4%"></i><i class="critical" style="width:4.4%"></i></div><span class="stack-value">63 / 24 / 4</span></div>
+            <div class="stack-row"><span class="stack-label">图形与几何</span><div class="stack"><i class="good" style="width:47.3%"></i><i class="attention" style="width:48.4%"></i><i class="critical" style="width:4.3%"></i></div><span class="stack-value">43 / 44 / 4</span></div>
+            <div class="legend"><span><i style="background:#5d9d85"></i>良好</span><span><i style="background:#7775c7"></i>注意</span><span><i style="background:#e49b58"></i>重点</span></div>
+            <ul class="evidence-list"><li>图形与几何有48个知识点尚未达到稳定掌握。</li><li>代表性内容包括菱形性质、斜边中线性质、勾股定理实际应用和平行四边形判定综合。</li></ul>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><h3>函数关系、二次根式和几何应用存在具体薄弱点</h3><span>数据依据</span></div>
+          <div class="panel-body"><table class="data-table"><thead><tr><th>知识点</th><th>作业</th><th>测验</th><th>结论</th></tr></thead><tbody>
+            <tr><td>一次函数与不等式组关系</td><td>3次·0%</td><td>—</td><td class="risk">存在缺口</td></tr>
+            <tr><td>二次根式分母有理化</td><td>5次·40%</td><td>—</td><td class="risk">掌握不稳</td></tr>
+            <tr><td>勾股定理实际应用</td><td>11次·81.8%</td><td>3次·33.3%</td><td class="risk">迁移不足</td></tr>
+            <tr><td>斜边中线性质</td><td>7次·57.1%</td><td>7次·71.4%</td><td class="watch">持续关注</td></tr>
+            <tr><td>一次函数与不等式关系</td><td>23次·65.2%</td><td>4次·75%</td><td class="watch">持续问题</td></tr>
+          </tbody></table></div>
+        </div>
+      </div>
+      <div class="statement-note"><h3>学生在日常练习中能完成部分题目，但遇到测验或题型变化时，表现不够稳定</h3><p>勾股定理实际应用由作业81.8%降至测验33.3%，后续可通过少量变式任务和间隔复测检查真实掌握。</p></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-no">2.3</span><h2>英语</h2></div>
+      <div class="statement-note" style="margin-top:0"><h3>英语整体理解较好，语言准确性和细节处理仍需加强</h3></div>
+      <div class="equal-col tight">
+        <div class="panel">
+          <div class="panel-title"><h3>听力和篇章整体理解是学生的优势</h3><span>题型依据</span></div>
+          <div class="panel-body english-bars">
+            <div class="metric-row"><span class="m-label">听力四类题型</span><span class="bar"><i style="width:100%"></i></span><span class="m-value">100%</span></div>
+            <div class="metric-row"><span class="m-label">阅读还原</span><span class="bar"><i style="width:100%"></i></span><span class="m-value">100%</span></div>
+            <div class="metric-row"><span class="m-label">单句选词填空</span><span class="bar"><i style="width:94%"></i></span><span class="m-value">约94%</span></div>
+            <ul class="evidence-list"><li>能够较好把握听力信息、篇章主旨和结构关系。</li></ul>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><h3>语法、词形变化和阅读细节是主要提升点</h3><span>题型依据</span></div>
+          <div class="panel-body english-bars">
+            <div class="metric-row"><span class="m-label">阅读表达</span><span class="bar orange"><i style="width:78%"></i></span><span class="m-value">约78%</span></div>
+            <div class="metric-row"><span class="m-label">汉语提示填空</span><span class="bar orange"><i style="width:67%"></i></span><span class="m-value">约67%</span></div>
+            <div class="metric-row"><span class="m-label">单句语法填空</span><span class="bar orange"><i style="width:60%"></i></span><span class="m-value">约60%</span></div>
+            <ul class="evidence-list"><li>能够理解“文章在说什么”，但在准确说明依据和运用语言形式时相对不足。</li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="statement-note"><h3>英语任务提交记录与学业结果存在差异，需要进一步核实</h3><p>92次任务中60次有提交记录、32次未形成提交记录，需要分析这些记录集中出现的时间、任务类型和实际完成方式。</p></div>
+    </div>
+
+    <div class="footer"><span>学生综合发展分析报告</span><span>01 / 02</span></div>
+  </section>
+
+  <!-- PAGE 2 -->
+  <section class="page compact-page">
+    <div class="section" style="margin-top:0">
+      <div class="section-title"><span class="section-no">2.4</span><h2>跨学科分析</h2></div>
+      <div class="statement-note" style="margin-top:0"><h3>三科共同表现为：整体理解较好，但在组织信息、准确表达和灵活运用方面仍需加强</h3></div>
+      <div class="key-strip">
+        <div class="key-chip"><b>具体反馈能够带来改进</b><span>作文四次修改全部增值。</span></div>
+        <div class="key-chip blue"><b>整体信息把握是明显优势</b><span>英语听力、篇章结构和数学总体测验表现较好。</span></div>
+        <div class="key-chip orange"><b>复杂任务中的信息组织仍需加强</b><span>语文材料详略、数学条件转换和英语准确表达均有体现。</span></div>
+        <div class="key-chip red"><b>英语任务记录需要进一步核实</b><span>32次记录需结合任务性质和实际完成方式判断。</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-no">03</span><h2>学习过程与改进成效</h2></div>
+      <div class="statement-note" style="margin-top:0"><h3>学生能根据指导及时改进，但还需在后续任务中继续使用学到的方法</h3></div>
+      <div class="process-grid">
+        <div class="process-card"><div class="big">+2.75</div><h3>语文反馈能够带来即时改进</h3><p>四篇二稿全部提高，但详略失衡仍有反复。</p></div>
+        <div class="process-card orange"><div class="big">81.8→33.3</div><h3>数学部分知识在测验中的表现下降</h3><p>日常练习与测验表现存在明显差异。</p></div>
+        <div class="process-card blue"><div class="big">60%</div><h3>英语准确表达仍需加强</h3><p>语法规则和局部语言处理需要继续练习。</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-no">04</span><h2>关键优势与核心问题诊断</h2></div>
+      <div class="statement-note" style="margin-top:0"><h3>学生的优势主要在整体理解和反馈吸收，核心问题集中在信息组织、准确表达和综合运用</h3></div>
+      <div class="diagnosis-grid compact-diagnosis">
+        <div class="diagnosis-col">
+          <div class="diag-item"><span class="diag-dot">1</span><div><h3>学生能较快理解并落实具体反馈</h3><p>四篇作文修改后均有进步。</p></div></div>
+          <div class="diag-item"><span class="diag-dot">2</span><div><h3>学生对整体信息的把握较好</h3><p>英语听力、篇章结构和数学总体测验表现较好。</p></div></div>
+        </div>
+        <div class="diagnosis-col">
+          <div class="diag-item"><span class="diag-dot problem">1</span><div><h3>学生组织复杂信息时容易出现遗漏或失衡</h3><p>语文详略安排和数学条件转换均有体现。</p></div></div>
+          <div class="diag-item"><span class="diag-dot problem">2</span><div><h3>学生的准确表达和综合运用仍需加强</h3><p>英语语法、词形、阅读细节及数学应用题表现相对薄弱。</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-no">05</span><h2>个性化提升与协同支持方案</h2><span class="desc">分学生、教师和家长三个层面</span></div>
+      <div class="statement-note" style="margin-top:0"><h3>支持重点是帮助学生把方法学会、用稳，而不是简单增加任务量</h3></div>
+      <div class="support-grid">
+        <div class="support"><div class="role">学生层面</div><h3>学生要形成“抓核心、找依据、理关系”的学习习惯</h3><p><b>语文：</b>明确核心事件和重点细节。<br /><b>数学：</b>梳理已知条件和数量、图形关系。<br /><b>英语：</b>定位答案依据并检查语言形式。</p></div>
+        <div class="support"><div class="role">教师层面</div><h3>教师要用代表性任务判断学生是否真正掌握</h3><p>语文跟踪后续作文的详略安排；数学设计函数、几何变式和间隔复测；英语通过句子改写、语境运用和原文证据定位检查学习效果。</p></div>
+        <div class="support"><div class="role">家长层面</div><h3>家长要关注孩子能否讲清自己的学习过程</h3><p>通过交流了解任务记录差异，关注孩子能否说清“为什么错、依据是什么、换一种题目能否完成”。</p></div>
+      </div>
+      <div class="summary-banner" style="margin-top:2.2mm"><strong>成长期待</strong><p>期待林知遥继续发挥理解力强、善于感受和乐于改进的优势，更准确地抓住核心、理清关系、表达思考，把每一次修改和练习转化为能够独立运用的能力，在新的学习任务中展现更加自信、稳定、从容的自己。</p></div>
+    </div>
+
+    <div class="footer"><span>学生综合发展分析报告</span><span>02 / 02</span></div>
+  </section>
+
+</body>
+</html>
