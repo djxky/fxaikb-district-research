@@ -109,9 +109,18 @@
     $('runElapsed').textContent = elapsedText();
   }
 
-  function scrollLatest() {
-    const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 220;
-    if (nearBottom || state.quick) window.scrollTo({ top: document.documentElement.scrollHeight, behavior: state.reducedMotion ? 'auto' : 'smooth' });
+  function scrollLatest(force = false) {
+    const scroll = () => {
+      const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 220;
+      if (force || nearBottom || state.quick) {
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: state.reducedMotion ? 'auto' : 'smooth' });
+      }
+    };
+    if (force) {
+      requestAnimationFrame(() => requestAnimationFrame(scroll));
+      return;
+    }
+    scroll();
   }
 
   async function streamText(node, text, signal) {
@@ -633,7 +642,7 @@
     $('followupInput').disabled = false;
     $('sendFollowup').disabled = !$('followupInput').value.trim();
     refreshIcons();
-    scrollLatest();
+    scrollLatest(true);
   }
 
   async function runResearch() {
@@ -726,7 +735,6 @@
     $('openReport').addEventListener('click', openReportPreview);
     $('closeReport').addEventListener('click', closeReportPreview);
     $('downloadReport').addEventListener('click', downloadReport);
-    $('openEvidenceFromFinish').addEventListener('click', openEvidence);
     $('closeEvidence').addEventListener('click', () => $('evidenceDialog').close());
     $('sendFollowup').addEventListener('click', appendFollowup);
     $('followupInput').addEventListener('input', () => { $('sendFollowup').disabled = !$('followupInput').value.trim(); });
