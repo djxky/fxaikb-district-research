@@ -229,6 +229,11 @@
       event.preventDefault();
       const query = input.value.trim();
       if (!query) return;
+      if (query === '帮我分析这个学校的作文数据') {
+        const params = new URLSearchParams({ q: query, school: 'shanghai-keller' });
+        location.href = `research-writing-school.html?${params.toString()}`;
+        return;
+      }
       const targets = { v1: 'research-golden.html', v2: 'research-golden-v2.html', v3: 'research-golden-v3.html', v4: 'research-golden-v4.html' };
       const target = targets[version];
       const params = new URLSearchParams({case:'overall', g:'11', golden:'16', q:query});

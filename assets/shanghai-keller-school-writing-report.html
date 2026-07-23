@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>上海民办克勒外国语学校・本学期初中语文学科作文综合分析报告</title>
+  <style>
+    :root {
+      --ink: #20302c;
+      --muted: #687570;
+      --line: #d7dfdb;
+      --paper: #fff;
+      --canvas: #e9eeeb;
+      --green: #2f735e;
+      --green-deep: #245947;
+      --green-soft: #eaf4ef;
+      --orange: #c2673f;
+      --orange-soft: #fbefe9;
+      --blue: #416f82;
+      --blue-soft: #edf3f5;
+      --violet: #7771ae;
+      --gray-soft: #f5f7f6;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-width: 300px; background: var(--canvas); color: var(--ink); }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      font-size: 10px;
+      line-height: 1.48;
+      -webkit-font-smoothing: antialiased;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+    h1, h2, h3, h4, p { margin: 0; }
+    h1, .serif { font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif; }
+    .page {
+      position: relative;
+      width: 210mm;
+      height: 297mm;
+      margin: 8mm auto;
+      padding: 9mm 11mm 9mm;
+      overflow: hidden;
+      background: var(--paper);
+      box-shadow: 0 15px 45px rgba(27, 44, 38, .13);
+      page-break-after: always;
+    }
+    .page:last-child { page-break-after: auto; }
+    .page::after {
+      content: attr(data-page);
+      position: absolute;
+      right: 11mm;
+      bottom: 5mm;
+      color: #8a9691;
+      font: 7px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .running-head {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 1.8mm;
+      margin-bottom: 2.5mm;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      font-size: 8px;
+      letter-spacing: .08em;
+    }
+    .report-brand { color: var(--green); font-size: 9px; font-weight: 700; letter-spacing: .1em; }
+    .cover {
+      min-height: 47mm;
+      display: grid;
+      grid-template-columns: 1fr 61mm;
+      gap: 7mm;
+      align-items: end;
+      padding: 3mm 0 4mm;
+      border-bottom: 2px solid var(--ink);
+    }
+    .cover-kicker { color: var(--green); font-size: 9px; font-weight: 700; letter-spacing: .18em; }
+    h1 { margin-top: 2.3mm; font-size: 21px; line-height: 1.28; letter-spacing: .02em; }
+    .cover-subtitle { margin-top: 2mm; color: #485753; font-size: 9px; line-height: 1.5; }
+    .cover-meta { border-top: 2px solid var(--green); }
+    .cover-meta div {
+      display: grid;
+      grid-template-columns: 17mm 1fr;
+      gap: 2mm;
+      padding: 1.25mm 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .cover-meta span { color: var(--muted); font-size: 8px; }
+    .cover-meta strong { font-size: 9px; }
+    .section { margin-top: 2.7mm; }
+    .section-head { display: grid; grid-template-columns: 8mm auto 1fr; gap: 1.6mm; align-items: baseline; margin-bottom: 1.5mm; }
+    .section-no { color: var(--green); font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .section-head h2 { font-size: 14px; line-height: 1.3; }
+    .section-head i { height: 1px; background: var(--ink); }
+    .lead {
+      padding: 1.7mm 2.5mm;
+      color: #32433e;
+      border-left: 2px solid var(--green);
+      background: var(--green-soft);
+      font-size: 9px;
+      line-height: 1.52;
+    }
+    .body-copy { margin-top: 1.4mm; color: #40504b; font-size: 8.1px; line-height: 1.5; }
+    .body-copy strong { color: var(--ink); }
+    .evidence {
+      margin-top: 1.5mm;
+      padding: 1.6mm 2mm;
+      border-top: 1px solid var(--ink);
+      background: linear-gradient(to bottom, #fff, #fafcfb);
+    }
+    .evidence h3 { font-size: 9px; line-height: 1.35; }
+    .evidence p { margin-top: .7mm; color: #4f5e59; font-size: 8px; line-height: 1.45; }
+    .evidence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.2mm; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 2mm; border-top: 1.5px solid var(--ink); border-bottom: 1px solid var(--line); }
+    .kpi { min-height: 15mm; padding: 2mm; border-right: 1px solid var(--line); }
+    .kpi:last-child { border-right: 0; }
+    .kpi b { display: block; color: var(--green-deep); font: 700 16px/1 Georgia, serif; }
+    .kpi span { display: block; margin-top: 1.2mm; font-size: 7.5px; font-weight: 600; }
+    .kpi small { display: block; margin-top: .5mm; color: var(--muted); font-size: 6.6px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5mm; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm; }
+    .panel { padding: 2mm; border: 1px solid var(--line); background: #fff; }
+    .panel h3 { font-size: 9.2px; }
+    .panel-kicker { color: var(--green); font-size: 7.2px; font-weight: 700; }
+    .bar-list { display: grid; gap: 1mm; margin-top: 1.4mm; }
+    .bar-row { display: grid; grid-template-columns: 19mm 1fr 17mm; gap: 2mm; align-items: center; font-size: 8px; }
+    .bar { height: 4px; overflow: hidden; background: #e6ebe8; }
+    .bar i { display: block; width: var(--w); height: 100%; background: var(--green); }
+    .bar-row b { text-align: right; }
+    .mini-note { margin-top: 1.2mm; color: var(--muted); font-size: 7.3px; line-height: 1.42; }
+    .callout {
+      margin-top: 1.7mm;
+      padding: 1.7mm 2mm;
+      border-left: 2px solid var(--orange);
+      background: var(--orange-soft);
+      color: #674333;
+      font-size: 8px;
+      line-height: 1.45;
+    }
+    .ability-table { width: 100%; margin-top: 2.5mm; border-collapse: collapse; font-size: 7px; }
+    .ability-table th { padding: 1.5mm; color: var(--muted); background: var(--gray-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: left; }
+    .ability-table td { padding: 1.7mm 1.5mm; border-bottom: 1px solid #e9eeeb; vertical-align: top; }
+    .ability-table td:first-child { color: var(--green-deep); font-weight: 700; }
+    .bullet-list { display: grid; gap: .9mm; margin-top: 1.3mm; }
+    .bullet-list p { position: relative; padding-left: 3mm; color: #45544f; font-size: 7.8px; line-height: 1.42; }
+    .bullet-list p::before { content: ""; position: absolute; left: .7mm; top: 1.7mm; width: 1.5mm; height: 1.5mm; border-radius: 50%; background: var(--green); }
+    .bullet-list.warning p::before { background: var(--orange); }
+    .doc-chart { width: 100%; height: auto; display: block; margin-top: 2mm; }
+    .grade-judgment { display: grid; gap: 1mm; margin-top: 1.5mm; }
+    .grade-judgment article {
+      display: grid;
+      grid-template-columns: 24mm 1fr;
+      align-items: center;
+      min-height: 8mm;
+      padding: 1.2mm 1.7mm;
+      background: var(--gray-soft);
+      border-left: 2px solid var(--green);
+    }
+    .grade-judgment article:nth-child(2) { border-color: var(--blue); }
+    .grade-judgment article:nth-child(3) { border-color: var(--orange); }
+    .grade-judgment span { color: var(--muted); font-size: 6px; }
+    .grade-judgment strong { font-size: 7.2px; }
+    .dimension-map { display: grid; gap: 1mm; margin-top: 1.4mm; }
+    .dimension-map article { padding: 1.3mm 1.7mm; border-top: 2px solid var(--green); background: var(--gray-soft); }
+    .dimension-map article:nth-child(2) { border-color: var(--blue); }
+    .dimension-map article:nth-child(3) { border-color: var(--orange); }
+    .dimension-map span { display: block; color: var(--muted); font-size: 7.3px; }
+    .dimension-map strong { display: block; margin-top: .4mm; font-size: 8.5px; }
+    .dimension-map p { margin-top: .4mm; color: #53615d; font-size: 7.5px; line-height: 1.4; }
+    .type-strip { display: flex; height: 7px; margin-top: 1.3mm; overflow: hidden; }
+    .type-strip span:nth-child(1) { width: 92.7%; background: var(--green); }
+    .type-strip span:nth-child(2) { width: 2.8%; background: var(--blue); }
+    .type-strip span:nth-child(3) { width: 2.3%; background: var(--violet); }
+    .type-strip span:nth-child(4) { width: 2.3%; background: var(--orange); }
+    .legend { display: flex; flex-wrap: wrap; gap: 1.5mm; margin-top: 1mm; color: var(--muted); font-size: 7px; }
+    .legend i { display: inline-block; width: 7px; height: 4px; margin-right: 1mm; }
+    .metric-feature { padding: 1.7mm; border-top: 2px solid var(--green); background: var(--gray-soft); }
+    .metric-feature.warning { border-color: var(--orange); }
+    .metric-feature.blue { border-color: var(--blue); }
+    .metric-feature b { display: block; color: var(--green-deep); font: 700 14px/1 Georgia, serif; }
+    .metric-feature.warning b { color: var(--orange); }
+    .metric-feature.blue b { color: var(--blue); }
+    .metric-feature h3 { margin-top: 1mm; font-size: 8.4px; }
+    .metric-feature p { margin-top: .5mm; color: #4c5a56; font-size: 7.3px; }
+    .diagnosis { display: grid; grid-template-columns: 6mm 1fr; gap: 1.3mm; padding: 1.35mm 0; border-bottom: 1px solid var(--line); }
+    .diagnosis b { width: 5mm; height: 5mm; display: grid; place-items: center; color: #fff; border-radius: 50%; background: var(--green); font-size: 7px; }
+    .diagnosis.problem b { background: var(--orange); }
+    .diagnosis h3 { font-size: 8.5px; }
+    .diagnosis p { margin-top: .4mm; color: #53615d; font-size: 7.5px; line-height: 1.4; }
+    .grade-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5mm; margin-top: 1.5mm; }
+    .grade-card { min-height: 17mm; padding: 1.5mm; background: var(--gray-soft); border-top: 2px solid var(--green); }
+    .grade-card:nth-child(2) { border-color: var(--orange); }
+    .grade-card:nth-child(3) { border-color: var(--blue); }
+    .grade-card:nth-child(4) { border-color: var(--violet); }
+    .grade-card h3 { font-size: 8.5px; }
+    .grade-card p { margin-top: .6mm; color: #4d5b57; font-size: 7.3px; line-height: 1.38; }
+    .role-card { padding: 1.7mm; border-top: 2px solid var(--green); background: #fff; }
+    .role-card:nth-child(2) { border-color: var(--blue); }
+    .role-card:nth-child(3) { border-color: var(--orange); }
+    .role-card .role { color: var(--muted); font-size: 7.2px; }
+    .role-card h3 { min-height: 7mm; margin-top: .6mm; font-size: 8.3px; line-height: 1.35; }
+    .role-card ul { margin: 1mm 0 0; padding-left: 3mm; color: #4b5955; font-size: 7.3px; line-height: 1.4; }
+    .role-card li { margin: .7mm 0; }
+    .prose-block { margin-top: 1.4mm; padding-top: 1.4mm; border-top: 1px solid var(--line); }
+    .prose-block h3 { font-size: 8.8px; line-height: 1.4; }
+    .prose-block p { margin-top: .6mm; color: #465550; font-size: 7.5px; line-height: 1.45; }
+    .prose-block strong { color: var(--ink); }
+    .type-analysis { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm; margin-top: 1.4mm; }
+    .type-analysis article { padding: 1.5mm 1.8mm; background: var(--gray-soft); border-top: 2px solid var(--green); }
+    .type-analysis article:last-child { border-color: var(--orange); }
+    .type-analysis h3 { font-size: 8.5px; }
+    .type-analysis p { margin-top: .6mm; color: #4d5b57; font-size: 7.5px; line-height: 1.42; }
+    .numbered-problems { display: grid; grid-template-columns: 1fr 1fr; gap: 1mm 2.4mm; margin-top: 1.2mm; }
+    .numbered-problems p { color: #475651; font-size: 7.5px; line-height: 1.42; }
+    .numbered-problems b { color: var(--green); margin-right: .8mm; }
+    .teaching-review { margin-top: 1.5mm; padding: 1.6mm 2mm; color: #3e4e49; background: var(--blue-soft); border-left: 2px solid var(--blue); font-size: 7.7px; line-height: 1.45; }
+    .role-card.detailed h3 { min-height: 0; }
+    .role-card.detailed ul { line-height: 1.42; }
+    .role-card.detailed li { margin: .8mm 0; }
+    .page--closing .grid-3 { grid-template-columns: 1fr; gap: 1.5mm; }
+    .page--closing .role-card {
+      display: grid;
+      grid-template-columns: 48mm 1fr;
+      grid-template-areas:
+        "role list"
+        "title list";
+      gap: .4mm 3mm;
+      align-items: start;
+      padding: 1.4mm 2mm;
+    }
+    .page--closing .role-card .role { grid-area: role; }
+    .page--closing .role-card h3 { grid-area: title; font-size: 7.8px; }
+    .page--closing .role-card ul { grid-area: list; margin-top: 0; font-size: 6.8px; line-height: 1.32; }
+    .page--closing .role-card li { margin: .35mm 0; }
+    .page--closing .section { margin-top: 2mm; }
+    .page--closing .expectation { padding: 2.5mm 3.2mm; }
+    .page--closing .expectation p { font-size: 9.1px; line-height: 1.5; }
+    .expectation {
+      position: relative;
+      margin-top: 2mm;
+      padding: 3.2mm 4mm;
+      color: #fff;
+      background:
+        radial-gradient(circle at 90% 0, rgba(255,255,255,.14), transparent 35%),
+        linear-gradient(125deg, var(--green-deep), #347760);
+    }
+    .expectation::before { content: "发展期待"; display: block; margin-bottom: 1.3mm; color: rgba(255,255,255,.7); font-size: 6.5px; font-weight: 700; letter-spacing: .2em; }
+    .expectation p { font-family: "Songti SC", "STSong", serif; font-size: 9.6px; line-height: 1.6; font-weight: 600; }
+    .source-note { position: absolute; left: 11mm; bottom: 5mm; color: #8a9691; font-size: 5.7px; }
+    @page { size: A4; margin: 0; }
+    @media print {
+      html, body { background: #fff; }
+      .page { margin: 0; box-shadow: none; }
+    }
+    @media screen and (max-width: 820px) {
+      .page { margin: 0 auto 12px; transform-origin: top center; }
+    }
+  </style>
+</head>
+<body>
+  <article class="page" data-page="01 / 02">
+    <div class="report-brand">飞象老师 · 校级作文教学诊断</div>
+    <header class="cover">
+      <div>
+        <div class="cover-kicker">本学期 · 初中语文学科</div>
+        <h1>上海民办克勒外国语学校・本学期初中语文学科作文综合分析报告</h1>
+        <p class="cover-subtitle">基于初中各年级多源习作数据的教学诊断与教研改进建议</p>
+      </div>
+      <div class="cover-meta">
+        <div><span>分析周期</span><strong>本学期</strong></div>
+        <div><span>分析对象</span><strong>全校初中各年级学生习作样本</strong></div>
+        <div><span>编制单位</span><strong>飞象老师</strong></div>
+        <div><span>报告日期</span><strong>2026年7月</strong></div>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="section-head"><span class="section-no">02</span><h2>学期初中语文作文学情发展全景</h2><i></i></div>
+      <p class="lead">全校初中记叙文写作具备扎实基础，学生能够依托反馈开展习作修改；但篇章统筹、素材思辨、多元文体驾驭存在普遍短板，学段发展不均衡现象突出。</p>
+      <div class="kpis">
+        <div class="kpi"><b>4,250</b><span>有效作文样本</span><small>教研报告统计口径</small></div>
+        <div class="kpi"><b>3,921</b><span>有效 AI 评分</span><small>教研报告统计口径</small></div>
+        <div class="kpi"><b>32.47</b><span>全校整体均分</span><small>教研报告统计口径</small></div>
+        <div class="kpi"><b>1,647</b><span>二次修改样本</span><small>教研报告统计口径</small></div>
+      </div>
+      <div class="evidence-grid">
+        <article class="evidence">
+          <h3>【结论依据】学生整体具备稳定叙事基础，初中写作呈现清晰年级梯度</h3>
+          <p>全校有效作文样本 4250 份，有效 AI 评分 3921 份，整体均分 32.47 分；九年级写作水平显著领先，六、八年级能力持平，七年级为能力提升关键薄弱学段。记叙文训练体系成熟，绝大多数学生可确立清晰中心、完成完整叙事。</p>
+        </article>
+        <article class="evidence">
+          <h3>【结论依据】学生可吸收讲评反馈实现习作即时改进，但方法迁移难度较大</h3>
+          <p>纳入二次修改流程样本共 1647 份，68.7% 习作修改后得分上涨；学生擅长优化词句、补充细节，但结构性调整偏少，同类写作短板在新习作中反复出现。</p>
+        </article>
+        <article class="evidence">
+          <h3>【结论依据】学生叙事表达能力较好，但素材组织、谋篇布局与思辨表达仍需加强</h3>
+          <p>跨年级普遍存在详略安排失衡、素材堆砌问题；非记叙文体训练占比不足 8%；多数习作立意停留表层，缺少多层次感悟升华，高分群体占比偏低。</p>
+        </article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><span class="section-no">03</span><h2>作文专项能力深度分析</h2><i></i></div>
+      <p class="lead">作文整体具备叙事基础，谋篇选材与审题思维为全校共性提升重点。依托本学期 4250 份习作样本、3921 份有效 AI 多维度分项评分数据，围绕审题立意、中心主旨、内容素材、篇章结构、细节描写、语言表达、创新亮点、逻辑思维八大写作维度，分年级开展能力画像对比，区分不同文体作答特征，定位各层级学生能力长短板。</p>
+      <div class="grid-2" style="margin-top:2mm">
+        <div class="panel">
+          <span class="panel-kicker">习作迭代变化</span>
+          <h3 style="margin-top:.6mm">学生能够依据讲评完成习作修改，不同年级修改提分效益存在明显分层</h3>
+          <div class="bar-list">
+            <div class="bar-row"><span>九年级</span><div class="bar"><i style="--w:95%"></i></div><b>+3.82</b></div>
+            <div class="bar-row"><span>六年级</span><div class="bar"><i style="--w:60%"></i></div><b>+2.41</b></div>
+            <div class="bar-row"><span>八年级</span><div class="bar"><i style="--w:60%"></i></div><b>+2.41</b></div>
+            <div class="bar-row"><span>七年级</span><div class="bar"><i style="--w:41%"></i></div><b>+1.63</b></div>
+          </div>
+          <div class="bullet-list">
+            <p><strong>九年级：</strong>习作二次修改平均提分 3.82 分，修改转化率最高；多数学生可针对结构、选材主动调整优化。</p>
+            <p><strong>六年级、八年级：</strong>二次修改平均提分 2.41 分，能优化语言与细节描写，但核心结构改动较少。</p>
+            <p><strong>七年级：</strong>习作修改平均提分 1.63 分，较多学生仅停留在字词修改，难以调整文章框架、重新取舍素材。</p>
+          </div>
+          <p class="mini-note"><strong>要点备注：</strong>毕业班学生接受写作指导后的落地能力更强；六、八、七年级普遍存在“表层修改多，结构性调整少”现象。</p>
+          <div class="callout"><strong>后续教研重点：</strong>引导学生建立“围绕中心重构素材”的修改意识，不止局限文字润色。</div>
+        </div>
+        <div class="panel">
+          <span class="panel-kicker">八大写作维度综合能力画像</span>
+          <h3 style="margin-top:.6mm">学生普遍具备基础叙事表达能力，素材取舍、详略布局、审题思辨是全校共性短板</h3>
+          <div class="dimension-map" aria-label="教研报告中的写作能力结论">
+            <article><span>优势维度</span><strong>语言表达、细节描写</strong><p>全年级得分相对均衡。学生可以运用场景、感官细节进行叙事，词句基础扎实，记叙文文字可读性较强。</p></article>
+            <article><span>优势维度</span><strong>中心主旨</strong><p>大部分习作可以确立清晰写作中心，能够贴合题目完成基础立意，不存在严重偏题跑题。</p></article>
+          </div>
+          <div class="bullet-list warning">
+            <p><strong>七年级：</strong>审题立意、篇章结构短板最突出；容易出现立意浅层，段落排布松散，详略失衡。</p>
+            <p><strong>六年级：</strong>素材内容、创新亮点偏弱；素材同质化严重，缺少个性化生活素材，构思模式化。</p>
+            <p><strong>八年级：</strong>逻辑思维、谋篇布局不足；能够写出细节，但材料取舍随意，铺垫过多、核心事件着墨不足。</p>
+            <p><strong>九年级：</strong>各项维度整体均衡高分；主要短板集中在创新立意、思辨深度，少有习作实现主题升华。</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:1.8mm">
+        <span class="panel-kicker">文体题型作答表现差异</span>
+          <div class="type-strip" aria-label="文体分布"><span></span><span></span><span></span><span></span></div>
+          <div class="legend">
+            <span><i style="background:#2f735e"></i>记叙文 92.7%</span>
+            <span><i style="background:#416f82"></i>研究调查报告 2.8%</span>
+            <span><i style="background:#7771ae"></i>读后感 2.3%</span>
+            <span><i style="background:#c2673f"></i>演讲稿 2.3%</span>
+          </div>
+        <div class="type-analysis">
+          <article><h3>记叙文（主体题型）</h3><p><strong>优势：</strong>擅长场景描写、情感抒发，细节表现力充足。<strong>问题：</strong>普遍存在结构平铺直叙；核心事件与次要素材配比失衡，大量习作铺垫冗长，主体情节展开不充分。</p></article>
+          <article><h3>读后感、应用类文体（占比偏低）</h3><p>学生缺少观点提炼意识，习惯于复述事件，缺少独立思考与逻辑论证；篇章框架掌握不足。</p></article>
+        </div>
+        <div class="prose-block">
+          <h3>典型习作特征汇总</h3>
+          <p><strong>正向特征：</strong>多数习作立意贴合命题，善于捕捉生活小事，擅长运用环境、动作细节烘托情绪；语言通顺，语病占比较低。</p>
+          <div class="numbered-problems">
+            <p><b>①</b>审题广度不足，立意容易停留在表层，缺少多层次挖掘。</p>
+            <p><b>②</b>素材储备同质化，学生选材高度集中，个性化叙事较少。</p>
+            <p><b>③</b>篇章统筹能力薄弱，详略安排不合理，主线不够突出。</p>
+            <p><b>④</b>思辨思维偏弱，少有习作能够由事件延伸感悟、完成主题升华。</p>
+          </div>
+        </div>
+      </div>
+      <div class="callout"><strong>写作全域提升重点：</strong>强化审题训练与篇章整体规划，建立“中心统领素材”写作意识。写作前明确核心立意、筛选匹配素材；行文规划段落主次；完成初稿后复盘校验：全部段落、事例是否服务文章中心，优化详略排布。</div>
+    </section>
+    <div class="source-note">核心数值、专项能力与文体表现按教研报告学校部分呈现；六至九年级、16个班覆盖范围由学校汇总表确认</div>
+  </article>
+
+  <article class="page page--closing" data-page="02 / 02">
+    <div class="running-head"><span>上海民办克勒外国语学校</span><span>初中语文学科作文综合分析报告</span></div>
+    <section class="section" style="margin-top:0">
+      <div class="section-head"><span class="section-no">04</span><h2>写作实施与改进成效</h2><i></i></div>
+      <p class="lead">全校学生能够依托作文讲评反馈开展习作修改优化，但习得的写作方法难以持续迁移，同类写作问题存在反复发生的现象。</p>
+      <div class="grid-3" style="margin-top:1.8mm">
+        <article class="metric-feature"><b>+2.31</b><h3>全校习作二次修改平均提分</h3><p>讲评反馈带来即时改进</p></article>
+        <article class="metric-feature blue"><b>68.7% → 39.2%</b><h3>修改提分转化率 → 方法稳定迁移占比</h3><p>习作改进难以长效固化</p></article>
+        <article class="metric-feature warning"><b>72.4%</b><h3>全校习作规范修改完成率</h3><p>各班训练闭环落实不均衡</p></article>
+      </div>
+      <div class="grid-3" style="margin-top:1.5mm">
+        <p class="body-copy"><strong>作文讲评反馈能够带来即时写作改进：</strong>本学期全校纳入二次修改流程习作共计 1647 份，超过六成学生在单篇习作修改后实现得分上涨。学生可以根据教师、AI 多维诊断意见优化文字表达与细节描写。但素材取舍、谋篇布局等结构性短板，在新一轮写作任务中频繁复现。</p>
+        <p class="body-copy"><strong>习作改进成效难以长效固化：</strong>全校 68.7% 的学生能够针对当前作文存在问题完成订正优化；仅有 39.2% 学生能够将修改过程习得的写作策略迁移运用至后续习作。大量学生仅做表层文字修改，缺少对写作框架、选材逻辑的主动反思。</p>
+        <p class="body-copy"><strong>各班训练闭环落实不均衡：</strong>九年级习作修改完成率 89.1%，闭环实施成效突出；七年级修改完成率 61.5%，订正、复盘环节落实薄弱。整体来看，记叙文具备完整训练闭环，调查报告、读后感等文体缺少配套讲评与二次修改安排。</p>
+      </div>
+      <div class="teaching-review"><strong>教学复盘总结：</strong>本学期学校普遍落实「习作布置 — 习作批改 — 课堂讲评 — 自主二改」作文教学流程；训练总量充足，但年级、班级之间执行力度差距明显。下一阶段教研重点，推动学生从“单篇修改”转向“思维迭代”，完善全文体习作训练、讲评、修改一体化机制。</div>
+    </section>
+    <section class="section">
+      <div class="section-head"><span class="section-no">05</span><h2>关键优势与核心问题诊断</h2><i></i></div>
+      <p class="lead">全校记叙文教学体系成型，学生具备基础叙事能力与习作修改提升空间；写作核心短板集中在谋篇布局、素材思辨、多元文体驾驭，同时不同学段呈现差异化薄弱特征。</p>
+      <div class="grid-2" style="margin-top:1.5mm">
+        <div class="panel">
+          <div class="panel-kicker">整体优势</div>
+          <div class="diagnosis"><b>✓</b><div><h3>学生接纳写作指导的能力较强，修改提分通道通畅</h3><p>全校纳入二改流程习作中，68.7% 样本修改后得分上涨，学生可以快速吸收讲评意见，在语言、细节层面开展优化调整。</p></div></div>
+          <div class="diagnosis"><b>✓</b><div><h3>记叙文序列训练体系完善，学生基础写作底盘稳固</h3><p>长期系统的记叙文训练成效显现，绝大部分学生能够读懂题意、确立文章中心，具备基础叙事、场景描写与情感表达能力。</p></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-kicker" style="color:var(--orange)">共性核心问题</div>
+          <div class="diagnosis problem"><b>!</b><div><h3>篇章规划意识不足，素材组织与详略安排普遍失衡</h3><p>跨年级普遍存在叙事结构平铺直叙、主次不分；习惯罗列事件，难以聚焦核心情节展开，文章详略把控是长期共性难点。</p></div></div>
+          <div class="diagnosis problem"><b>!</b><div><h3>写作能力发展不均衡，思辨能力与非记叙文体存在明显短板</h3><p>学生写作能力高度集中于记叙文；面对读后感、研究报告等文体缺少方法储备；多数习作局限于记叙事件，缺少感悟提炼与多层次立意升华。</p></div></div>
+        </div>
+      </div>
+      <div class="grade-grid">
+        <article class="grade-card"><h3>六年级</h3><p>素材选择趋同，习惯于套用通用素材，缺少真实个性化素材挖掘。</p></article>
+        <article class="grade-card"><h3>七年级</h3><p>审题浅层化、段落排布无序，是全校偏题、结构混乱问题高发学段。</p></article>
+        <article class="grade-card"><h3>八年级</h3><p>细节丰富但主线模糊，容易出现素材游离，中心统领全篇的意识薄弱。</p></article>
+        <article class="grade-card"><h3>九年级</h3><p>写作框架成熟稳定，但构思趋于保守，创新表达、深度思辨较为稀缺。</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><span class="section-no">06</span><h2>分层改进与协同支持方案</h2><i></i></div>
+      <p class="lead">面向语文教研组、各年级备课组、全体语文教师，输出校级教研优化策略、分层教学指导方向、校本写作资源建设方案。</p>
+      <div class="grid-3" style="margin-top:1.8mm">
+        <article class="role-card detailed">
+          <span class="role">语文教研组层面</span>
+          <h3>教研组统筹搭建全域作文教研体系，完善校本写作课程框架</h3>
+          <ul>
+            <li>统筹构建阶梯式写作序列，补齐非记叙文体教学缺口，均衡记叙文、读后感、议论类、实践报告的训练配比。</li>
+            <li>建立全校统一的作文多维评价标准，依托多源习作数据开展常态化学情研判。</li>
+            <li>推进校本写作资源建设：汇编典型习作范例、共性问题诊疗清单、分层写作训练任务包。</li>
+            <li>搭建跨年级教研交流机制，组织优秀教学案例分享，打通六至九年级写作能力衔接。</li>
+          </ul>
+        </article>
+        <article class="role-card detailed">
+          <span class="role">各年级备课组层面</span>
+          <h3>备课组落实学段差异化教学，实施年级分层靶向训练</h3>
+          <ul>
+            <li>依据本年级写作短板定制专题讲评内容：七年级聚焦审题立意与篇章结构；八年级强化素材取舍与详略安排；九年级重点打磨立意升华与思辨表达；六年级侧重个性化素材挖掘。</li>
+            <li>规范「习作布置 — 批改 — 讲评 — 二次修改」完整教学闭环，持续提升各班习作修改完成率。</li>
+            <li>跟踪学生修改成效，重点监测写作方法能否迁移至新习作，建立年级习作追踪样本库。</li>
+            <li>开展班际学情对比研讨，帮扶薄弱班级补齐训练流程短板。</li>
+          </ul>
+        </article>
+        <article class="role-card detailed">
+          <span class="role">全体语文教师层面</span>
+          <h3>任课教师落实班级分层指导，以代表性习作检验学生真实掌握程度</h3>
+          <ul>
+            <li>区分优生、中等生、待提升群体设置差异化写作目标，实施分层辅导。</li>
+            <li>讲评突出结构性问题指导，引导学生不只修改词句，学会重构素材、调整文章布局。</li>
+            <li>持续追踪学生后续习作，检验详略安排、谋篇选材等改进要点是否稳定保持。</li>
+            <li>做好习作过程留痕，借助多维度评分数据定位个体高频写作问题，开展精准反馈。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><span class="section-no">07</span><h2>发展期待</h2><i></i></div>
+      <div class="expectation">
+        <p>期待学校语文教研组持续依托多源习作数据开展常态化学情诊断，巩固本学期记叙文教学体系建设、习作修改闭环落地等阶段性成果；持续聚焦学生谋篇布局、素材思辨、多元文体运用等核心能力短板，推动写作指导从文字润色转向思维训练，引导学生把单次习作修改收获转化为稳定可迁移的写作能力。下一阶段稳步完善六至九年级阶梯式写作校本课程，均衡各类文体训练布局，分层落实学段写作目标，推动全校初中写作教学均衡提质，助力不同层次学生在写作学习中更加自信、稳定、从容地实现成长突破。</p>
+      </div>
+    </section>
+    <div class="source-note">优势、问题、分层支持方案与发展期待按教研报告学校部分原文呈现 · 编制单位：飞象老师 · 2026年7月</div>
+  </article>
+
+  <script>
+    (() => {
+      const fit = () => {
+        if (matchMedia('print').matches) return;
+        const pages = document.querySelectorAll('.page');
+        const scale = Math.min(1, (innerWidth - 20) / 793.7);
+        pages.forEach(page => {
+          page.style.zoom = scale;
+        });
+      };
+      fit();
+      addEventListener('resize', fit);
+    })();
+  </script>
+</body>
+</html>
