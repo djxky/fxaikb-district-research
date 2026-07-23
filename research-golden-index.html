@@ -61,6 +61,12 @@
       <button class="query-suggestion" type="button" data-query="帮我分析这个学校的作文数据">
         <span>帮我分析这个学校的作文数据</span>
       </button>
+      <button class="query-suggestion" type="button" data-query="帮我分析这个学校七年级本学期的作文数据">
+        <span>帮我分析这个学校七年级本学期的作文数据</span>
+      </button>
+      <button class="query-suggestion" type="button" data-query="九年级2班本学期的作文数据反映出哪些问题？">
+        <span>九年级2班本学期的作文数据反映出哪些问题？</span>
+      </button>
     </div>
 
     <section class="section">
@@ -232,6 +238,16 @@
       if (query === '帮我分析这个学校的作文数据') {
         const params = new URLSearchParams({ q: query, school: 'shanghai-keller' });
         location.href = `research-writing-school.html?${params.toString()}`;
+        return;
+      }
+      if (/七年级/.test(query) && /作文/.test(query)) {
+        const params = new URLSearchParams({ q: query, school: 'shanghai-keller', grade: '7' });
+        location.href = `research-writing-grade.html?${params.toString()}`;
+        return;
+      }
+      if (/九年级\s*2班|九年级2班/.test(query) && /作文/.test(query)) {
+        const params = new URLSearchParams({ q: query, school: 'shanghai-keller', grade: '9', class: '2' });
+        location.href = `research-writing-class.html?${params.toString()}`;
         return;
       }
       const targets = { v1: 'research-golden.html', v2: 'research-golden-v2.html', v3: 'research-golden-v3.html', v4: 'research-golden-v4.html' };

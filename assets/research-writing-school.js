@@ -333,7 +333,7 @@
     }
   }
 
-  const REPORT_URL = 'assets/shanghai-keller-school-writing-report.html?v=school-writing-v4-05';
+  const REPORT_URL = 'assets/shanghai-keller-school-writing-report.html?v=school-writing-v4-06';
 
   function renderReport() {
     $('reportDocument').innerHTML = `<iframe class="v4-report-frame" title="上海民办克勒外国语学校本学期初中语文学科作文综合分析报告" src="${REPORT_URL}"></iframe>`;
