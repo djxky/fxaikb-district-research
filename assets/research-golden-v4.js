@@ -111,9 +111,19 @@
 
   function scrollLatest(force = false) {
     const scroll = () => {
-      const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 220;
+      const scrollingElement = document.scrollingElement || document.documentElement || document.body;
+      const maxScrollHeight = Math.max(
+        document.documentElement.scrollHeight,
+        document.body ? document.body.scrollHeight : 0,
+        scrollingElement ? scrollingElement.scrollHeight : 0
+      );
+      const currentScroll = window.scrollY || document.documentElement.scrollTop || (document.body ? document.body.scrollTop : 0);
+      const nearBottom = window.innerHeight + currentScroll >= maxScrollHeight - 220;
       if (force || nearBottom || state.quick) {
-        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: state.reducedMotion ? 'auto' : 'smooth' });
+        const behavior = state.reducedMotion ? 'auto' : 'smooth';
+        window.scrollTo({ top: maxScrollHeight, behavior });
+        [scrollingElement, document.documentElement, document.body].filter(Boolean).forEach(element => { element.scrollTop = maxScrollHeight; });
+        $('finishMessage')?.scrollIntoView({ block: 'end', behavior });
       }
     };
     if (force) {
